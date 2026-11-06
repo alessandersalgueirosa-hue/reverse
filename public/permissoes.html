@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Permissões - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .pyside-button {
+            transition: all 0.2s ease;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+        .pyside-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2);
+        }
+    </style>
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            /* No celular, os submenus ficam sempre abertos para facilitar o toque */
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+            
+    <!-- MENU ADMIN -->
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white font-bold text-orange-400">Permissões</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MENU CLIENTE -->
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            if (isCliente) {
+                document.getElementById('menu-admin').style.display = 'none';
+                document.getElementById('menu-cliente').classList.remove('hidden');
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
+                };
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+            } else {
+                document.getElementById('menu-cliente').style.display = 'none';
+                document.getElementById('menu-admin').classList.remove('hidden');
+            }
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <main class="max-w-4xl mx-auto p-4 md:p-8">
+        
+        <!-- Cabeçalho da Página -->
+        <div class="flex items-center gap-4 mb-8 bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+            <div class="p-3 bg-orange-500/20 rounded-lg text-orange-500">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Gestão de Permissões</h1>
+                <p class="text-slate-400 text-sm">Controle o que cada cliente pode acessar no Portal.</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-8">
+            <label class="block text-sm font-medium mb-2 text-slate-300">Selecione o Cliente para Configurar</label>
+            <select id="selectCliente" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white text-lg focus:outline-none focus:border-orange-500 transition-colors">
+                <option value="">Carregando clientes...</option>
+            </select>
+        </div>
+
+        <form id="formPermissoes" class="hidden space-y-6">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                    <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h2 class="text-xl font-bold text-white">Módulos Permitidos</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex items-center gap-3 bg-slate-800 p-4 rounded-lg border border-slate-700 cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" id="p_metricas" class="w-5 h-5 accent-orange-500">
+                        <span class="text-white font-medium">Métricas de Tráfego</span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-slate-800 p-4 rounded-lg border border-slate-700 cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" id="p_financeiro" class="w-5 h-5 accent-orange-500">
+                        <span class="text-white font-medium">Financeiro</span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-slate-800 p-4 rounded-lg border border-slate-700 cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" id="p_calendario" class="w-5 h-5 accent-orange-500">
+                        <span class="text-white font-medium">Calendário Editorial</span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-slate-800 p-4 rounded-lg border border-slate-700 cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" id="p_branding" class="w-5 h-5 accent-orange-500">
+                        <span class="text-white font-medium">Branding</span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-slate-800 p-4 rounded-lg border border-slate-700 cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" id="p_propostas" class="w-5 h-5 accent-orange-500">
+                        <span class="text-white font-medium">Propostas</span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-slate-800 p-4 rounded-lg border border-slate-700 cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" id="p_campanhas" class="w-5 h-5 accent-orange-500">
+                        <span class="text-white font-medium">Campanhas</span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-slate-800 p-4 rounded-lg border border-slate-700 cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" id="p_tarefas" class="w-5 h-5 accent-orange-500">
+                        <span class="text-white font-medium">Tarefas</span>
+                    </label>
+                </div>
+
+                <div class="flex justify-end mt-6">
+                    <button type="submit" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Salvar Permissões
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        async function carregarClientes() {
+            try {
+                const res = await fetch('/api/clientes', { headers: { 'Authorization': `Bearer ${token}` } });
+                const clientes = await res.json();
+                const select = document.getElementById('selectCliente');
+                select.innerHTML = '<option value="">Selecione um cliente...</option>';
+                clientes.forEach(c => {
+                    select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+                });
+            } catch (error) { console.error('Erro ao carregar clientes:', error); }
+        }
+
+        document.getElementById('selectCliente').addEventListener('change', async function() {
+            const id = this.value;
+            if (!id) return document.getElementById('formPermissoes').classList.add('hidden');
+            document.getElementById('formPermissoes').classList.remove('hidden');
+
+            try {
+                const res = await fetch(`/api/permissoes/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const p = await res.json();
+
+                document.getElementById('p_metricas').checked = p.pode_ver_metricas ?? true;
+                document.getElementById('p_financeiro').checked = p.pode_ver_financeiro ?? true;
+                document.getElementById('p_calendario').checked = p.pode_ver_calendario ?? true;
+                document.getElementById('p_branding').checked = p.pode_ver_branding ?? true;
+                document.getElementById('p_propostas').checked = p.pode_ver_propostas ?? false;
+                document.getElementById('p_campanhas').checked = p.pode_ver_campanhas ?? false;
+                document.getElementById('p_tarefas').checked = p.pode_ver_tarefas ?? true;
+            } catch (error) { console.error('Erro ao carregar permissões:', error); }
+        });
+
+        document.getElementById('formPermissoes').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('selectCliente').value;
+            if (!id) return;
+
+            const dados = {
+                pode_ver_metricas: document.getElementById('p_metricas').checked,
+                pode_ver_financeiro: document.getElementById('p_financeiro').checked,
+                pode_ver_calendario: document.getElementById('p_calendario').checked,
+                pode_ver_branding: document.getElementById('p_branding').checked,
+                pode_ver_propostas: document.getElementById('p_propostas').checked,
+                pode_ver_campanhas: document.getElementById('p_campanhas').checked,
+                pode_ver_tarefas: document.getElementById('p_tarefas').checked
+            };
+
+            try {
+                const res = await fetch(`/api/permissoes/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(dados)
+                });
+
+                if (res.ok) alert('Permissões salvas com sucesso!');
+                else alert('Erro ao salvar permissões.');
+            } catch (error) { alert('Erro de conexão.'); }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarClientes);
+    </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+
+</body>
+</html>

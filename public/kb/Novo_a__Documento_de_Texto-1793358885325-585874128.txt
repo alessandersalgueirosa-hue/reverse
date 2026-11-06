@@ -1,0 +1,9 @@
+De acordo com as informações mais recentes (outubro de 2026), os seguintes modelos são gratuitos na camada gratuita da API Gemini:
+
+    Série Flash: Gemini 3.8 Flash, Gemini 3.6 Flash
+
+    Série Flash-Lite: Gemini 3.5 Flash-Lite, Gemini 3.1 Flash-Lite
+
+    Série Live/Voice: Gemini 3.8 Live, Gemini 3.5 Live Translate, etc.
+
+    Modelos legados: Gemini 2.5 Pro, Gemini 2.5 Flash (requer atenção: novos projetos podem não conseguir acessá-los)

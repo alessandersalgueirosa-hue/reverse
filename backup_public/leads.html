@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funil de Vendas (Leads) - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="bg-orange-500 rounded-full w-8 h-8 flex items-center justify-center font-bold text-white">R</div>
+            <h1 class="text-xl font-bold">Funil de Vendas</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="/admin.html" class="text-sm text-slate-400 hover:text-white">Dashboard</a>
+            <a href="/clientes.html" class="text-sm text-slate-400 hover:text-white">Clientes</a>
+            <a href="/campanhas.html" class="text-sm text-slate-400 hover:text-white">Campanhas</a>
+            <button id="btnSair" class="text-sm text-slate-400 hover:text-white">Sair</button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-8">
+        <!-- Cabeçalho e Filtros -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold mb-2">Gerenciamento de Leads</h2>
+                <p class="text-slate-400">Acompanhe a jornada dos seus contatos até se tornarem clientes.</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                <input type="text" id="buscarLead" placeholder="Buscar por nome, e-mail ou empresa..." 
+                    class="bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 w-full md:w-64">
+                
+                <select id="filtroStatus" class="bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-orange-500">
+                    <option value="todos">Todos os Status</option>
+                    <option value="novo">Novos</option>
+                    <option value="em_atendimento">Em Atendimento</option>
+                    <option value="atendido">Atendidos</option>
+                    <option value="convertido">Convertidos</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabela -->
+        <div class="bg-slate-900 rounded-lg shadow-lg overflow-x-auto border border-slate-800">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                        <th class="p-4">Lead</th>
+                        <th class="p-4">Contato</th>
+                        <th class="p-4">Origem</th>
+                        <th class="p-4 w-48">Status / Funil</th>
+                        <th class="p-4 w-64">Tags</th>
+                        <th class="p-4 text-center w-40">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaLeads" class="divide-y divide-slate-800">
+                    <tr><td colspan="6" class="p-4 text-center text-slate-400">Carregando leads...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal de Conversão para Cliente -->
+    <div id="modalConversao" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-700 w-96 shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-white">Converter em Cliente</h3>
+            <p class="text-sm text-slate-400 mb-4">Complete os dados obrigatórios para gerar o cadastro deste cliente.</p>
+            
+            <input type="hidden" id="leadIdConversao">
+            
+            <label class="block text-sm text-slate-400 mb-1">Tipo de Pessoa</label>
+            <select id="tipoCliente" class="w-full p-2 mb-3 bg-slate-800 border border-slate-600 rounded text-white">
+                <option value="PF">Pessoa Física (PF)</option>
+                <option value="PJ">Pessoa Jurídica (PJ)</option>
+            </select>
+
+            <label class="block text-sm text-slate-400 mb-1">CPF ou CNPJ *</label>
+            <input type="text" id="cpfCnpj" placeholder="Apenas números" class="w-full p-2 mb-4 bg-slate-800 border border-slate-600 rounded text-white">
+
+            <div class="flex justify-end gap-2">
+                <button onclick="fecharModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white">Cancelar</button>
+                <button onclick="salvarCliente()" class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded text-white font-bold">Confirmar Conversão</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login.html';
+
+        let todosOsLeads = [];
+        let todasAsTags = [];
+
+        async function carregarLeads() {
+            try {
+                const [resLeads, resTags] = await Promise.all([
+                    fetch('/api/leads', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/tags', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                
+                todosOsLeads = await resLeads.json();
+                todasAsTags = await resTags.json();
+                
+                aplicarFiltros();
+            } catch (error) {
+                console.error(error);
+                document.getElementById('tabelaLeads').innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-400">Erro ao carregar leads.</td></tr>';
+            }
+        }
+
+        function aplicarFiltros() {
+            const termo = document.getElementById('buscarLead').value.toLowerCase();
+            const status = document.getElementById('filtroStatus').value;
+
+            const filtrados = todosOsLeads.filter(l => {
+                const matchTexto = l.nome.toLowerCase().includes(termo) || 
+                                   (l.email && l.email.toLowerCase().includes(termo)) || 
+                                   (l.empresa && l.empresa.toLowerCase().includes(termo));
+                
+                const matchStatus = status === 'todos' || l.status === status;
+                
+                return matchTexto && matchStatus;
+            });
+
+            renderizarTabela(filtrados);
+        }
+
+        function renderizarTabela(leads) {
+            const tbody = document.getElementById('tabelaLeads');
+            tbody.innerHTML = '';
+
+            if (leads.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhum lead encontrado com esses filtros.</td></tr>';
+                return;
+            }
+
+            leads.forEach(l => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition-colors';
+                
+                // Dropdown de Status
+                const statusSelect = `
+                    <select onchange="alterarStatus(${l.id}, this.value)" class="w-full p-2 bg-slate-800 border border-slate-600 rounded text-white text-sm">
+                        <option value="novo" ${l.status === 'novo' ? 'selected' : ''}>Novo</option>
+                        <option value="em_atendimento" ${l.status === 'em_atendimento' ? 'selected' : ''}>Em Atendimento</option>
+                        <option value="atendido" ${l.status === 'atendido' ? 'selected' : ''}>Atendido</option>
+                        <option value="convertido" ${l.status === 'convertido' ? 'selected' : ''}>Convertido</option>
+                    </select>
+                `;
+
+                // Tags do Lead (com botão de remover)
+                const tagsHtml = l.tags && l.tags.length > 0 
+                    ? l.tags.map(t => `
+                        <span class="bg-blue-500/20 text-blue-400 text-xs px-2 py-1 rounded border border-blue-500/30 flex items-center gap-1">
+                            ${t.nome}
+                            <button onclick="removerTag(${l.id}, ${t.id})" class="hover:text-red-400 font-bold ml-1" title="Remover Tag">&times;</button>
+                        </span>`).join(' ')
+                    : '<span class="text-slate-500 text-xs italic">Sem tags</span>';
+
+                // Botão de Converter
+                const btnConverter = !l.cliente_id 
+                    ? `<button onclick="abrirModalConversao(${l.id})" class="text-green-500 hover:text-green-400 text-xs font-bold block mb-2 border border-green-500/50 py-1 px-2 rounded w-full">Converter em Cliente</button>`
+                    : `<span class="text-green-500 text-xs font-bold block mb-2">✓ Já é Cliente</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-4">
+                        <p class="font-bold text-white">${l.nome}</p>
+                        <p class="text-xs text-slate-400">${l.empresa || ''}</p>
+                    </td>
+                    <td class="p-4 text-sm">
+                        <p class="text-slate-300">${l.email || '-'}</p>
+                        <p class="text-slate-400">${l.telefone || '-'}</p>
+                    </td>
+                    <td class="p-4 text-sm text-slate-300">${l.origem || '-'}</td>
+                    <td class="p-4">${statusSelect}</td>
+                    <td class="p-4">
+                        <div class="flex flex-wrap gap-1 mb-2">${tagsHtml}</div>
+                        <button onclick="adicionarTag(${l.id})" class="text-orange-400 hover:text-orange-300 text-xs font-semibold border border-orange-500/30 px-2 py-1 rounded">+ Adicionar Tag</button>
+                    </td>
+                    <td class="p-4 text-center">
+                        ${btnConverter}
+                        <button onclick="excluirLead(${l.id})" class="text-red-500 hover:text-red-400 text-xs font-bold">Excluir Lead</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- AÇÕES ---
+
+        async function alterarStatus(id, novoStatus) {
+            try {
+                await fetch(`/api/leads/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status: novoStatus })
+                });
+                // Atualiza o array local para não precisar recarregar tudo
+                const lead = todosOsLeads.find(l => l.id === id);
+                if (lead) lead.status = novoStatus;
+            } catch (error) {
+                alert('Erro ao alterar status.');
+            }
+        }
+
+        async function adicionarTag(leadId) {
+            const nomeTag = prompt("Digite o nome da nova tag (ex: VIP, Interessado, Black Friday):");
+            if (!nomeTag || nomeTag.trim() === '') return;
+
+            try {
+                // 1. Cria a tag (se não existir)
+                const resTag = await fetch('/api/tags', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ nome: nomeTag.trim() })
+                });
+                
+                let tagId;
+                if (resTag.status === 201 || resTag.status === 409) {
+                    const tagsAtuais = await (await fetch('/api/tags', { headers: { 'Authorization': `Bearer ${token}` } })).json();
+                    const tagEncontrada = tagsAtuais.find(t => t.nome.toLowerCase() === nomeTag.trim().toLowerCase());
+                    if (tagEncontrada) tagId = tagEncontrada.id;
+                }
+
+                // 2. Vincula a tag ao lead
+                if (tagId) {
+                    await fetch(`/api/leads/${leadId}/tags`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ tag_id: tagId })
+                    });
+                    carregarLeads();
+                }
+            } catch (error) {
+                alert('Erro ao adicionar tag.');
+            }
+        }
+
+        async function removerTag(leadId, tagId) {
+            if (!confirm('Deseja remover esta tag deste lead?')) return;
+            try {
+                await fetch(`/api/leads/${leadId}/tags/${tagId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                carregarLeads();
+            } catch (error) {
+                alert('Erro ao remover tag.');
+            }
+        }
+
+        async function excluirLead(id) {
+            if (!confirm('Tem certeza que deseja excluir este lead?')) return;
+            try {
+                await fetch(`/api/leads/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                carregarLeads();
+            } catch (error) {
+                alert('Erro ao excluir lead.');
+            }
+        }
+
+        // --- CONVERSÃO DE CLIENTE ---
+        function abrirModalConversao(id) {
+            document.getElementById('leadIdConversao').value = id;
+            document.getElementById('modalConversao').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalConversao').classList.add('hidden');
+            document.getElementById('cpfCnpj').value = '';
+        }
+
+        async function salvarCliente() {
+            const id = document.getElementById('leadIdConversao').value;
+            const lead = todosOsLeads.find(l => l.id == id);
+            const tipo = document.getElementById('tipoCliente').value;
+            const cpfCnpj = document.getElementById('cpfCnpj').value;
+
+            if (!cpfCnpj) return alert('O CPF ou CNPJ é obrigatório.');
+
+            const dadosCliente = {
+                tipo: tipo,
+                nome: lead.nome,
+                email: lead.email,
+                telefone: lead.telefone,
+                cpf: tipo === 'PF' ? cpfCnpj : null,
+                cnpj: tipo === 'PJ' ? cpfCnpj : null,
+                observacoes: `Convertido a partir do Lead #${lead.id}`
+            };
+
+            try {
+                // 1. Cria o cliente
+                const resCliente = await fetch('/api/clientes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(dadosCliente)
+                });
+
+                if (!resCliente.ok) throw new Error('Erro ao criar cliente');
+
+                const clienteCriado = await resCliente.json();
+                
+                // 2. Atualiza o Lead com o cliente_id e status 'convertido'
+                await fetch(`/api/leads/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status: 'convertido', cliente_id: clienteCriado.cliente.id })
+                });
+
+                fecharModal();
+                carregarLeads();
+                alert('Lead convertido em cliente com sucesso!');
+
+            } catch (error) {
+                alert('Erro ao converter. Verifique se o CPF/CNPJ já está cadastrado.');
+            }
+        }
+
+        // Eventos de Filtro
+        document.getElementById('buscarLead').addEventListener('input', aplicarFiltros);
+        document.getElementById('filtroStatus').addEventListener('change', aplicarFiltros);
+
+        document.getElementById('btnSair').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        carregarLeads();
+    </script>
+</body>
+</html>

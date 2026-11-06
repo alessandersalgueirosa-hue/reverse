@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campanhas - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="bg-orange-500 rounded-full w-8 h-8 flex items-center justify-center font-bold text-white">R</div>
+            <h1 class="text-xl font-bold">Campanhas</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="/admin.html" class="text-sm text-slate-400 hover:text-white">Dashboard</a>
+            <a href="/clientes.html" class="text-sm text-slate-400 hover:text-white">Clientes</a>
+            <a href="/calculadora-trafego.html" class="text-sm text-slate-400 hover:text-white">Calculadora de Tráfego</a>
+            <a href="/prospects.html" class="text-sm text-slate-400 hover:text-white">Prospects</a>
+            <a href="/redes_sociais.html" class="text-sm text-slate-400 hover:text-white">Redes Sociais</a>
+            <button id="btnSair" class="text-sm text-slate-400 hover:text-white">Sair</button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-8">
+        <!-- Formulário -->
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-8">
+            <h2 class="text-2xl font-extrabold mb-4">Nova Campanha</h2>
+            <form id="formCampanha" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1">Nome da Campanha</label>
+                    <input type="text" id="nome" required placeholder="Ex: Black Friday 2026" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1">Descrição</label>
+                    <textarea id="descricao" rows="2" placeholder="Descreva o objetivo da campanha..." class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Data de Início</label>
+                    <input type="date" id="data_inicio" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Data de Fim</label>
+                    <input type="date" id="data_fim" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Orçamento (R$)</label>
+                    <input type="number" step="0.01" id="orcamento" placeholder="0.00" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Cliente Vinculado</label>
+                    <select id="cliente_id" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white">
+                        <option value="">Nenhum</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2 flex justify-end mt-2">
+                    <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg">Criar Campanha</button>
+                </div>
+            </form>
+            <div id="feedback" class="hidden mt-4 p-3 rounded-lg text-center font-bold"></div>
+        </div>
+
+        <!-- Tabela -->
+        <div class="mb-4">
+            <h2 class="text-2xl font-extrabold mb-1">Campanhas Cadastradas</h2>
+            <p class="text-slate-400 text-sm">Gerencie suas campanhas de marketing.</p>
+        </div>
+
+        <div class="bg-slate-900 rounded-lg shadow-lg overflow-x-auto border border-slate-800">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Nome</th>
+                        <th class="p-4">Cliente</th>
+                        <th class="p-4">Orçamento</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaCampanhas" class="divide-y divide-slate-800">
+                    <tr><td colspan="6" class="p-4 text-center text-slate-400">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login.html';
+
+        async function carregarClientes() {
+            try {
+                const res = await fetch('/api/clientes', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) return;
+                const clientes = await res.json();
+                const select = document.getElementById('cliente_id');
+                clientes.forEach(c => {
+                    select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar clientes', error);
+            }
+        }
+
+        async function carregarCampanhas() {
+            try {
+                const res = await fetch('/api/campanhas', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) throw new Error('Falha ao buscar campanhas');
+                const campanhas = await res.json();
+                renderizarTabela(campanhas);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('tabelaCampanhas').innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-400">Erro ao carregar campanhas.</td></tr>';
+            }
+        }
+
+        function renderizarTabela(campanhas) {
+            const tbody = document.getElementById('tabelaCampanhas');
+            tbody.innerHTML = '';
+
+            if (campanhas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhuma campanha cadastrada.</td></tr>';
+                return;
+            }
+
+            campanhas.forEach(c => {
+                const orcamento = parseFloat(c.orcamento || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-4 text-slate-400">${c.id}</td>
+                    <td class="p-4 font-bold">${c.nome}</td>
+                    <td class="p-4 text-slate-300">${c.cliente_nome || 'Sem cliente'}</td>
+                    <td class="p-4 text-slate-300">${orcamento}</td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold bg-blue-500/20 text-blue-400">${c.status || 'Ativa'}</span></td>
+                    <td class="p-4">
+                        <button onclick="excluirCampanha(${c.id})" class="text-red-500 hover:text-red-400 text-sm">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('formCampanha').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'hidden';
+
+            const dados = {
+                nome: document.getElementById('nome').value,
+                descricao: document.getElementById('descricao').value || null,
+                data_inicio: document.getElementById('data_inicio').value || null,
+                data_fim: document.getElementById('data_fim').value || null,
+                orcamento: document.getElementById('orcamento').value || null,
+                cliente_id: document.getElementById('cliente_id').value || null
+            };
+
+            try {
+                const res = await fetch('/api/campanhas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(dados)
+                });
+                
+                if (!res.ok) throw new Error('Falha ao salvar');
+                
+                feedback.textContent = 'Campanha criada com sucesso!';
+                feedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-green-600 text-white';
+                document.getElementById('formCampanha').reset();
+                carregarCampanhas();
+            } catch (error) {
+                feedback.textContent = 'Erro ao criar campanha.';
+                feedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-red-600 text-white';
+            }
+        });
+
+        async function excluirCampanha(id) {
+            if (!confirm('Excluir esta campanha?')) return;
+            try {
+                await fetch(`/api/campanhas/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                carregarCampanhas();
+            } catch (error) {
+                alert('Erro ao excluir.');
+            }
+        }
+
+        document.getElementById('btnSair').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        // Inicialização
+        carregarClientes();
+        carregarCampanhas();
+    </script>
+</body>
+</html>

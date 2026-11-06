@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="bg-orange-500 rounded-full w-8 h-8 flex items-center justify-center font-bold text-white">R</div>
+            <h1 class="text-xl font-bold">Dashboard - Reverse Marketing</h1>
+        </div>
+        <button id="btnSair" class="text-sm text-slate-400 hover:text-white transition-colors">Sair</button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto p-8">
+        
+        <!-- Cards de Métricas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <p class="text-slate-400 text-sm font-medium mb-1">Total de Leads</p>
+                <p id="totalLeads" class="text-4xl font-extrabold text-white">0</p>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <p class="text-yellow-400 text-sm font-medium mb-1">Pendentes</p>
+                <p id="leadsPendentes" class="text-4xl font-extrabold text-yellow-400">0</p>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <p class="text-green-400 text-sm font-medium mb-1">Atendidos</p>
+                <p id="leadsAtendidos" class="text-4xl font-extrabold text-green-400">0</p>
+            </div>
+        </div>
+
+        <!-- Tabela -->
+        <div class="mb-4">
+            <h2 class="text-2xl font-extrabold mb-1">Leads Recentes</h2>
+            <p class="text-slate-400">Visualize e gerencie os leads capturados.</p>
+        </div>
+
+        <div class="bg-slate-900 rounded-lg shadow-lg overflow-hidden border border-slate-800">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Nome</th>
+                        <th class="p-4">E-mail</th>
+                        <th class="p-4">Mensagem</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaLeads" class="divide-y divide-slate-800">
+                    <!-- Linhas inseridas via JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // Verifica autenticação
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/login.html';
+        }
+
+        // Função para carregar os leads e calcular os cards
+        async function carregarLeads() {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch('/api/leads', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Falha ao buscar leads');
+
+                const leads = await response.json();
+
+                // 1. Atualiza os Cards de Métricas
+                const total = leads.length;
+                const pendentes = leads.filter(l => l.status === 'pendente' || !l.status).length;
+                const atendidos = leads.filter(l => l.status === 'atendido').length;
+
+                document.getElementById('totalLeads').textContent = total;
+                document.getElementById('leadsPendentes').textContent = pendentes;
+                document.getElementById('leadsAtendidos').textContent = atendidos;
+
+                // 2. Preenche a Tabela
+                const tbody = document.getElementById('tabelaLeads');
+                tbody.innerHTML = '';
+
+                leads.forEach(lead => {
+                    const statusColor = lead.status === 'atendido' 
+                        ? 'text-green-400 bg-green-400/10' 
+                        : 'text-yellow-400 bg-yellow-400/10';
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-800/50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="p-4 text-slate-400">${lead.id}</td>
+                        <td class="p-4 font-medium">${lead.nome}</td>
+                        <td class="p-4 text-blue-400">${lead.email}</td>
+                        <td class="p-4 text-slate-300 max-w-xs truncate">${lead.mensagem}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${statusColor}">${lead.status || 'pendente'}</span></td>
+                        <td class="p-4 flex gap-2">
+                            <button onclick="atenderLead(${lead.id})" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">Atender</button>
+                            <button onclick="excluirLead(${lead.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors">Excluir</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar dados. Verifique o console.');
+            }
+        }
+
+        // Funções de Ação
+        async function atenderLead(id) {
+            if (!confirm('Marcar como atendido?')) return;
+            const token = localStorage.getItem('token');
+            await fetch(`/api/leads/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+            carregarLeads();
+        }
+
+        async function excluirLead(id) {
+            if (!confirm('Excluir este lead?')) return;
+            const token = localStorage.getItem('token');
+            await fetch(`/api/leads/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            carregarLeads();
+        }
+
+        // Botão Sair
+        document.getElementById('btnSair').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        // Inicializa a página
+        carregarLeads();
+    </script>
+</body>
+</html>

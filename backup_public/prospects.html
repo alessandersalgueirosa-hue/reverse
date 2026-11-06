@@ -1,0 +1,533 @@
+﻿﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prospects - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0f172a; min-height: 100vh; }
+        .input-field { width: 100%; padding: 0.75rem 1rem; background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; color: #f8fafc; font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; }
+        .input-field:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25); }
+        .input-field::placeholder { color: #64748b; }
+        .status-novo { background: #3b82f6; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-contatado { background: #eab308; color: #1e293b; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-qualificado { background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-perdido { background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+    </style>
+    <link rel="icon" type="image/png" href="/logo.png">
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+            
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            
+            if (isCliente) {
+                const menuAdminEl = document.getElementById('menu-admin');
+                if (menuAdminEl) menuAdminEl.style.display = 'none';
+                
+                const menuClienteEl = document.getElementById('menu-cliente');
+                if (menuClienteEl) menuClienteEl.classList.remove('hidden');
+                
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a');
+                    a.href = href;
+                    a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors';
+                    a.innerText = texto;
+                    nav.insertBefore(a, btnSair);
+                };
+
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+                
+            } else {
+                const menuClienteEl = document.getElementById('menu-cliente');
+                if (menuClienteEl) menuClienteEl.style.display = 'none';
+                
+                const menuAdminEl = document.getElementById('menu-admin');
+                if (menuAdminEl) menuAdminEl.classList.remove('hidden');
+            }
+            
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('permissoes');
+                    window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <main class="max-w-7xl mx-auto p-8">
+        <!-- Formulário -->
+        <div class="bg-slate-900 rounded-xl p-8 mb-8 border border-slate-800">
+            <h2 class="text-2xl font-bold mb-6">Novo Prospect</h2>
+            
+            <form id="prospectForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nome <span class="text-red-500">*</span></label>
+                        <input type="text" id="nome" required class="input-field" placeholder="Nome completo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">E-mail</label>
+                        <input type="email" id="email" class="input-field" placeholder="exemplo@empresa.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Telefone</label>
+                        <input type="text" id="telefone" class="input-field" placeholder="(00) 00000-0000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Empresa</label>
+                        <input type="text" id="empresa" class="input-field" placeholder="Nome da empresa">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Cargo</label>
+                        <input type="text" id="cargo" class="input-field" placeholder="Ex: Diretor">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Origem</label>
+                        <select id="origem" class="input-field">
+                            <option value="">Selecione...</option>
+                            <option value="Google">Google</option>
+                            <option value="Indicação">Indicação</option>
+                            <option value="Redes Sociais">Redes Sociais</option>
+                            <option value="Evento">Evento</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Status</label>
+                        <select id="status" class="input-field">
+                            <option value="novo">Novo</option>
+                            <option value="contatado">Contatado</option>
+                            <option value="qualificado">Qualificado</option>
+                            <option value="perdido">Perdido</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-2">Observações</label>
+                        <textarea id="observacoes" rows="2" class="input-field" placeholder="Observações..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">Salvar Prospect</button>
+            </form>
+        </div>
+
+        <!-- Tabela de Prospects -->
+        <div class="bg-slate-900 rounded-xl p-8 border border-slate-800">
+            <h2 class="text-2xl font-bold mb-6">Prospects Cadastrados</h2>
+            
+            <div class="mb-4 flex gap-3 flex-wrap">
+                <input type="text" id="buscarProspect" placeholder="Buscar por nome ou e-mail..." class="input-field w-64">
+                <select id="filtrarStatus" class="input-field w-auto">
+                    <option value="">Todos os Status</option>
+                    <option value="novo">Novo</option>
+                    <option value="contatado">Contatado</option>
+                    <option value="qualificado">Qualificado</option>
+                    <option value="perdido">Perdido</option>
+                </select>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                            <th class="p-4">ID</th>
+                            <th class="p-4">Nome</th>
+                            <th class="p-4">E-mail</th>
+                            <th class="p-4">Telefone</th>
+                            <th class="p-4">Empresa</th>
+                            <th class="p-4">Cargo</th>
+                            <th class="p-4">Origem</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaProspects" class="divide-y divide-slate-800">
+                        <!-- Linhas inseridas via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Edição -->
+    <div id="modalEdicao" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 rounded-lg shadow-2xl border border-slate-800 w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-xl font-bold">Editar Prospect</h3>
+                <button id="fecharModalEdicao" class="text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1">
+                <form id="formEdicao">
+                    <input type="hidden" id="editId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Nome</label>
+                            <input type="text" id="editNome" required class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">E-mail</label>
+                            <input type="email" id="editEmail" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Telefone</label>
+                            <input type="text" id="editTelefone" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Empresa</label>
+                            <input type="text" id="editEmpresa" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Cargo</label>
+                            <input type="text" id="editCargo" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Origem</label>
+                            <select id="editOrigem" class="input-field">
+                                <option value="">Selecione...</option>
+                                <option value="Google">Google</option>
+                                <option value="Indicação">Indicação</option>
+                                <option value="Redes Sociais">Redes Sociais</option>
+                                <option value="Evento">Evento</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Status</label>
+                            <select id="editStatus" class="input-field">
+                                <option value="novo">Novo</option>
+                                <option value="contatado">Contatado</option>
+                                <option value="qualificado">Qualificado</option>
+                                <option value="perdido">Perdido</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-2">Observações</label>
+                            <textarea id="editObservacoes" rows="2" class="input-field"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors w-full">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/login.html';
+        }
+
+        const token = localStorage.getItem('token');
+        let todosOsProspects = [];
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getStatusClass(status) {
+            if (status === 'novo') return 'status-novo';
+            if (status === 'contatado') return 'status-contatado';
+            if (status === 'qualificado') return 'status-qualificado';
+            return 'status-perdido';
+        }
+
+        async function carregarProspects() {
+            try {
+                const response = await fetch('/api/prospects', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Falha ao buscar prospects');
+                todosOsProspects = await response.json();
+                renderizarTabela(todosOsProspects);
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar prospects.');
+            }
+        }
+
+        function renderizarTabela(prospects) {
+            const tbody = document.getElementById('tabelaProspects');
+            tbody.innerHTML = '';
+
+            if (prospects.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum prospect encontrado.</td></tr>`;
+                return;
+            }
+
+            prospects.forEach(p => {
+                const statusClass = getStatusClass(p.status);
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-4 text-slate-400">${p.id}</td>
+                    <td class="p-4 font-medium">${escapeHtml(p.nome)}</td>
+                    <td class="p-4 text-blue-400">${escapeHtml(p.email) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(p.telefone) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(p.empresa) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(p.cargo) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(p.origem) || '-'}</td>
+                    <td class="p-4"><span class="${statusClass}">${p.status}</span></td>
+                    <td class="p-4">
+                        <button onclick="abrirEdicao(${p.id})" class="text-cyan-400 hover:text-cyan-300 text-sm mr-2">Editar</button>
+                        <button onclick="excluirProspect(${p.id})" class="text-red-500 hover:text-red-400 text-sm">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('prospectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const dados = {
+                nome: document.getElementById('nome').value,
+                email: document.getElementById('email').value || null,
+                telefone: document.getElementById('telefone').value || null,
+                empresa: document.getElementById('empresa').value || null,
+                cargo: document.getElementById('cargo').value || null,
+                origem: document.getElementById('origem').value || null,
+                status: document.getElementById('status').value,
+                observacoes: document.getElementById('observacoes').value || null
+            };
+
+            try {
+                const response = await fetch('/api/prospects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(dados)
+                });
+                if (!response.ok) throw new Error('Falha ao criar prospect');
+                alert('Prospect salvo com sucesso!');
+                document.getElementById('prospectForm').reset();
+                carregarProspects();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao salvar prospect.');
+            }
+        });
+
+        function abrirEdicao(id) {
+            const p = todosOsProspects.find(x => x.id === id);
+            if (!p) return;
+
+            document.getElementById('editId').value = p.id;
+            document.getElementById('editNome').value = p.nome;
+            document.getElementById('editEmail').value = p.email || '';
+            document.getElementById('editTelefone').value = p.telefone || '';
+            document.getElementById('editEmpresa').value = p.empresa || '';
+            document.getElementById('editCargo').value = p.cargo || '';
+            document.getElementById('editOrigem').value = p.origem || '';
+            document.getElementById('editStatus').value = p.status;
+            document.getElementById('editObservacoes').value = p.observacoes || '';
+
+            document.getElementById('modalEdicao').classList.remove('hidden');
+        }
+
+        document.getElementById('fecharModalEdicao').addEventListener('click', () => {
+            document.getElementById('modalEdicao').classList.add('hidden');
+        });
+
+        document.getElementById('modalEdicao').addEventListener('click', (e) => {
+            if (e.target.id === 'modalEdicao') {
+                document.getElementById('modalEdicao').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('formEdicao').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const dados = {
+                nome: document.getElementById('editNome').value,
+                email: document.getElementById('editEmail').value || null,
+                telefone: document.getElementById('editTelefone').value || null,
+                empresa: document.getElementById('editEmpresa').value || null,
+                cargo: document.getElementById('editCargo').value || null,
+                origem: document.getElementById('editOrigem').value || null,
+                status: document.getElementById('editStatus').value,
+                observacoes: document.getElementById('editObservacoes').value || null
+            };
+
+            try {
+                const response = await fetch(`/api/prospects/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(dados)
+                });
+                if (!response.ok) throw new Error('Falha ao atualizar prospect');
+                alert('Prospect atualizado!');
+                document.getElementById('modalEdicao').classList.add('hidden');
+                carregarProspects();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao atualizar prospect.');
+            }
+        });
+
+        async function excluirProspect(id) {
+            if (!confirm('Excluir este prospect?')) return;
+            try {
+                const response = await fetch(`/api/prospects/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Falha ao excluir');
+                alert('Prospect excluído!');
+                carregarProspects();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao excluir prospect.');
+            }
+        }
+
+        function filtrarProspects() {
+            const termo = document.getElementById('buscarProspect').value.toLowerCase();
+            const status = document.getElementById('filtrarStatus').value;
+            const filtrados = todosOsProspects.filter(p => 
+                (p.nome.toLowerCase().includes(termo) || (p.email && p.email.toLowerCase().includes(termo))) &&
+                (!status || p.status === status)
+            );
+            renderizarTabela(filtrados);
+        }
+
+        document.getElementById('buscarProspect').addEventListener('input', filtrarProspects);
+        document.getElementById('filtrarStatus').addEventListener('change', filtrarProspects);
+
+        carregarProspects();
+    </script>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.tipo === 'cliente') {
+                    const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html', 'branding.html', 'permissoes.html'];
+                    
+                    const urlAtual = window.location.pathname.split('/').pop();
+                    
+                    if (paginasAdmin.includes(urlAtual)) {
+                        alert('Acesso negado. Esta área é restrita.');
+                        window.location.href = '/portal_cliente.html';
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+</body>
+</html>

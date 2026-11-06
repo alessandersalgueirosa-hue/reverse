@@ -1,0 +1,428 @@
+﻿﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campanhas - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .pyside-button {
+            transition: all 0.2s ease;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+        .pyside-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2);
+        }
+    </style>
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+            
+    <!-- MENU ADMIN -->
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white font-bold text-orange-400">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MENU CLIENTE -->
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            if (isCliente) {
+                document.getElementById('menu-admin').style.display = 'none';
+                document.getElementById('menu-cliente').classList.remove('hidden');
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
+                };
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+            } else {
+                document.getElementById('menu-cliente').style.display = 'none';
+                document.getElementById('menu-admin').classList.remove('hidden');
+            }
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <!-- Cabeçalho da Página -->
+        <div class="flex items-center gap-4 mb-8 bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+            <div class="p-3 bg-orange-500/20 rounded-lg text-orange-500">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Gestão de Campanhas</h1>
+                <p class="text-slate-400 text-sm">Gerencie suas campanhas de marketing e acompanhe os resultados.</p>
+            </div>
+        </div>
+
+        <!-- Formulário de Nova Campanha (Oculto para Clientes) -->
+        <div id="containerNovaCampanha" class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-8">
+            <div class="flex items-center justify-between mb-6 border-b border-slate-700 pb-4">
+                <div class="flex items-center gap-3">
+                    <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    <h2 class="text-xl font-bold text-white">Nova Campanha</h2>
+                </div>
+                <a href="/campanhas_mail.html" class="pyside-button bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    Disparo de E-mail
+                </a>
+            </div>
+
+            <form id="formCampanha" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Nome da Campanha *</label>
+                    <input type="text" id="nome" required placeholder="Ex: Black Friday 2026" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Descrição</label>
+                    <textarea id="descricao" rows="2" placeholder="Descreva o objetivo da campanha..." class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Data de Início</label>
+                    <input type="date" id="data_inicio" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Data de Fim</label>
+                    <input type="date" id="data_fim" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Orçamento (R$)</label>
+                    <input type="number" step="0.01" id="orcamento" placeholder="0.00" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Cliente Vinculado</label>
+                    <select id="cliente_id" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                        <option value="">Nenhum</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2 flex justify-end mt-2">
+                    <button type="submit" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Criar Campanha
+                    </button>
+                </div>
+            </form>
+            <div id="feedback" class="hidden mt-4 p-3 rounded-lg text-center font-bold"></div>
+        </div>
+
+        <!-- Tabela de Campanhas -->
+        <div class="bg-slate-900 rounded-lg border border-slate-800 shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                <h2 class="text-xl font-bold text-white">Campanhas Cadastradas</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                            <th class="p-4">ID</th>
+                            <th class="p-4">Nome</th>
+                            <th class="p-4">Cliente</th>
+                            <th class="p-4">Orçamento</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4 text-right" id="thAcoes">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaCampanhas" class="divide-y divide-slate-800">
+                        <tr><td colspan="6" class="p-4 text-center text-slate-400">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login.html';
+
+        let isCliente = false;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.tipo === 'cliente') isCliente = true;
+        } catch(e) {}
+
+        if (isCliente) {
+            document.getElementById('containerNovaCampanha').style.display = 'none';
+            document.getElementById('thAcoes').style.display = 'none';
+        }
+
+        async function carregarClientes() {
+            if (isCliente) return; // Clientes não precisam carregar a lista de clientes
+            try {
+                const res = await fetch('/api/clientes', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) return;
+                const clientes = await res.json();
+                const select = document.getElementById('cliente_id');
+                clientes.forEach(c => {
+                    select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+                });
+            } catch (error) { console.error('Erro ao carregar clientes', error); }
+        }
+
+        async function carregarCampanhas() {
+            try {
+                const res = await fetch('/api/campanhas', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) throw new Error('Falha ao buscar campanhas');
+                const campanhas = await res.json();
+                renderizarTabela(campanhas);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('tabelaCampanhas').innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-400">Erro ao carregar campanhas.</td></tr>';
+            }
+        }
+
+        function renderizarTabela(campanhas) {
+            const tbody = document.getElementById('tabelaCampanhas');
+            tbody.innerHTML = '';
+            if (campanhas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhuma campanha cadastrada.</td></tr>';
+                return;
+            }
+            campanhas.forEach(c => {
+                const orcamento = parseFloat(c.orcamento || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition-colors';
+                
+                // Se for cliente, não mostra a coluna de ações
+                const tdAcoes = isCliente ? '' : `<td class="p-4 text-right"><button onclick="excluirCampanha(${c.id})" class="text-red-500 hover:text-red-400 text-sm font-bold">Excluir</button></td>`;
+
+                tr.innerHTML = `
+                    <td class="p-4 text-slate-400">${c.id}</td>
+                    <td class="p-4 font-bold">${c.nome}</td>
+                    <td class="p-4 text-slate-300">${c.cliente_nome || 'Sem cliente'}</td>
+                    <td class="p-4 text-slate-300">${orcamento}</td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold bg-blue-500/20 text-blue-400">${c.status || 'Ativa'}</span></td>
+                    ${tdAcoes}
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('formCampanha').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'hidden';
+            const dados = {
+                nome: document.getElementById('nome').value,
+                descricao: document.getElementById('descricao').value || null,
+                data_inicio: document.getElementById('data_inicio').value || null,
+                data_fim: document.getElementById('data_fim').value || null,
+                orcamento: document.getElementById('orcamento').value || null,
+                cliente_id: document.getElementById('cliente_id').value || null
+            };
+            try {
+                const res = await fetch('/api/campanhas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(dados)
+                });
+                if (!res.ok) throw new Error('Falha ao salvar');
+                feedback.textContent = 'Campanha criada com sucesso!';
+                feedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-green-600 text-white';
+                document.getElementById('formCampanha').reset();
+                carregarCampanhas();
+            } catch (error) {
+                feedback.textContent = 'Erro ao criar campanha.';
+                feedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-red-600 text-white';
+            }
+        });
+
+        async function excluirCampanha(id) {
+            if (!confirm('Excluir esta campanha?')) return;
+            try {
+                await fetch(`/api/campanhas/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                carregarCampanhas();
+            } catch (error) { alert('Erro ao excluir.'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarClientes();
+            carregarCampanhas();
+        });
+    </script>
+
+    <!-- BLOQUEIO DE CLIENTE (Removido o campanhas.html da lista) -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.tipo === 'cliente') {
+                    // REMOVIDO 'campanhas.html' DESTA LISTA
+                    const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html', 'branding.html', 'permissoes.html'];
+                    const urlAtual = window.location.pathname.split('/').pop();
+                    if (paginasAdmin.includes(urlAtual)) {
+                        alert('Acesso negado. Esta área é restrita.');
+                        window.location.href = '/portal_cliente.html';
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,620 @@
+﻿﻿﻿<!DOCTYPE html>
+<html lang="pt-BR" data-tema="claro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Métricas de Tráfego Pago - Reverse Marketing</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --text:#101828; --muted:#667085; --border:#e4e7ec;
+  --accent:#2563eb; --accent-soft:#eff4ff; --chip:#f2f4f7; --hover:#f9fafb;
+  --mark:#fde68a; --mark-txt:#422006; --radius:12px;
+  --ok:#16a34a; --ruim:#dc2626;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.08);
+}
+html[data-tema="escuro"]{
+  --bg:#0f172a; --card:#1e293b; --text:#f8fafc; --muted:#94a3b8; --border:#334155;
+  --accent:#3b82f6; --accent-soft:#1e3a8a; --chip:#0f172a; --hover:#334155;
+  --mark:#d97706; --mark-txt:#ffffff;
+  --ok:#22c55e; --ruim:#ef4444;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+body{background-color:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif;}
+.topo{padding:16px clamp(14px,4vw,40px) 14px; border-bottom:1px solid var(--border); margin-bottom:20px;}
+.barra{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.barra input[type="search"]{flex:1 1 260px;min-width:200px}
+.barra input,.barra select,.btn{font:inherit;font-size:14px;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px}
+.barra input:focus,.barra select:focus,.btn:focus-visible,.calc-grid input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.btn{cursor:pointer;transition:border-color .15s,color .15s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+main{padding:22px clamp(14px,4vw,40px) 60px;max-width:1240px;margin:0 auto}
+.dica{background:var(--accent-soft);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin:0 0 22px;font-size:14px}
+.dica strong{color:var(--accent)}
+.calculadora{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px 20px;margin:0 0 26px}
+.calculadora h2{display:flex;align-items:center;gap:8px;font-size:1.08rem;margin:0 0 4px}
+.cat-desc{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0 14px}
+.calc-grid label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.calc-grid input{font:inherit;font-size:14px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;width:100%}
+.calc-acoes{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.calc-resultados{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.calc-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--bg);display:flex;flex-direction:column;gap:2px}
+.calc-card.ok{border-color:var(--ok);border-left-width:4px}
+.calc-card.ruim{border-color:var(--ruim);border-left-width:4px}
+.calc-card.pendente{opacity:.72}
+.calc-nome{font-weight:700;font-size:13.5px;letter-spacing:.02em}
+.calc-rotulo{color:var(--muted);font-size:12.5px;margin:0 0 6px}
+.calc-valor{font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;margin:0 0 4px}
+.calc-valor.calc-pendente-txt{font-size:.92rem;font-weight:500;color:var(--muted)}
+.calc-meta{font-size:12.5px;margin:2px 0 4px;color:var(--ok);font-weight:600}
+.calc-meta.ruim{color:var(--ruim)}
+.calc-formula-mini{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:var(--muted);background:var(--chip);padding:3px 6px;border-radius:5px;display:inline-block;margin-top:auto;align-self:flex-start}
+.categoria{margin:0 0 30px}
+.categoria h2{display:flex;align-items:center;gap:10px;font-size:1.05rem;margin:0 0 4px}
+.categoria .icone{font-size:1.1rem}
+.badge{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:1px 9px}
+.tabela-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--hover)}
+td.nome{font-weight:600;min-width:165px}
+.formula{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;background:var(--chip);padding:2px 7px;border-radius:6px}
+.obs{color:var(--muted);font-size:13.5px}
+.vazio{text-align:center;color:var(--muted);padding:60px 20px}
+mark{background:var(--mark);color:var(--mark-txt);border-radius:3px;padding:0 2px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:13.5px;pointer-events:none;transition:.25s;z-index:50}
+.toast.ativo{opacity:1;transform:translate(-50%,0)}
+@media(max-width:760px){
+  thead{display:none}
+  table,tbody,tr,td{display:block;width:100%}
+  tr{padding:10px 0;border-bottom:1px solid var(--border)}
+  tbody tr:last-child{border-bottom:0}
+  td{border:0;padding:3px 14px}
+  td[data-label]::before{content:attr(data-label) ": ";font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  td.nome{font-size:1.02rem;padding-bottom:6px}
+  td.nome::before{content:none}
+}
+/* Estilo para o card de acesso negado */
+.acesso-negado-card {
+    background: var(--card);
+    border: 1px solid var(--ruim);
+    border-radius: var(--radius);
+    padding: 40px;
+    text-align: center;
+    margin: 40px auto;
+    max-width: 600px;
+    box-shadow: var(--shadow);
+}
+.acesso-negado-card h2 { color: var(--ruim); font-size: 1.8rem; margin-bottom: 10px; }
+.acesso-negado-card p { color: var(--muted); margin-bottom: 20px; }
+.acesso-negado-card a {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+.acesso-negado-card a:hover { background: #1d4ed8; }
+</style>
+<link rel="icon" type="image/png" href="/logo.png">
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            /* No celular, os submenus ficam sempre abertos para facilitar o toque */
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+
+</head>
+<body>
+            
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+            
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+            <script>
+                (function() {
+                    const token = localStorage.getItem('token');
+                    let isCliente = false;
+                    
+                    if (token) {
+                        try {
+                            const payload = JSON.parse(atob(token.split('.')[1]));
+                            if (payload.tipo === 'cliente') isCliente = true;
+                        } catch(e) {}
+                    }
+                    
+                    if (isCliente) {
+                        const menuAdminEl = document.getElementById('menu-admin');
+                        if (menuAdminEl) menuAdminEl.style.display = 'none';
+                        
+                        const menuClienteEl = document.getElementById('menu-cliente');
+                        if (menuClienteEl) menuClienteEl.classList.remove('hidden');
+                        
+                        const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                        const nav = document.getElementById('nav-cliente');
+                        const btnSair = nav.querySelector('.btn-sair');
+                        
+                        const addLink = (href, texto) => {
+                            const a = document.createElement('a');
+                            a.href = href;
+                            a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors';
+                            a.innerText = texto;
+                            nav.insertBefore(a, btnSair);
+                        };
+
+                        if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                        if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                        if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                        if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                        if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                        if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                        if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+                        
+                    } else {
+                        const menuClienteEl = document.getElementById('menu-cliente');
+                        if (menuClienteEl) menuClienteEl.style.display = 'none';
+                        
+                        const menuAdminEl = document.getElementById('menu-admin');
+                        if (menuAdminEl) menuAdminEl.classList.remove('hidden');
+                    }
+                    
+                    document.querySelectorAll('.btn-sair').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('permissoes');
+                            window.location.href = '/login.html';
+                        });
+                    });
+                })();
+            </script>
+        
+            <script>
+                (function() {
+                    const token = localStorage.getItem('token');
+                    let isCliente = false;
+                    
+                    if (token) {
+                        try {
+                            const payload = JSON.parse(atob(token.split('.')[1]));
+                            if (payload.tipo === 'cliente') isCliente = true;
+                        } catch(e) {}
+                    }
+                    
+                    if (isCliente) {
+                        document.getElementById('menu-cliente').classList.remove('hidden');
+                        
+                        const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                        const nav = document.getElementById('nav-cliente');
+                        const btnSair = nav.querySelector('.btn-sair');
+                        
+                        const addLink = (href, texto) => {
+                            const a = document.createElement('a');
+                            a.href = href;
+                            a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors';
+                            a.innerText = texto;
+                            nav.insertBefore(a, btnSair);
+                        };
+
+                        if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                        if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                        if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                        if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                        if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                        if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                        if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+                        
+                    } else {
+                        document.getElementById('menu-admin').classList.remove('hidden');
+                    }
+                    
+                    document.querySelectorAll('.btn-sair').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('permissoes');
+                            window.location.href = '/login.html';
+                        });
+                    });
+                })();
+            </script>
+
+    <!-- CARD DE ACESSO NEGADO (Inicialmente Escondido) -->
+    <div id="acessoNegado" style="display: none;">
+        <div class="acesso-negado-card">
+            <h2>Acesso Negado</h2>
+            <p>Você não tem permissão para visualizar as Métricas de Tráfego.</p>
+            <p style="font-size: 13px;">Se precisar de acesso, entre em contato com a agência.</p>
+            <a href="/portal_cliente.html">Voltar para o Portal</a>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PROTEGIDO -->
+    <div id="conteudoProtegido">
+        <!-- PAINEL DO GOOGLE ANALYTICS -->
+        <div style="max-width: 1240px; margin: 20px auto; padding: 0 20px;">
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);">
+                <h2 style="font-size: 1.2rem; font-weight: bold; margin-bottom: 4px; color: var(--text);">Google Analytics (Últimos 30 dias)</h2>
+                <p style="color: var(--muted); font-size: 13px; margin-bottom: 16px;">Dados reais de audiência do seu site.</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                    <div style="background: var(--bg); padding: 16px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                        <p style="font-size: 12px; color: var(--muted); margin: 0;">Usuários Ativos</p>
+                        <h3 id="gaUsuarios" style="font-size: 1.8rem; font-weight: bold; margin: 4px 0 0; color: var(--text);">0</h3>
+                    </div>
+                    <div style="background: var(--bg); padding: 16px; border-radius: 8px; border-left: 4px solid #a855f7;">
+                        <p style="font-size: 12px; color: var(--muted); margin: 0;">Sessões</p>
+                        <h3 id="gaSessoes" style="font-size: 1.8rem; font-weight: bold; margin: 4px 0 0; color: var(--text);">0</h3>
+                    </div>
+                    <div style="background: var(--bg); padding: 16px; border-radius: 8px; border-left: 4px solid #ec4899;">
+                        <p style="font-size: 12px; color: var(--muted); margin: 0;">Visualizações</p>
+                        <h3 id="gaVisualizacoes" style="font-size: 1.8rem; font-weight: bold; margin: 4px 0 0; color: var(--text);">0</h3>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg); padding: 16px; border-radius: 8px;">
+                    <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 10px; color: var(--text);">Evolução Diária</h3>
+                    <div style="height: 250px; width: 100%;">
+                        <canvas id="graficoEvolucaoGA"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="topo">
+          <p class="sub" id="contador" style="margin-bottom:12px; color:var(--muted); font-size:13.5px;">Carregando...</p>
+          <div class="barra">
+            <input id="busca" type="search" placeholder="Buscar métrica, fórmula ou descrição…  (atalho: /)" autocomplete="off">
+            <select id="filtro-categoria"></select>
+            <button class="btn" id="btn-tema" type="button">🌙</button>
+          </div>
+        </div>
+
+        <main>
+          <aside class="dica"><strong>Como usar:</strong> escolha <strong>uma métrica principal</strong> alinhada ao objetivo da campanha (ROAS para vendas, CPL para leads, CPM para awareness) e trate as demais como <strong>métricas de diagnóstico</strong>.</aside>
+          <div id="conteudo"></div>
+        </main>
+    </div>
+
+    <script id="dados" type="application/json">{"categorias":[{"nome":"Custo e Investimento","icone":"💰","metricas":[{"nome":"CPM","mede":"Custo por mil impressões","formula":"(Investimento ÷ Impressões) × 1.000","obs":"Mede o custo efetivo para cada 1.000 vezes que o anúncio é exibido"},{"nome":"CPC","mede":"Custo por clique","formula":"Investimento ÷ Cliques","obs":"Quanto você paga, em média, por cada clique na sua campanha"},{"nome":"CPA / CPL","mede":"Custo por aquisição ou por lead","formula":"Investimento ÷ Conversões","obs":"Quanto custa, em média, cada ação desejada (venda, cadastro, etc.)"},{"nome":"Investimento Total","mede":"Valor total gasto na campanha","formula":"Soma de todos os valores investidos","obs":"O montante total aplicado em mídia ao longo do período analisado"}]},{"nome":"Impressões e Alcance","icone":"👁️","metricas":[{"nome":"Impressões","mede":"Número total de vezes que o anúncio foi exibido","formula":"Contagem direta do display do anúncio","obs":"Não confunda com alcance — mesma pessoa pode gerar múltiplas impressões"},{"nome":"Alcance","mede":"Número de pessoas únicas que viram o anúncio","formula":"Contagem de indivíduos alcançados","obs":"Indica a dimensão da audiência exposta à sua mensagem"},{"nome":"Frequência","mede":"Quantas vezes, em média, cada pessoa viu o anúncio","formula":"Impressões ÷ Alcance","obs":"Útil para verificar se a mensagem está sendo repetida adequada ou excessivamente"}]},{"nome":"Cliques e Engajamento","icone":"📊","metricas":[{"nome":"CTR","mede":"Taxa de cliques","formula":"(Cliques ÷ Impressões) × 100","obs":"Percentual de pessoas que clicaram após ver o anúncio — indica relevância"},{"nome":"Cliques","mede":"Número total de cliques no anúncio","formula":"Contagem direta de interações","obs":"Mede o nível de interesse inicial gerado pelo seu conteúdo"},{"nome":"Clicks por Impressão","mede":"Média de cliques por cada impressão","formula":"Cliques ÷ Impressões","obs":"Variante do CTR sem conversão para porcentagem"}]},{"nome":"Conversões e Vendas","icone":"🛒","metricas":[{"nome":"Conversões","mede":"Número de ações desejadas completadas","formula":"Contagem de eventos de conversão registrados","obs":"Pode ser venda, cadastro, download, lead — depende do objetivo da campanha"},{"nome":"Taxa de Conversão (CR)","mede":"Percentual de cliques que resultaram em conversão","formula":"(Conversões ÷ Cliques) × 100","obs":"Indica a eficácia da página de destino e da oferta apresentada"},{"nome":"Valor por Conversão","mede":"Receita média gerada por conversão","formula":"Receita Total ÷ Conversões","obs":"Ajuda a entender o valor de cada ação realizada"}]},{"nome":"ROI e Rentabilidade","icone":"📈","metricas":[{"nome":"ROAS","mede":"Retorno sobre o investimento em anúncios","formula":"Receita ÷ Investimento","obs":"Quantos reais são retornados para cada real investido em mídia"},{"nome":"ROI","mede":"Retorno sobre o investimento","formula":"((Receita − Investimento) ÷ Investimento) × 100","obs":"Percentual de lucro ou prejuízo gerado pela campanha após custos"},{"nome":"LTV / CAC Ratio","mede":"Relação entre lifetime value e custo de aquisição","formula":"LTV ÷ CPA","obs":"Indica a sustentabilidade a longo prazo do modelo de aquisição de clientes"}]},{"nome":"Métricas Auxiliares","icone":"📋","metricas":[{"nome":"EPC","mede":"Ganhos por clique","formula":"Receita ÷ Cliques","obs":"Quanto cada clique gerou de receita, em média"},{"nome":"RPM","mede":"Receita por mil impressões","formula":"(Receita ÷ Impressões) × 1.000","obs":"Mede o quanto cada 1.000 exibições gerou de receita — comum em mídia programática"},{"nome":"CR por Segmento","mede":"Taxa de conversão por segmento de audiência","formula":"Conversões por segmento ÷ Cliques por segmento","obs":"Permite identificar quais grupos de audiência performam melhor"}]}]}</script>
+
+    <script>
+    // ==========================================
+    // SCRIPT 1: LÓGICA DO GOOGLE ANALYTICS (COM BLOQUEIO)
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        let chartEvolucaoGA = null;
+
+        try {
+            const resResumo = await fetch('/api/analytics/resumo', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            // NOVO: Verifica se o acesso foi negado
+            if (resResumo.status === 403) {
+                document.getElementById('conteudoProtegido').style.display = 'none';
+                document.getElementById('acessoNegado').style.display = 'block';
+                return;
+            }
+
+            if (resResumo.ok) {
+                const dados = await resResumo.json();
+                document.getElementById('gaUsuarios').innerText = dados.usuariosAtivos || 0;
+                document.getElementById('gaSessoes').innerText = dados.sessoes || 0;
+                document.getElementById('gaVisualizacoes').innerText = dados.visualizacoes || 0;
+            }
+
+            const resDetalhado = await fetch('/api/analytics/detalhado', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (resDetalhado.ok) {
+                const dadosDiarios = await resDetalhado.json();
+                
+                if (dadosDiarios.length > 0) {
+                    const labels = dadosDiarios.map(d => d.data);
+                    const usuarios = dadosDiarios.map(d => d.usuarios);
+                    const sessoes = dadosDiarios.map(d => d.sessoes);
+
+                    const isDark = document.documentElement.dataset.tema === 'escuro';
+                    const textColor = isDark ? '#94a3b8' : '#667085';
+                    const gridColor = isDark ? '#334155' : '#e4e7ec';
+
+                    chartEvolucaoGA = new Chart(document.getElementById('graficoEvolucaoGA').getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Usuários', data: usuarios, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.3 },
+                                { label: 'Sessões', data: sessoes, borderColor: '#a855f7', backgroundColor: 'transparent', tension: 0.3 }
+                            ]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: { legend: { labels: { color: textColor } } }, 
+                            scales: { 
+                                x: { ticks: { color: textColor }, grid: { color: gridColor } }, 
+                                y: { ticks: { color: textColor }, grid: { color: gridColor } } 
+                            } 
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Erro ao carregar Google Analytics:", error);
+        }
+    });
+
+    // ==========================================
+    // SCRIPT 2: LÓGICA DO GLOSSÁRIO E CALCULADORA
+    // ==========================================
+    (function () {
+      var toastEl = null, toastTimer = null;
+      function toast(msg) {
+        if (!toastEl) { toastEl = document.createElement('div'); toastEl.className='toast'; document.body.appendChild(toastEl); }
+        toastEl.textContent = msg;
+        toastEl.classList.add('ativo');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.classList.remove('ativo'); }, 2400);
+      }
+      var CHAVE_TEMA = 'metricas.tema';
+      function aplicarTema(t) {
+        document.documentElement.dataset.tema = t;
+        var btn = document.getElementById('btn-tema');
+        if(btn) {
+            btn.textContent = t === 'escuro' ? '☀️' : '🌙';
+            btn.title = t === 'escuro' ? 'Tema claro' : 'Tema escuro';
+        }
+        try { localStorage.setItem(CHAVE_TEMA, t); } catch (e) {}
+      }
+      var temaSalvo = null;
+      try { temaSalvo = localStorage.getItem(CHAVE_TEMA); } catch (e) {}
+      aplicarTema(temaSalvo || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro'));
+
+      var DADOS = JSON.parse(document.getElementById('dados').textContent);
+      var CATS = DADOS.categorias || [];
+      var TOTAL = CATS.reduce(function (n, c) { return n + (c.metricas || []).length; }, 0);
+
+      var norm = function (s) { return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); };
+      CATS.forEach(function (c) {
+        (c.metricas || []).forEach(function (m) {
+          m._busca = norm([c.nome, c.descricao, m.nome, m.mede, m.formula, m.obs].join(' '));
+        });
+      });
+
+      var $ = function (id) { return document.getElementById(id); };
+      var conteudo = $('conteudo'), busca = $('busca'), selectCat = $('filtro-categoria'), contador = $('contador');
+      var estado = { termo: '', categoria: '' };
+
+      var opTodas = document.createElement('option'); opTodas.value = ''; opTodas.textContent = 'Todas as categorias'; selectCat.appendChild(opTodas);
+      CATS.forEach(function (c) {
+        var op = document.createElement('option'); op.value = c.nome; op.textContent = (c.icone ? c.icone + ' ' : '') + c.nome; selectCat.appendChild(op);
+      });
+
+      function el(tag, cls, txt) { var n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; }
+      function destacar(texto, termo) {
+        var frag = document.createDocumentFragment(); var txt = String(texto == null ? '' : texto); var alvoTermo = norm(termo);
+        if (!alvoTermo) { frag.appendChild(document.createTextNode(txt)); return frag; }
+        var alvo = norm(txt); var i = 0;
+        while (i <= txt.length) {
+          var pos = alvo.indexOf(alvoTermo, i);
+          if (pos === -1) { frag.appendChild(document.createTextNode(txt.slice(i))); break; }
+          if (pos > i) frag.appendChild(document.createTextNode(txt.slice(i, pos)));
+          var mk = document.createElement('mark'); mk.textContent = txt.slice(pos, pos + alvoTermo.length); frag.appendChild(mk);
+          i = pos + alvoTermo.length;
+        }
+        return frag;
+      }
+
+      function construirSecao(cat, itens, termo) {
+        var sec = el('section', 'categoria');
+        var h2 = el('h2'); if (cat.icone) h2.appendChild(el('span', 'icone', cat.icone));
+        h2.appendChild(document.createTextNode(cat.nome)); h2.appendChild(el('span', 'badge', String(itens.length)));
+        var wrap = el('div', 'tabela-wrap'); var table = el('table'); var thead = el('thead'); var trh = el('tr');
+        ['Métrica', 'O que mede', 'Fórmula', 'Observação'].forEach(function (t) { trh.appendChild(el('th', null, t)); }); thead.appendChild(trh);
+        var tbody = el('tbody');
+        itens.forEach(function (m) {
+          var tr = el('tr');
+          var tdNome = el('td', 'nome'); tdNome.dataset.label = 'Métrica'; tdNome.appendChild(destacar(m.nome, termo));
+          var tdMede = el('td'); tdMede.dataset.label = 'O que mede'; tdMede.appendChild(destacar(m.mede, termo));
+          var tdForm = el('td'); tdForm.dataset.label = 'Fórmula';
+          if (m.formula) { var code = el('code', 'formula'); code.appendChild(destacar(m.formula, termo)); tdForm.appendChild(code); } else { tdForm.appendChild(el('span', 'obs', '—')); }
+          var tdObs = el('td'); tdObs.dataset.label = 'Observação';
+          if (m.obs) { var sp = el('span', 'obs'); sp.appendChild(destacar(m.obs, termo)); tdObs.appendChild(sp); } else { tdObs.appendChild(el('span', 'obs', '—')); }
+          tr.append(tdNome, tdMede, tdForm, tdObs); tbody.appendChild(tr);
+        });
+        table.append(thead, tbody); wrap.appendChild(table); sec.appendChild(h2);
+        if (cat.descricao) sec.appendChild(el('p', 'cat-desc', cat.descricao));
+        sec.appendChild(wrap); return sec;
+      }
+
+      function render() {
+        var termo = estado.termo, alvo = norm(termo), catSel = estado.categoria, frag = document.createDocumentFragment();
+        CATS.forEach(function (c) {
+          if (catSel && c.nome !== catSel) return;
+          var itens = (c.metricas || []).filter(function (m) { return !alvo || m._busca.indexOf(alvo) !== -1; });
+          if (!itens.length) return;
+          frag.appendChild(construirSecao(c, itens, termo));
+        });
+        conteudo.replaceChildren(frag);
+        if (contador) contador.textContent = 'Métricas de Tráfego Pago - ' + TOTAL + ' cadastradas';
+      }
+
+      var debounce; busca.addEventListener('input', function () { clearTimeout(debounce); debounce = setTimeout(function () { estado.termo = busca.value; render(); }, 120); });
+      selectCat.addEventListener('change', function () { estado.categoria = selectCat.value; render(); });
+      document.getElementById('btn-tema').addEventListener('click', function () { aplicarTema(document.documentElement.dataset.tema === 'escuro' ? 'claro' : 'escuro'); });
+      
+      render();
+    })();
+    </script>
+
+            <script>
+                (function() {
+                    const token = localStorage.getItem('token');
+                    if (!token) return;
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        if (payload.tipo === 'cliente') {
+                            const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html', 'branding.html', 'permissoes.html'];
+                            
+                            const urlAtual = window.location.pathname.split('/').pop();
+                            
+                            if (paginasAdmin.includes(urlAtual)) {
+                                alert('Acesso negado. Esta área é restrita.');
+                                window.location.href = '/portal_cliente.html';
+                            }
+                        }
+                    } catch(e) {}
+                })();
+            </script>
+        
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+
+</body>
+</html>

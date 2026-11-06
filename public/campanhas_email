@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disparo de E-mail - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Quill.js para o editor de texto -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+            <h1 class="text-xl font-bold">Disparo de E-mail</h1>
+        </div>
+        <div class="flex flex-wrap items-center gap-4 text-sm">
+            <a href="/admin.html" class="text-slate-400 hover:text-white transition-colors">Dashboard</a>
+            <a href="/campanhas.html" class="text-slate-400 hover:text-white transition-colors">Campanhas</a>
+            <a href="/campanhas_mail.html" class="text-white font-bold border-b-2 border-orange-500 pb-1">Disparo de E-mail</a>
+            <button id="btnSair" class="text-slate-400 hover:text-white transition-colors font-bold">Sair</button>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-8">
+        <div class="bg-slate-900 p-8 rounded-lg border border-slate-800 shadow-lg">
+            <h2 class="text-2xl font-bold mb-6 text-orange-400">Novo Disparo de E-mail</h2>
+
+            <form id="formEmail" class="flex flex-col gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Destinatário (Lead / Cliente)</label>
+                        <select id="destinatario" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                            <option value="">Selecione um contato...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Assunto do E-mail</label>
+                        <input type="text" id="assunto" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500" placeholder="Ex: Novidades da Agência">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Corpo do E-mail</label>
+                    <!-- Editor Quill com fundo escuro para combinar com o sistema -->
+                    <div id="editor-container" class="bg-white text-black rounded-lg min-h-[300px]"></div>
+                </div>
+
+                <div class="mt-4 flex justify-end">
+                    <button type="submit" id="btnEnviar" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg transition-colors flex items-center gap-2">
+                        <span>Enviar E-mail</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login.html';
+
+        // Inicializa o Editor de Texto
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Escreva o seu e-mail aqui...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['image', 'link', 'video'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Carregar Leads e Clientes para o Select
+        async function carregarDestinatarios() {
+            try {
+                const [resLeads, resClientes] = await Promise.all([
+                    fetch('/api/leads', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/clientes', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                
+                const leads = await resLeads.json();
+                const clientes = await resClientes.json();
+                const select = document.getElementById('destinatario');
+
+                if (clientes.length > 0) {
+                    const optgroupCli = document.createElement('optgroup');
+                    optgroupCli.label = "Clientes";
+                    clientes.forEach(c => {
+                        if(c.email) {
+                            const opt = document.createElement('option');
+                            opt.value = c.email;
+                            opt.textContent = `[Cliente] ${c.nome} (${c.email})`;
+                            optgroupCli.appendChild(opt);
+                        }
+                    });
+                    select.appendChild(optgroupCli);
+                }
+
+                if (leads.length > 0) {
+                    const optgroupLeads = document.createElement('optgroup');
+                    optgroupLeads.label = "Leads";
+                    leads.forEach(l => {
+                        if(l.email) {
+                            const opt = document.createElement('option');
+                            opt.value = l.email;
+                            opt.textContent = `[Lead] ${l.nome} (${l.email})`;
+                            optgroupLeads.appendChild(opt);
+                        }
+                    });
+                    select.appendChild(optgroupLeads);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar contatos", error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarDestinatarios);
+
+        // Envio do E-mail
+        document.getElementById('formEmail').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnEnviar');
+            btn.innerHTML = 'Enviando...';
+            btn.disabled = true;
+
+            const destinatario = document.getElementById('destinatario').value;
+            const assunto = document.getElementById('assunto').value;
+            const conteudoHtml = quill.root.innerHTML;
+
+            try {
+                const res = await fetch('/api/enviar-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ destinatario, assunto, conteudoHtml })
+                });
+
+                if (res.ok) {
+                    alert('E-mail disparado com sucesso!');
+                    document.getElementById('formEmail').reset();
+                    quill.root.innerHTML = '';
+                } else {
+                    const erro = await res.text();
+                    alert('Erro ao enviar: ' + erro);
+                }
+            } catch (error) {
+                alert('Erro de conexão.');
+            } finally {
+                btn.innerHTML = 'Enviar E-mail';
+                btn.disabled = false;
+            }
+        });
+
+        document.getElementById('btnSair').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+    </script>
+</body>
+</html>

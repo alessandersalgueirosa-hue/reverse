@@ -1,0 +1,5 @@
+node_modules
+.git
+_backups
+_backup_calculadora_*
+*.log

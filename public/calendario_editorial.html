@@ -1,0 +1,544 @@
+﻿﻿﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário Editorial - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .pyside-button { transition: all 0.2s ease; border-radius: 0.375rem; font-weight: 500; }
+        .pyside-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2); }
+    </style>
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+            
+    <!-- MENU ADMIN -->
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white font-bold text-orange-400">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MENU CLIENTE -->
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            if (isCliente) {
+                document.getElementById('menu-admin').style.display = 'none';
+                document.getElementById('menu-cliente').classList.remove('hidden');
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
+                };
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+            } else {
+                document.getElementById('menu-cliente').style.display = 'none';
+                document.getElementById('menu-admin').classList.remove('hidden');
+            }
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <div class="flex items-center gap-4 mb-8 bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+            <div class="p-3 bg-orange-500/20 rounded-lg text-orange-500">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Calendário Editorial</h1>
+                <p class="text-slate-400 text-sm">Gerencie o cronograma de publicações dos seus clientes.</p>
+            </div>
+        </div>
+
+        <!-- Formulário de Agendamento -->
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-8">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                <h2 class="text-xl font-bold text-white">Agendar Novo Post</h2>
+            </div>
+
+            <form id="formPost" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Cliente *</label>
+                    <select id="postClienteId" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500">
+                        <option value="">Selecione...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Data de Publicação *</label>
+                    <input type="date" id="postData" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Plataforma</label>
+                    <select id="postPlataforma" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500">
+                        <option value="Instagram">Instagram</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="Blog">Blog</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Título *</label>
+                    <input type="text" id="postTitulo" required placeholder="Título do post" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1">Conteúdo / Legenda</label>
+                    <textarea id="postConteudo" rows="3" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500"></textarea>
+                </div>
+                
+                <!-- CAMPO DE UPLOAD -->
+                <div class="md:col-span-2 bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <label class="block text-sm text-slate-400 mb-2 font-bold text-white">Anexar Arquivo (Imagem, PDF, Documento)</label>
+                    <input type="file" id="postArquivo" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-orange-500 file:text-white hover:file:bg-orange-600 transition-all">
+                    <p class="text-xs text-slate-500 mt-2">Formatos aceitos: JPG, PNG, PDF, DOC, DOCX. Tamanho máx: 10MB.</p>
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1">OU URL da Mídia (opcional)</label>
+                    <input type="url" id="postMidia" placeholder="https://..." class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500">
+                </div>
+                
+                <div class="md:col-span-2 flex justify-end mt-2">
+                    <button type="submit" id="btnSalvarPost" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Agendar Post
+                    </button>
+                </div>
+            </form>
+            <div id="feedbackPost" class="hidden mt-4 p-2 rounded text-center text-sm font-bold"></div>
+        </div>
+
+        <!-- Lista de Posts -->
+        <div class="bg-slate-900 rounded-lg border border-slate-800 shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                <h2 class="text-xl font-bold text-white">Posts Agendados</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                            <th class="p-4">Data</th>
+                            <th class="p-4">Cliente</th>
+                            <th class="p-4">Plataforma</th>
+                            <th class="p-4">Título</th>
+                            <th class="p-4">Anexo</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4">Feedback</th>
+                            <th class="p-4 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaPosts" class="divide-y divide-slate-800">
+                        <tr><td colspan="8" class="p-4 text-center text-slate-400">Carregando posts...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL DE CHAT (NOVO) -->
+    <div id="modalChat" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-lg p-6 relative flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
+                <h3 class="text-xl font-bold text-orange-400" id="chatTitulo">Chat</h3>
+                <button onclick="fecharChat()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div id="chatMensagens" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-4">
+                <p class="text-slate-500 text-sm text-center">Carregando...</p>
+            </div>
+
+            <div class="flex gap-2">
+                <input type="text" id="inputMensagem" placeholder="Digite sua mensagem..." class="flex-1 p-3 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500">
+                <button onclick="enviarMensagem()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login.html';
+
+        let todosOsPosts = [];
+        let tipoChatAtual = null;
+        let idChatAtual = null;
+
+        async function carregarClientes() {
+            try {
+                const res = await fetch('/api/clientes', { headers: { 'Authorization': `Bearer ${token}` } });
+                const clientes = await res.json();
+                const select = document.getElementById('postClienteId');
+                select.innerHTML = '<option value="">Selecione o cliente...</option>';
+                clientes.forEach(c => {
+                    select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+                });
+            } catch (error) { console.error('Erro ao carregar clientes:', error); }
+        }
+
+        async function carregarPosts() {
+            try {
+                const res = await fetch('/api/acoes-sociais', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) throw new Error('Falha ao buscar posts');
+                todosOsPosts = await res.json();
+                renderizarTabela(todosOsPosts);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('tabelaPosts').innerHTML = '<tr><td colspan="8" class="p-4 text-center text-red-400">Erro ao carregar posts.</td></tr>';
+            }
+        }
+
+        function renderizarTabela(posts) {
+            const tbody = document.getElementById('tabelaPosts');
+            tbody.innerHTML = '';
+
+            if (posts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Nenhum post agendado.</td></tr>';
+                return;
+            }
+
+            posts.forEach(p => {
+                let data = '-';
+                if (p.data_publicacao) {
+                    const dateStr = p.data_publicacao.split('T')[0];
+                    const parts = dateStr.split('-');
+                    if(parts.length === 3) data = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+                
+                let corStatus = 'bg-yellow-500/20 text-yellow-400';
+                if (p.status === 'aprovado') corStatus = 'bg-green-500/20 text-green-400';
+                if (p.status === 'recusado') corStatus = 'bg-red-500/20 text-red-400';
+
+                let anexoHtml = '-';
+                if (p.url_midia) {
+                    anexoHtml = `<a href="${p.url_midia}" target="_blank" class="text-orange-400 hover:text-orange-300 underline font-bold text-xs">Ver Anexo</a>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition-colors';
+                
+                // Adicionado o botão de Chat na coluna de Ações
+                tr.innerHTML = `
+                    <td class="p-4 text-slate-300">${data}</td>
+                    <td class="p-4 text-blue-300 font-medium">${p.cliente_nome || 'Sem cliente'}</td>
+                    <td class="p-4 text-slate-300">${p.plataforma || p.tipo || '-'}</td>
+                    <td class="p-4 font-bold text-white">${p.titulo}</td>
+                    <td class="p-4">${anexoHtml}</td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${corStatus}">${(p.status || 'pendente').toUpperCase()}</span></td>
+                    <td class="p-4 text-orange-300 italic max-w-xs break-words">${p.feedback_cliente || '-'}</td>
+                    <td class="p-4 text-center whitespace-nowrap">
+                        <button onclick="abrirChat('post', ${p.id}, '${(p.titulo || '').replace(/'/g, "\\'")}')" class="bg-orange-500/20 hover:bg-orange-500/40 text-orange-400 px-3 py-1 rounded text-xs font-bold transition-colors mr-2">Chat</button>
+                        <button onclick="excluirPost(${p.id})" class="text-red-500 hover:text-red-400 text-xs font-bold">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('formPost').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const feedback = document.getElementById('feedbackPost');
+            feedback.className = 'hidden';
+            const btn = document.getElementById('btnSalvarPost');
+            btn.disabled = true;
+            btn.innerHTML = 'Enviando...';
+
+            const formData = new FormData();
+            formData.append('cliente_id', document.getElementById('postClienteId').value);
+            formData.append('data_publicacao', document.getElementById('postData').value);
+            formData.append('plataforma', document.getElementById('postPlataforma').value);
+            formData.append('titulo', document.getElementById('postTitulo').value);
+            formData.append('conteudo', document.getElementById('postConteudo').value);
+            formData.append('url_midia', document.getElementById('postMidia').value || '');
+            formData.append('status', 'pendente');
+
+            const arquivo = document.getElementById('postArquivo').files[0];
+            if (arquivo) {
+                formData.append('arquivo', arquivo);
+            }
+
+            try {
+                const res = await fetch('/api/acoes-sociais', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                
+                if (!res.ok) throw new Error('Falha ao salvar');
+                feedback.textContent = 'Post agendado com sucesso!';
+                feedback.className = 'mt-4 p-2 rounded text-center text-sm font-bold bg-green-600 text-white';
+                document.getElementById('formPost').reset();
+                carregarPosts();
+            } catch (error) {
+                feedback.textContent = 'Erro ao agendar post.';
+                feedback.className = 'mt-4 p-2 rounded text-center text-sm font-bold bg-red-600 text-white';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Agendar Post`;
+            }
+        });
+
+        async function excluirPost(id) {
+            if (!confirm('Tem certeza que deseja excluir este post?')) return;
+            try {
+                await fetch(`/api/acoes-sociais/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                carregarPosts();
+            } catch (error) { alert('Erro ao excluir.'); }
+        }
+
+        // ==================== LÓGICA DO CHAT ====================
+        async function abrirChat(tipo, id, titulo) {
+            tipoChatAtual = tipo;
+            idChatAtual = id;
+            document.getElementById('chatTitulo').innerText = `Chat: ${titulo}`;
+            document.getElementById('modalChat').classList.remove('hidden');
+            document.getElementById('modalChat').classList.add('flex');
+            
+            const divMensagens = document.getElementById('chatMensagens');
+            divMensagens.innerHTML = '<p class="text-slate-500 text-sm text-center">Carregando...</p>';
+
+            try {
+                const res = await fetch(`/api/comentarios/${tipo}/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const mensagens = await res.json();
+                
+                if (mensagens.length === 0) {
+                    divMensagens.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">Nenhum comentário ainda. Seja o primeiro a enviar!</p>';
+                    return;
+                }
+
+                divMensagens.innerHTML = mensagens.map(m => {
+                    const isAdmin = m.usuario_tipo === 'admin';
+                    // No lado do admin, as mensagens da agência ficam à direita, as do cliente à esquerda.
+                    const alinhamento = isAdmin ? 'ml-auto bg-slate-800 border-slate-600 text-right' : 'mr-auto bg-orange-500/20 border-orange-500/50 text-left';
+                    const autor = isAdmin ? 'Você (Agência)' : 'Cliente';
+                    const corAutor = isAdmin ? 'text-blue-400' : 'text-orange-400';
+                    
+                    return `
+                        <div class="p-3 rounded-lg border max-w-[80%] ${alinhamento}">
+                            <p class="text-xs font-bold mb-1 ${corAutor}">${autor}</p>
+                            <p class="text-sm text-white break-words">${m.mensagem}</p>
+                        </div>
+                    `;
+                }).join('');
+                
+                divMensagens.scrollTop = divMensagens.scrollHeight;
+
+            } catch (err) {
+                divMensagens.innerHTML = '<p class="text-red-400 text-sm text-center">Erro ao carregar mensagens.</p>';
+            }
+        }
+
+        function fecharChat() {
+            document.getElementById('modalChat').classList.add('hidden');
+            document.getElementById('modalChat').classList.remove('flex');
+            document.getElementById('inputMensagem').value = '';
+            tipoChatAtual = null;
+            idChatAtual = null;
+        }
+
+        async function enviarMensagem() {
+            if (!tipoChatAtual || !idChatAtual) return;
+            
+            const input = document.getElementById('inputMensagem');
+            const mensagem = input.value.trim();
+            if (!mensagem) return;
+
+            input.value = '';
+
+            const payload = { mensagem };
+            if (tipoChatAtual === 'post') payload.post_id = idChatAtual;
+
+            try {
+                const res = await fetch('/api/comentarios', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    // Recarrega as mensagens após enviar
+                    abrirChat(tipoChatAtual, idChatAtual, document.getElementById('chatTitulo').innerText.replace('Chat: ', ''));
+                } else {
+                    alert('Erro ao enviar mensagem.');
+                }
+            } catch (err) {
+                alert('Erro de conexão.');
+            }
+        }
+
+        document.getElementById('inputMensagem').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') enviarMensagem();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarClientes();
+            carregarPosts();
+        });
+    </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+
+</body>
+</html>

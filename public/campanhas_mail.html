@@ -1,0 +1,266 @@
+﻿﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disparo de E-mail - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Quill.js para o editor de texto -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+            <h1 class="text-xl font-bold">Disparo de E-mail</h1>
+        </div>
+        <div class="flex flex-wrap items-center gap-4 text-sm">
+            <a href="/admin.html" class="text-slate-400 hover:text-white transition-colors">Dashboard</a>
+            <a href="/campanhas.html" class="text-slate-400 hover:text-white transition-colors">Campanhas</a>
+            <a href="/campanhas_mail.html" class="text-white font-bold border-b-2 border-orange-500 pb-1">Disparo de E-mail</a>
+            <a href="/configuracoes_email.html" class="text-slate-400 hover:text-white transition-colors">Configurações de E-mail</a>
+            <button class="btn-sair text-slate-400 hover:text-white transition-colors font-bold">Sair</button>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-8">
+        <div class="bg-slate-900 p-8 rounded-lg border border-slate-800 shadow-lg">
+            <h2 class="text-2xl font-bold mb-6 text-orange-400">Novo Disparo de E-mail</h2>
+
+            <form id="formEmail" class="flex flex-col gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Destinatário (Lead / Cliente)</label>
+                        <select id="destinatario" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                            <option value="">Selecione um contato...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Assunto do E-mail</label>
+                        <input type="text" id="assunto" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500" placeholder="Ex: Novidades da Agência">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Corpo do E-mail</label>
+                    <div id="editor-container" class="bg-white text-black rounded-lg min-h-[300px]"></div>
+                </div>
+
+                <div class="mt-4 flex justify-end">
+                    <button type="submit" id="btnEnviar" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg transition-colors flex items-center gap-2">
+                        <span>Enviar E-mail</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login.html';
+
+        // Inicializa o Editor de Texto
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Escreva o seu e-mail aqui...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['image', 'link', 'video'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Carregar Leads e Clientes para o Select
+        async function carregarDestinatarios() {
+            try {
+                const [resLeads, resClientes] = await Promise.all([
+                    fetch('/api/leads', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/clientes', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                
+                const leads = await resLeads.json();
+                const clientes = await resClientes.json();
+                const select = document.getElementById('destinatario');
+
+                if (clientes.length > 0) {
+                    const optgroupCli = document.createElement('optgroup');
+                    optgroupCli.label = "Clientes";
+                    clientes.forEach(c => {
+                        if(c.email) {
+                            const opt = document.createElement('option');
+                            opt.value = c.email;
+                            opt.textContent = `[Cliente] ${c.nome} (${c.email})`;
+                            optgroupCli.appendChild(opt);
+                        }
+                    });
+                    select.appendChild(optgroupCli);
+                }
+
+                if (leads.length > 0) {
+                    const optgroupLeads = document.createElement('optgroup');
+                    optgroupLeads.label = "Leads";
+                    leads.forEach(l => {
+                        if(l.email) {
+                            const opt = document.createElement('option');
+                            opt.value = l.email;
+                            opt.textContent = `[Lead] ${l.nome} (${l.email})`;
+                            optgroupLeads.appendChild(opt);
+                        }
+                    });
+                    select.appendChild(optgroupLeads);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar contatos", error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarDestinatarios);
+
+        // Envio do E-mail
+        document.getElementById('formEmail').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnEnviar');
+            btn.innerHTML = 'Enviando...';
+            btn.disabled = true;
+
+            const destinatario = document.getElementById('destinatario').value;
+            const assunto = document.getElementById('assunto').value;
+            
+            // Pega o HTML do editor
+            let conteudoHtml = quill.root.innerHTML;
+            
+            // Validação básica: o Quill retorna <p><br></p> se estiver vazio
+            if (conteudoHtml === '<p><br></p>' || conteudoHtml.trim() === '') {
+                alert('Por favor, escreva o corpo do e-mail antes de enviar.');
+                btn.innerHTML = 'Enviar E-mail';
+                btn.disabled = false;
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/enviar-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    // CORREÇÃO: Enviando o campo como 'corpo' em vez de 'conteudoHtml'
+                    body: JSON.stringify({ destinatario, assunto, corpo: conteudoHtml })
+                });
+
+                if (res.ok) {
+                    alert('E-mail disparado com sucesso!');
+                    document.getElementById('formEmail').reset();
+                    quill.root.innerHTML = '';
+                } else {
+                    const erro = await res.json().catch(() => ({}));
+                    alert('Erro ao enviar: ' + (erro.error || 'Verifique as credenciais do Gmail no servidor.'));
+                }
+            } catch (error) {
+                alert('Erro de conexão com o servidor.');
+            } finally {
+                btn.innerHTML = 'Enviar E-mail';
+                btn.disabled = false;
+            }
+        });
+
+        // --- BOTÃO SAIR (PADRONIZADO) ---
+        document.querySelectorAll('.btn-sair').forEach(btn => {
+            btn.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('permissoes');
+                window.location.href = '/login.html';
+            });
+        });
+    </script>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.tipo === 'cliente') {
+                    const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html', 'branding.html', 'permissoes.html', 'campanhas_mail.html', 'configuracoes_email.html'];
+                    
+                    const urlAtual = window.location.pathname.split('/').pop();
+                    
+                    if (paginasAdmin.includes(urlAtual)) {
+                        alert('Acesso negado. Esta área é restrita.');
+                        window.location.href = '/portal_cliente.html';
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+</body>
+</html>

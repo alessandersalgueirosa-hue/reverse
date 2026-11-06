@@ -1,0 +1,942 @@
+﻿﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .pyside-button {
+            transition: all 0.2s ease;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+        .pyside-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2);
+        }
+    </style>
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+            
+    <!-- MENU ADMIN -->
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-400">Dashboard</a>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MENU CLIENTE -->
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            if (isCliente) {
+                document.getElementById('menu-admin').style.display = 'none';
+                document.getElementById('menu-cliente').classList.remove('hidden');
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
+                };
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+            } else {
+                document.getElementById('menu-cliente').style.display = 'none';
+                document.getElementById('menu-admin').classList.remove('hidden');
+            }
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <!-- Cabeçalho de Boas-Vindas -->
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-orange-500/20 rounded-lg text-orange-500">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white">Dashboard Executivo</h1>
+                    <p class="text-slate-400 text-sm">Bem-vindo de volta! Aqui está o resumo da sua agência.</p>
+                </div>
+            </div>
+            <button onclick="baixarBackup()" class="w-full md:w-auto bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-5 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg pyside-button">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Baixar Backup
+            </button>
+        </div>
+
+        <!-- 1. CARDS EXECUTIVOS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 border-l-4 border-l-yellow-500 shadow-lg flex items-center gap-4">
+                <div class="p-3 bg-yellow-500/20 rounded-lg text-yellow-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-400 font-medium mb-1">Criativos Pendentes</p>
+                    <h3 class="text-3xl font-bold text-white" id="cardCriativosPendentes">0</h3>
+                    <p class="text-xs text-yellow-400 mt-1">Aguardando aprovação</p>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 border-l-4 border-l-green-500 shadow-lg flex items-center gap-4">
+                <div class="p-3 bg-green-500/20 rounded-lg text-green-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-400 font-medium mb-1">Faturamento no Mês</p>
+                    <h3 class="text-3xl font-bold text-white" id="cardFaturamentoMes">R$ 0,00</h3>
+                    <p class="text-xs text-green-400 mt-1">Receitas do mês atual</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. CARDS DO GOOGLE ANALYTICS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 border-l-4 border-l-blue-500 shadow-lg">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <p class="text-sm text-slate-400 font-medium">Usuários Ativos (30d)</p>
+                </div>
+                <h3 class="text-3xl font-bold text-white" id="gaUsuarios">0</h3>
+                <p class="text-xs text-blue-400 mt-1">Via Google Analytics</p>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 border-l-4 border-l-purple-500 shadow-lg">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <p class="text-sm text-slate-400 font-medium">Sessões (30d)</p>
+                </div>
+                <h3 class="text-3xl font-bold text-white" id="gaSessoes">0</h3>
+                <p class="text-xs text-purple-400 mt-1">Via Google Analytics</p>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 border-l-4 border-l-pink-500 shadow-lg">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    <p class="text-sm text-slate-400 font-medium">Visualizações (30d)</p>
+                </div>
+                <h3 class="text-3xl font-bold text-white" id="gaVisualizacoes">0</h3>
+                <p class="text-xs text-pink-400 mt-1">Via Google Analytics</p>
+            </div>
+        </div>
+
+        <!-- 3. CARDS DE MÉTRICAS -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg flex items-center gap-3">
+                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <div>
+                    <p class="text-slate-400 text-xs">Total de Leads</p>
+                    <p id="cardTotalLeads" class="text-2xl font-bold text-white">0</p>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg flex items-center gap-3">
+                <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div>
+                    <p class="text-yellow-400 text-xs">Pendentes</p>
+                    <p id="cardPendentes" class="text-2xl font-bold text-yellow-400">0</p>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg flex items-center gap-3">
+                <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div>
+                    <p class="text-green-400 text-xs">Atendidos</p>
+                    <p id="cardAtendidos" class="text-2xl font-bold text-green-400">0</p>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg flex items-center gap-3">
+                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <div>
+                    <p class="text-blue-400 text-xs">Clientes Ativos</p>
+                    <p id="cardClientes" class="text-2xl font-bold text-blue-400">0</p>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg flex items-center gap-3">
+                <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                <div>
+                    <p class="text-purple-400 text-xs">Prospects</p>
+                    <p id="cardProspects" class="text-2xl font-bold text-purple-400">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERTA DE TAREFAS ATRASADAS -->
+        <div id="alertaTarefasAtrasadas" class="hidden mb-8 bg-red-900/20 border border-red-500/50 rounded-lg p-4 shadow-lg flex items-start gap-4">
+            <div class="p-2 bg-red-500/20 rounded-lg text-red-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-red-400">Atenção: Tarefas Atrasadas!</h3>
+                <p class="text-sm text-red-200 mt-1" id="textoTarefasAtrasadas">Você tem tarefas pendentes que já passaram do prazo.</p>
+                <div id="listaAtrasadas" class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2"></div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO DE GRÁFICOS -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h2 class="text-xl font-bold text-white">Evolução do Faturamento (6 meses)</h2>
+                </div>
+                <div class="relative h-72">
+                    <canvas id="graficoFaturamento"></canvas>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <h2 class="text-xl font-bold text-white">Distribuição de Leads por Status</h2>
+                </div>
+                <div class="relative h-72">
+                    <canvas id="graficoLeads"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-8">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                <h2 class="text-xl font-bold text-white">Novos Clientes por Mês</h2>
+            </div>
+            <div class="relative h-64">
+                <canvas id="graficoNovosClientes"></canvas>
+            </div>
+        </div>
+
+        <!-- 4. OUTBOUND / INBOUND / TRÁFEGO PAGO / CALENDÁRIO -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="flex flex-col gap-8">
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-orange-400 flex items-center gap-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                                Observações do Outbound
+                            </h2>
+                            <p class="text-slate-400 text-sm">Acompanhamento de prospecção ativa por cliente.</p>
+                        </div>
+                        <a href="/outbound.html" class="text-sm text-orange-500 hover:text-orange-400 font-bold transition-colors">Gerenciar Outbound →</a>
+                    </div>
+                    <div id="listaOutbound" class="bg-slate-900 rounded-lg shadow-lg border border-slate-800 p-4 h-[400px] overflow-y-auto"><p class="text-slate-400">Carregando observações...</p></div>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-blue-400 flex items-center gap-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                                Ações de Inbound
+                            </h2>
+                            <p class="text-slate-400 text-sm">Conteúdos e estratégias de atração.</p>
+                        </div>
+                        <a href="/inbound.html" class="text-sm text-blue-500 hover:text-blue-400 font-bold transition-colors">Gerenciar Inbound →</a>
+                    </div>
+                    <div id="listaInbound" class="bg-slate-900 rounded-lg shadow-lg border border-slate-800 p-4 h-[400px] overflow-y-auto"><p class="text-slate-400">Carregando ações...</p></div>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-green-400 flex items-center gap-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                                Tráfego Pago
+                            </h2>
+                            <p class="text-slate-400 text-sm">Campanhas ativas e performance.</p>
+                        </div>
+                        <a href="/trafego_pago.html" class="text-sm text-green-500 hover:text-green-400 font-bold transition-colors">Gerenciar Tráfego →</a>
+                    </div>
+                    <div id="listaTrafegoPago" class="bg-slate-900 rounded-lg shadow-lg border border-slate-800 p-4 h-[400px] overflow-y-auto"><p class="text-slate-400">Carregando campanhas...</p></div>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg flex flex-col h-[400px]">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        Calendário
+                    </h2>
+                    <select id="filtroClienteCalendario" class="p-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm cursor-pointer max-w-[200px]"><option value="todos">Todos os Clientes</option></select>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <button id="btnMesAnterior" class="text-slate-400 hover:text-white px-2 py-1 bg-slate-800 rounded transition-colors">&#8592;</button>
+                    <span id="mesAnoAtual" class="font-bold text-lg text-orange-400"></span>
+                    <button id="btnProximoMes" class="text-slate-400 hover:text-white px-2 py-1 bg-slate-800 rounded transition-colors">&#8594;</button>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center text-xs text-slate-500 mb-2 font-bold"><div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div></div>
+                <div id="gridCalendario" class="grid grid-cols-7 gap-1 text-sm flex-1"></div>
+            </div>
+        </div>
+
+        <!-- 5. TAREFAS -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold flex items-center gap-2">
+                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        Tarefas Pendentes
+                    </h2>
+                    <p class="text-slate-400 text-sm">Acompanhe seus follow-ups.</p>
+                </div>
+                <a href="/tarefas.html" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Nova Tarefa
+                </a>
+            </div>
+            <div id="listaTarefas" class="bg-slate-900 rounded-lg shadow-lg border border-slate-800 p-4"><p class="text-slate-400">Carregando tarefas...</p></div>
+        </div>
+
+        <!-- 6. LEADS RECENTES -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold flex items-center gap-2">
+                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Leads Recentes
+                    </h2>
+                    <p class="text-slate-400 text-sm">Visualize e gerencie os leads capturados.</p>
+                </div>
+                <a href="/leads.html" class="text-sm text-orange-500 hover:text-orange-400 font-bold transition-colors">Ver todos os Leads →</a>
+            </div>
+            <div class="bg-slate-900 rounded-lg shadow-lg overflow-x-auto border border-slate-800">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                            <th class="p-4">ID</th><th class="p-4">Nome</th><th class="p-4">E-mail</th><th class="p-4">Telefone</th><th class="p-4">Origem</th><th class="p-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaLeads" class="divide-y divide-slate-800"><tr><td colspan="6" class="p-4 text-center text-slate-400">Carregando...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 7. CAMPANHAS -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold flex items-center gap-2">
+                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                        Campanhas por Cliente
+                    </h2>
+                    <p class="text-slate-400 text-sm">Potencial de investimento do cliente exibido ao lado de cada campanha.</p>
+                </div>
+                <a href="/campanhas.html" class="text-sm text-orange-500 hover:text-orange-400 font-bold transition-colors">Ir para Campanhas →</a>
+            </div>
+            <div id="listaCampanhas" class="bg-slate-900 rounded-lg shadow-lg border border-slate-800 p-4"><p class="text-slate-400">Carregando campanhas...</p></div>
+        </div>
+
+        <!-- 7.1 PLANEJAMENTOS (BSC) -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold flex items-center gap-2">
+                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        Planejamentos Estratégicos (BSC)
+                    </h2>
+                    <p class="text-slate-400 text-sm">Ações, metas de ROAS e orçamentos definidos por cliente.</p>
+                </div>
+                <a href="/planejamento.html" class="text-sm text-orange-500 hover:text-orange-400 font-bold transition-colors">Ir para Planejamento →</a>
+            </div>
+            <div id="listaPlanejamentos" class="bg-slate-900 rounded-lg shadow-lg border border-slate-800 p-4">
+                <p class="text-slate-400">Carregando planejamentos...</p>
+            </div>
+        </div>
+
+        <!-- 7.2 CRIATIVOS RECENTES (NOVO) -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold flex items-center gap-2">
+                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        Criativos Recentes
+                    </h2>
+                    <p class="text-slate-400 text-sm">Últimos criativos enviados e status de aprovação.</p>
+                </div>
+                <a href="/criativos.html" class="text-sm text-orange-500 hover:text-orange-400 font-bold transition-colors">Gerenciar Criativos →</a>
+            </div>
+            <div id="listaCriativosDashboard" class="bg-slate-900 rounded-lg shadow-lg border border-slate-800 p-4">
+                <p class="text-slate-400">Carregando criativos...</p>
+            </div>
+        </div>
+
+        <!-- 8. RESUMO FINANCEIRO -->
+        <div>
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold flex items-center gap-2">
+                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Resumo Financeiro por Cliente
+                    </h2>
+                    <p class="text-slate-400 text-sm">Acompanhe as receitas, despesas e saldo por cliente.</p>
+                </div>
+                <a href="/financeiro.html" class="text-sm text-orange-500 hover:text-orange-400 font-bold transition-colors">Ir para Financeiro →</a>
+            </div>
+            <div id="listaResumoFinanceiro" class="bg-slate-900 rounded-lg shadow-lg border border-slate-800 p-4"><p class="text-slate-400">Carregando dados financeiros...</p></div>
+        </div>
+    </main>
+
+    <!-- Modal de Tarefas do Calendário -->
+    <div id="modalTarefas" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-md p-6 relative">
+            <button onclick="fecharModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">&times;</button>
+            <h3 id="modalTituloData" class="text-xl font-bold text-orange-400 mb-4 border-b border-slate-700 pb-2">Tarefas do Dia</h3>
+            <div id="modalConteudo" class="space-y-3 max-h-64 overflow-y-auto pr-2"></div>
+        </div>
+    </div>
+
+    <!-- SCRIPT PRINCIPAL -->
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login.html';
+
+        let todasAsTarefas = [];
+        let listaClientes = [];
+        let dataAtual = new Date();
+        let mesAtual = dataAtual.getMonth();
+        let anoAtual = dataAtual.getFullYear();
+        const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        async function fetchAPI(url) {
+            try {
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                    return null;
+                }
+                if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+                return await res.json();
+            } catch (error) {
+                console.error(`Erro ao buscar ${url}:`, error);
+                return null;
+            }
+        }
+
+        async function baixarBackup() {
+            try {
+                const res = await fetch('/api/backup', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) {
+                    const erro = await res.json();
+                    throw new Error(erro.error || 'Erro ao gerar backup');
+                }
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `backup_sistema_${new Date().toISOString().split('T')[0]}.sql`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('Erro no backup: ' + error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 0. Carregar Novos Cards (Dashboard)
+            const dash = await fetchAPI('/api/dashboard');
+            if (dash) {
+                document.getElementById('cardCriativosPendentes').innerText = dash.criativosPendentes || 0;
+                const valor = dash.faturamentoMes || 0;
+                document.getElementById('cardFaturamentoMes').innerText = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }
+
+            // 1. Carregar Dados do Google Analytics
+            const gaData = await fetchAPI('/api/analytics/resumo');
+            if (gaData) {
+                const elUsuarios = document.getElementById('gaUsuarios');
+                const elSessoes = document.getElementById('gaSessoes');
+                const elVisualizacoes = document.getElementById('gaVisualizacoes');
+                
+                if (elUsuarios) elUsuarios.innerText = gaData.usuariosAtivos;
+                if (elSessoes) elSessoes.innerText = gaData.sessoes;
+                if (elVisualizacoes) elVisualizacoes.innerText = gaData.visualizacoes;
+            }
+
+            // 2. Carregar Clientes
+            const clientes = await fetchAPI('/api/clientes');
+            if (clientes) {
+                listaClientes = clientes;
+                const select = document.getElementById('filtroClienteCalendario');
+                clientes.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.nome;
+                    select.appendChild(opt);
+                });
+            }
+
+            // 3. Métricas
+            const metricas = await fetchAPI('/api/metricas');
+            if (metricas) {
+                document.getElementById('cardClientes').innerText = metricas.totalClientes || 0;
+                document.getElementById('cardProspects').innerText = metricas.totalProspects || 0;
+            }
+
+            // 4. Leads
+            const leads = await fetchAPI('/api/leads');
+            if (leads) {
+                document.getElementById('cardTotalLeads').innerText = leads.length;
+                const pendentes = leads.filter(l => l.status === 'novo' || l.status === 'em_atendimento').length;
+                const atendidos = leads.filter(l => l.status === 'atendido' || l.status === 'convertido').length;
+                document.getElementById('cardPendentes').innerText = pendentes;
+                document.getElementById('cardAtendidos').innerText = atendidos;
+                renderizarLeads(leads);
+            }
+
+            // 5. Tarefas
+            const tarefas = await fetchAPI('/api/tarefas');
+            if (tarefas) {
+                todasAsTarefas = tarefas;
+                renderizarTarefas(tarefas.filter(t => !t.concluida));
+                renderizarCalendario();
+            }
+
+            // 5.1 Carregar Tarefas Atrasadas
+            const atrasadas = await fetchAPI('/api/dashboard/tarefas-atrasadas');
+            if (atrasadas && atrasadas.length > 0) {
+                document.getElementById('alertaTarefasAtrasadas').classList.remove('hidden');
+                document.getElementById('textoTarefasAtrasadas').innerText = `Você tem ${atrasadas.length} tarefa(s) pendente(s) que já passaram do prazo.`;
+                
+                const listaDiv = document.getElementById('listaAtrasadas');
+                listaDiv.innerHTML = atrasadas.map(t => {
+                    const dataFormatada = t.data_vencimento ? t.data_vencimento.split('T')[0].split('-').reverse().join('/') : 'Sem data';
+                    return `
+                        <div class="bg-red-950/40 p-2 rounded border border-red-500/30 flex justify-between items-center">
+                            <div>
+                                <p class="text-sm font-bold text-white">${t.titulo}</p>
+                                <p class="text-xs text-red-300">Cliente: ${t.cliente_nome || 'N/A'} | Venceu em: ${dataFormatada}</p>
+                            </div>
+                            <a href="/tarefas.html" class="text-xs bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded transition-colors">Ver</a>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 6. Campanhas
+            const campanhas = await fetchAPI('/api/campanhas');
+            if (campanhas) renderizarCampanhas(campanhas);
+
+            // 6.1 Planejamentos
+            const planejamentos = await fetchAPI('/api/planejamento');
+            if (planejamentos) renderizarPlanejamentos(planejamentos);
+
+            // 6.2 Criativos
+            const criativos = await fetchAPI('/api/admin/criativos');
+            if (criativos) renderizarCriativos(criativos);
+
+            // 7. Outbound e Inbound e Tráfego Pago
+            const outbound = await fetchAPI('/api/outbound');
+            if (outbound) renderizarOutbound(outbound);
+            
+            const inbound = await fetchAPI('/api/inbound');
+            if (inbound) renderizarInbound(inbound);
+
+            const trafegoPago = await fetchAPI('/api/trafego-pago');
+            if (trafegoPago) renderizarTrafegoPago(trafegoPago);
+
+            // 8. Resumo Financeiro
+            carregarResumoFinanceiro();
+
+            // 9. CARREGAR GRÁFICOS DO DASHBOARD
+            const dadosGraficos = await fetchAPI('/api/dashboard/graficos');
+            
+            if (dadosGraficos) {
+                const ctxFat = document.getElementById('graficoFaturamento').getContext('2d');
+                new Chart(ctxFat, {
+                    type: 'line',
+                    data: {
+                        labels: dadosGraficos.faturamento.map(d => d.mes),
+                        datasets: [{
+                            label: 'Faturamento (R$)',
+                            data: dadosGraficos.faturamento.map(d => parseFloat(d.total)),
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#22c55e',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return 'R$ ' + context.raw.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); } } } },
+                        scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }, y: { ticks: { color: '#94a3b8', callback: function(value) { return 'R$ ' + value.toLocaleString('pt-BR'); } }, grid: { color: '#334155' } } }
+                    }
+                });
+
+                const ctxLeads = document.getElementById('graficoLeads').getContext('2d');
+                const labelsLeads = dadosGraficos.leads.map(l => (l.status || 'Novo').toUpperCase());
+                const dataLeads = dadosGraficos.leads.map(l => parseInt(l.total));
+                
+                new Chart(ctxLeads, {
+                    type: 'doughnut',
+                    data: { labels: labelsLeads, datasets: [{ data: dataLeads, backgroundColor: ['#3b82f6', '#eab308', '#22c55e', '#f97316', '#a855f7', '#ef4444', '#14b8a6'], borderWidth: 0, hoverOffset: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20, font: { size: 12 } } } }, cutout: '60%' }
+                });
+
+                const ctxClientes = document.getElementById('graficoNovosClientes').getContext('2d');
+                new Chart(ctxClientes, {
+                    type: 'bar',
+                    data: { labels: dadosGraficos.clientes.map(d => d.mes), datasets: [{ label: 'Novos Clientes', data: dadosGraficos.clientes.map(d => parseInt(d.total)), backgroundColor: '#a855f7', borderRadius: 6, barThickness: 40 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#94a3b8' }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: '#334155' } } } }
+                });
+            }
+        });
+
+        document.getElementById('btnMesAnterior').addEventListener('click', () => { mesAtual--; if (mesAtual < 0) { mesAtual = 11; anoAtual--; } renderizarCalendario(); });
+        document.getElementById('btnProximoMes').addEventListener('click', () => { mesAtual++; if (mesAtual > 11) { mesAtual = 0; anoAtual++; } renderizarCalendario(); });
+        document.getElementById('filtroClienteCalendario').addEventListener('change', () => { renderizarCalendario(); });
+
+        function renderizarCalendario() {
+            const grid = document.getElementById('gridCalendario'); const mesAnoTexto = document.getElementById('mesAnoAtual'); const filtroCliente = document.getElementById('filtroClienteCalendario').value;
+            grid.innerHTML = ''; mesAnoTexto.textContent = `${meses[mesAtual]} ${anoAtual}`;
+            const primeiroDia = new Date(anoAtual, mesAtual, 1).getDay(); const diasNoMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
+            const tarefasFiltradas = todasAsTarefas.filter(t => filtroCliente === 'todos' || t.cliente_id == filtroCliente);
+            for (let i = 0; i < primeiroDia; i++) { grid.innerHTML += `<div></div>`; }
+            for (let dia = 1; dia <= diasNoMes; dia++) {
+                const dataStr = `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                const temTarefa = tarefasFiltradas.some(t => t.data_vencimento && String(t.data_vencimento).split('T')[0] === dataStr);
+                const hoje = new Date(); const isHoje = dia === hoje.getDate() && mesAtual === hoje.getMonth() && anoAtual === hoje.getFullYear();
+                let classes = "flex items-center justify-center w-8 h-8 rounded-full cursor-pointer transition-colors hover:bg-slate-700 ";
+                if (temTarefa) { classes += "bg-orange-500 font-bold text-white hover:bg-orange-600 "; } else if (isHoje) { classes += "border border-orange-500 text-orange-400 "; }
+                grid.innerHTML += `<div class="${classes}" onclick="abrirModal('${dataStr}')">${dia}</div>`;
+            }
+        }
+
+        function abrirModal(dataStr) {
+            const filtroCliente = document.getElementById('filtroClienteCalendario').value;
+            const tarefasDoDia = todasAsTarefas.filter(t => { const matchData = t.data_vencimento && String(t.data_vencimento).startsWith(dataStr); const matchCliente = filtroCliente === 'todos' ? true : t.cliente_id == filtroCliente; return matchData && matchCliente; });
+            const [ano, mes, dia] = dataStr.split('-');
+            document.getElementById('modalTituloData').textContent = `Tarefas de ${dia}/${mes}/${ano}`;
+            const conteudo = document.getElementById('modalConteudo'); conteudo.innerHTML = '';
+            if (tarefasDoDia.length === 0) { conteudo.innerHTML = '<p class="text-slate-400 text-center py-4">Nenhuma tarefa agendada para esta data.</p>'; } 
+            else { tarefasDoDia.forEach(t => { const cor = t.concluida ? 'text-green-400 line-through' : 'text-white'; const status = t.concluida ? 'Concluída' : 'Pendente'; conteudo.innerHTML += `<div class="bg-slate-800 p-3 rounded border border-slate-700"><p class="font-bold ${cor}">${t.titulo}</p><p class="text-sm text-blue-300">Cliente: ${t.cliente_nome || 'Sem cliente'}</p><p class="text-xs text-slate-400 mt-1">Lead: ${t.lead_nome || 'N/A'} | Status: ${status}</p></div>`; }); }
+            const modal = document.getElementById('modalTarefas'); modal.classList.remove('hidden'); modal.classList.add('flex');
+        }
+
+        function fecharModal() { const modal = document.getElementById('modalTarefas'); modal.classList.add('hidden'); modal.classList.remove('flex'); }
+        document.getElementById('modalTarefas').addEventListener('click', (e) => { if (e.target.id === 'modalTarefas') fecharModal(); });
+
+        function renderizarOutbound(acoes) {
+            const div = document.getElementById('listaOutbound'); const comObservacao = acoes.filter(a => a.observacoes && a.observacoes.trim() !== '');
+            if (comObservacao.length === 0) { div.innerHTML = '<p class="text-slate-400">Nenhuma observação interna registrada no momento.</p>'; return; }
+            comObservacao.sort((a, b) => new Date(b.data_criacao) - new Date(a.data_criacao));
+            div.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${comObservacao.map(a => `<div class="bg-slate-800 p-4 rounded-lg border border-slate-700 relative overflow-hidden"><div class="absolute top-0 left-0 w-1 h-full bg-orange-500"></div><div class="flex justify-between items-start mb-2 gap-2 w-full"><div class="flex-1 min-w-0"><span class="bg-slate-900 text-blue-400 text-xs px-2 py-1 rounded border border-slate-600 font-bold block truncate" title="${a.cliente_nome || 'Sem Cliente'}">${a.cliente_nome || 'Sem Cliente'}</span></div><span class="text-xs text-slate-500 font-bold whitespace-nowrap">${a.canal}</span></div><p class="text-sm font-bold text-white mt-2">${a.prospect_nome || 'Prospect não informado'}</p><div class="mt-3 bg-slate-900/50 p-2 rounded border border-yellow-500/20"><p class="text-xs text-yellow-400"><strong>Obs:</strong> ${a.observacoes}</p></div>${a.mensagem ? `<p class="text-xs text-slate-500 mt-2 truncate" title="${a.mensagem}">Msg: ${a.mensagem}</p>` : ''}<div class="mt-3 flex justify-between items-center border-t border-slate-700 pt-2"><span class="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Status: ${a.status.replace('_', ' ')}</span><span class="text-[10px] text-slate-500">${new Date(a.data_acao + 'T00:00:00').toLocaleDateString('pt-BR')}</span></div></div>`).join('')}</div>`;
+        }
+
+        function renderizarInbound(acoes) {
+            const div = document.getElementById('listaInbound'); if (acoes.length === 0) { div.innerHTML = '<p class="text-slate-400">Nenhuma ação de inbound registrada.</p>'; return; }
+            acoes.sort((a, b) => new Date(b.data_criacao) - new Date(a.data_criacao));
+            div.innerHTML = `<div class="space-y-4">${acoes.map(a => `<div class="bg-slate-800 p-4 rounded-lg border border-slate-700 relative overflow-hidden"><div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div><div class="flex justify-between items-start mb-2"><div><span class="bg-slate-900 text-blue-300 text-xs px-2 py-1 rounded border border-slate-600 font-bold">${a.cliente_nome || 'Sem Cliente'}</span></div><span class="text-xs text-slate-500 font-bold">${a.tipo_conteudo || 'Conteúdo'}</span></div><p class="text-sm font-bold text-white mt-2">${a.titulo || 'Sem título'}</p><p class="text-xs text-slate-400 mt-1 line-clamp-2">${a.descricao || ''}</p><div class="mt-3 flex justify-between items-center border-t border-slate-700 pt-2"><span class="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Etapa: ${a.etapa_funil || '-'}</span><span class="text-[10px] text-slate-500 font-bold uppercase">${a.status || '-'}</span></div></div>`).join('')}</div>`;
+        }
+
+        function renderizarTrafegoPago(campanhas) {
+            const div = document.getElementById('listaTrafegoPago');
+            if (campanhas.length === 0) {
+                div.innerHTML = '<p class="text-slate-400">Nenhuma campanha de tráfego pago registrada.</p>';
+                return;
+            }
+            
+            div.innerHTML = `<div class="space-y-4">${campanhas.map(c => `
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="bg-slate-900 text-green-300 text-xs px-2 py-1 rounded border border-slate-600 font-bold">${c.cliente_nome || 'Sem Cliente'}</span>
+                            <span class="text-xs text-slate-400 ml-2">${c.plataforma || 'Plataforma'}</span>
+                        </div>
+                        <span class="text-xs font-bold ${c.status === 'Ativa' ? 'text-green-400' : 'text-slate-500'}">${c.status || 'Ativa'}</span>
+                    </div>
+                    <p class="text-sm font-bold text-white mt-2">${c.nome_campanha}</p>
+                    <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
+                        <div class="bg-slate-900/50 p-2 rounded"><span class="text-slate-500">Investimento:</span> <span class="text-green-400 font-bold">R$ ${parseFloat(c.investimento_total || 0).toFixed(2).replace('.', ',')}</span></div>
+                        <div class="bg-slate-900/50 p-2 rounded"><span class="text-slate-500">Orçamento/dia:</span> <span class="text-blue-400 font-bold">R$ ${parseFloat(c.orcamento_diario || 0).toFixed(2).replace('.', ',')}</span></div>
+                        <div class="bg-slate-900/50 p-2 rounded"><span class="text-slate-500">Cliques:</span> <span class="text-purple-400 font-bold">${c.cliques || 0}</span></div>
+                        <div class="bg-slate-900/50 p-2 rounded"><span class="text-slate-500">Conversões:</span> <span class="text-orange-400 font-bold">${c.conversoes || 0}</span></div>
+                    </div>
+                </div>
+            `).join('')}</div>`;
+        }
+
+        function renderizarCriativos(criativos) {
+            const div = document.getElementById('listaCriativosDashboard');
+            if (criativos.length === 0) {
+                div.innerHTML = '<p class="text-slate-400">Nenhum criativo cadastrado.</p>';
+                return;
+            }
+
+            const recentes = criativos.slice(0, 6); // Mostrar apenas os 6 mais recentes
+
+            div.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${recentes.map(c => {
+                    let corStatus = 'bg-yellow-500/20 text-yellow-400';
+                    if (c.status === 'aprovado') corStatus = 'bg-green-500/20 text-green-400';
+                    if (c.status === 'recusado') corStatus = 'bg-red-500/20 text-red-400';
+                    
+                    const feedback = c.feedback_cliente ? `<div class="mt-2 text-xs text-slate-400 bg-slate-900/50 p-2 rounded border border-slate-700"><strong>Feedback:</strong> ${c.feedback_cliente}</div>` : '';
+                    
+                    return `
+                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-xs font-bold text-blue-300">${c.cliente_nome || 'Cliente'}</span>
+                                <span class="px-2 py-1 rounded text-[10px] font-bold ${corStatus}">${c.status.toUpperCase()}</span>
+                            </div>
+                            <h4 class="font-bold text-white mb-1 truncate" title="${c.titulo}">${c.titulo}</h4>
+                            ${feedback}
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-slate-700 flex justify-between items-center">
+                            <span class="text-xs text-slate-500">${new Date(c.data_criacao).toLocaleDateString('pt-BR')}</span>
+                            <a href="${c.url_arquivo}" target="_blank" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-2 py-1 rounded transition-colors">Ver Peça</a>
+                        </div>
+                    </div>
+                    `;
+                }).join('')}
+            </div>`;
+        }
+
+        function renderizarLeads(leads) {
+            const tbody = document.getElementById('tabelaLeads'); if (leads.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhum lead cadastrado.</td></tr>'; return; }
+            tbody.innerHTML = leads.slice(0, 5).map(l => `<tr class="hover:bg-slate-800/50 transition-colors"><td class="p-4 text-slate-400">${l.id}</td><td class="p-4 font-medium">${l.nome}</td><td class="p-4 text-slate-300">${l.email || '-'}</td><td class="p-4 text-slate-300">${l.telefone || '-'}</td><td class="p-4 text-slate-300">${l.origem || '-'}</td><td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded text-xs border border-slate-600">${l.status || 'Novo'}</span></td></tr>`).join('');
+        }
+
+        function renderizarTarefas(tarefas) {
+            const div = document.getElementById('listaTarefas'); if (tarefas.length === 0) { div.innerHTML = '<p class="text-slate-400">Nenhuma tarefa pendente.</p>'; return; }
+            div.innerHTML = `<div class="space-y-2">${tarefas.map(t => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 flex justify-between items-center"><div class="flex items-center gap-3"><input type="checkbox" onchange="alternarStatus(${t.id}, this.checked)" class="w-5 h-5 accent-orange-500 cursor-pointer" title="Marcar como realizada"><div><p class="font-bold">${t.titulo}</p><p class="text-sm text-slate-400">Cliente: ${t.cliente_nome || 'N/A'} | Lead: ${t.lead_nome || 'N/A'}</p></div></div><button onclick="excluirTarefa(${t.id})" class="text-red-500 hover:text-red-400 text-sm font-bold">Excluir</button></div>`).join('')}</div>`;
+        }
+
+        function renderizarCampanhas(campanhas) {
+            const div = document.getElementById('listaCampanhas'); if (campanhas.length === 0) { div.innerHTML = '<p class="text-slate-400">Nenhuma campanha cadastrada.</p>'; return; }
+            div.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${campanhas.map(c => `<div class="bg-slate-800 p-4 rounded-lg border border-slate-700"><h4 class="font-bold text-orange-400 mb-1">${c.nome}</h4><p class="text-sm text-slate-300">Cliente: ${c.cliente_nome || 'Sem cliente'}</p></div>`).join('')}</div>`;
+        }
+
+        function renderizarPlanejamentos(planejamentos) {
+            const div = document.getElementById('listaPlanejamentos');
+            if (planejamentos.length === 0) {
+                div.innerHTML = '<p class="text-slate-400">Nenhum planejamento cadastrado.</p>';
+                return;
+            }
+
+            const formatadorMoeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            div.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${planejamentos.map(p => `
+                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 relative overflow-hidden flex flex-col gap-2">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                        
+                        <div class="flex justify-between items-start">
+                            <div class="overflow-hidden">
+                                <h4 class="font-bold text-blue-300 truncate" title="${p.cliente_nome || 'Sem cliente'}">${p.cliente_nome || 'Sem cliente'}</h4>
+                                <p class="text-xs text-slate-400 truncate" title="${p.campanha_nome || 'Nenhuma campanha vinculada'}">${p.campanha_nome || 'Nenhuma campanha vinculada'}</p>
+                            </div>
+                            <span class="bg-slate-900 text-xs px-2 py-1 rounded border border-slate-600 text-slate-300">${p.responsavel || 'Sem resp.'}</span>
+                        </div>
+
+                        <div class="flex justify-between text-sm mt-2">
+                            <span class="text-slate-400">Orçamento:</span>
+                            <span class="text-green-400 font-bold">${formatadorMoeda.format(p.orcamento || 0)}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-slate-400">Meta de ROAS:</span>
+                            <span class="text-purple-400 font-bold">${p.meta_roas || 0}x</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+
+        async function carregarResumoFinanceiro() {
+            const dados = await fetchAPI('/api/financeiro/dados'); const div = document.getElementById('listaResumoFinanceiro');
+            if (!dados) { div.innerHTML = '<p class="text-red-500 text-sm">Erro ao carregar dados financeiros.</p>'; return; }
+            const receitas = dados.receitas || []; const despesas = dados.despesas || [];
+            if (receitas.length === 0 && despesas.length === 0) { div.innerHTML = '<p class="text-slate-400 text-sm">Nenhum lançamento financeiro encontrado.</p>'; return; }
+            const formatador = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }); const agrupamento = {};
+            const initCliente = (nome) => { if (!agrupamento[nome]) agrupamento[nome] = { receita: 0, despesa: 0 }; };
+            receitas.forEach(r => { const nome = r.cliente_nome || 'Sem Cliente'; initCliente(nome); agrupamento[nome].receita += parseFloat(r.valor || 0); });
+            despesas.forEach(d => { const nome = d.cliente_nome || 'Sem Cliente'; initCliente(nome); agrupamento[nome].despesa += parseFloat(d.valor || 0); });
+            let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">';
+            Object.entries(agrupamento).forEach(([cliente, d]) => {
+                const saldo = d.receita - d.despesa; const corSaldo = saldo >= 0 ? 'text-green-400' : 'text-red-400';
+                html += `<div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex flex-col gap-2"><h4 class="font-bold text-blue-300 mb-1 truncate" title="${cliente}">${cliente}</h4><div class="flex justify-between text-sm"><span class="text-slate-400">Receitas:</span> <span class="text-green-400 font-bold">${formatador.format(d.receita)}</span></div><div class="flex justify-between text-sm"><span class="text-slate-400">Despesas:</span> <span class="text-red-400 font-bold">${formatador.format(d.despesa)}</span></div><div class="flex justify-between font-bold mt-2 pt-2 border-t border-slate-700 ${corSaldo}"><span>Saldo Líquido:</span> <span>${formatador.format(saldo)}</span></div></div>`;
+            });
+            html += '</div>'; div.innerHTML = html;
+        }
+
+        async function alternarStatus(id, concluida) { try { await fetch(`/api/tarefas/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ concluida }) }); window.location.reload(); } catch (error) { alert('Erro ao atualizar tarefa.'); } }
+        async function excluirTarefa(id) { if (!confirm('Tem certeza que deseja excluir esta tarefa?')) return; try { await fetch(`/api/tarefas/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } }); window.location.reload(); } catch (error) { alert('Erro ao excluir.'); } }
+    </script>
+
+    <!-- BLOQUEIO DE CLIENTE -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.tipo === 'cliente') {
+                    const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html', 'branding.html', 'permissoes.html'];
+                    const urlAtual = window.location.pathname.split('/').pop();
+                    if (paginasAdmin.includes(urlAtual)) {
+                        alert('Acesso negado. Esta área é restrita.');
+                        window.location.href = '/portal_cliente.html';
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+</body>
+</html>

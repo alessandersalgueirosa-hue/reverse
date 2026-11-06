@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Painel Administrativo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body {
+      background: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 2rem;
+      border: 1px solid #334155;
+      border-radius: 1rem;
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+    }
+    .login-card h1 { color: #f8faff; margin-bottom: 1.5rem; }
+    .input-field {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      color: #f8fafc;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25);
+    }
+    .input-field::placeholder { color: #64748b; }
+    .btn-entrar {
+      width: 100%;
+      padding: 0.75rem;
+      background: #f97316;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+    .btn-entrar:hover { background: #ea580c; }
+    .btn-entrar:active { transform: scale(0.98); }
+  </style>
+  <link rel="icon" type="image/png" href="/logo.png">
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            /* No celular, os submenus ficam sempre abertos para facilitar o toque */
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+
+</head>
+<body>
+  <div class="login-card">
+    <div class="flex items-center justify-center mb-4">
+      <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center mr-3">
+        <span class="text-white font-bold text-lg">R</span>
+      </div>
+      <h1 class="text-2xl font-bold text-white">Reverse Marketing</h1>
+    </div>
+    <h1>Acesso Administrativo</h1>
+    <p class="text-slate-400 text-sm mb-6">Digite suas credenciais abaixo.</p>
+
+    <form id="loginForm">
+      <div class="mb-4">
+        <input type="email" id="email" name="email" class="input-field" placeholder="E-mail" required autocomplete="email">
+      </div>
+      <div class="mb-4">
+        <input type="password" id="senha" name="senha" class="input-field" placeholder="Senha" required autocomplete="current-password">
+      </div>
+      <div id="feedback"></div>
+      <button type="submit" class="btn-entrar">Entrar</button>
+    </form>
+
+    <!-- Link Esqueci minha senha -->
+    <a href="#" onclick="abrirModalEsqueciSenha()" class="block text-center text-sm text-slate-400 hover:text-orange-500 mt-4 transition-colors">Esqueci minha senha</a>
+  </div>
+
+  <!-- Modal Esqueci Minha Senha -->
+  <div id="modalEsqueciSenha" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+      <div class="bg-slate-900 p-8 rounded-lg border border-slate-800 w-full max-w-md">
+          <h2 class="text-2xl font-bold mb-4 text-white">Recuperar Senha</h2>
+          <p class="text-sm text-slate-400 mb-4">Digite seu e-mail cadastrado. Enviaremos uma senha temporária.</p>
+          <form id="formEsqueciSenha">
+              <div class="mb-4">
+                  <label class="block text-sm font-medium mb-2 text-slate-300">E-mail</label>
+                  <input type="email" id="emailRecuperacao" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+              </div>
+              <div class="flex justify-end gap-4 mt-6">
+                  <button type="button" onclick="fecharModalEsqueciSenha()" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Cancelar</button>
+                  <button type="submit" class="px-6 py-2 bg-orange-500 hover:bg-orange-400 text-white font-bold rounded-lg transition-colors">Enviar</button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <script>
+    // --- LÓGICA DE LOGIN ---
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+        const feedback = document.getElementById('feedback');
+        feedback.textContent = '';
+        feedback.className = 'hidden';
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('token', data.token);
+                window.location.href = '/admin.html';
+            } else {
+                feedback.textContent = data.error || 'Credenciais inválidas.';
+                feedback.className = 'block text-red-500 text-sm font-bold mt-2';
+            }
+        } catch (error) {
+            feedback.textContent = 'Erro ao conectar com o servidor.';
+            feedback.className = 'block text-red-500 text-sm font-bold mt-2';
+        }
+    });
+
+    // --- LÓGICA DE ESQUECI MINHA SENHA ---
+    function abrirModalEsqueciSenha() {
+        document.getElementById('modalEsqueciSenha').classList.remove('hidden');
+        document.getElementById('modalEsqueciSenha').classList.add('flex');
+    }
+
+    function fecharModalEsqueciSenha() {
+        document.getElementById('modalEsqueciSenha').classList.add('hidden');
+        document.getElementById('modalEsqueciSenha').classList.remove('flex');
+    }
+
+    document.getElementById('formEsqueciSenha').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('emailRecuperacao').value;
+        try {
+            const response = await fetch('/api/esqueci-senha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await response.json();
+            alert(data.message || 'Verifique seu e-mail.');
+            fecharModalEsqueciSenha();
+        } catch (error) {
+            alert('Erro de conexão.');
+        }
+    });
+  </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+
+</body>
+</html>

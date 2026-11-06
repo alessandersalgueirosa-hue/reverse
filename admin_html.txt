@@ -1,0 +1,669 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="bg-orange-500 rounded-full w-8 h-8 flex items-center justify-center font-bold text-white">R</div>
+            <h1 class="text-xl font-bold">Dashboard - Reverse Marketing</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="/clientes.html" class="text-sm text-slate-400 hover:text-white transition-colors">Clientes</a>
+            <a href="/campanhas.html" class="text-sm text-slate-400 hover:text-white transition-colors">Campanhas</a>
+            <a href="/metricas.html" class="text-sm text-slate-400 hover:text-white transition-colors">Métricas</a>
+            <button id="btnSair" class="text-sm text-slate-400 hover:text-white transition-colors">Sair</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto p-8">
+        
+        <!-- Cards de Métricas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <p class="text-slate-400 text-sm font-medium mb-1">Total de Leads</p>
+                <p id="totalLeads" class="text-4xl font-extrabold text-white">0</p>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <p class="text-yellow-400 text-sm font-medium mb-1">Pendentes</p>
+                <p id="leadsPendentes" class="text-4xl font-extrabold text-yellow-400">0</p>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <p class="text-green-400 text-sm font-medium mb-1">Atendidos</p>
+                <p id="leadsAtendidos" class="text-4xl font-extrabold text-green-400">0</p>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+                <p class="text-blue-400 text-sm font-medium mb-1">Clientes Ativos</p>
+                <p id="totalClientes" class="text-4xl font-extrabold text-blue-400">0</p>
+            </div>
+        </div>
+
+        <!-- Título e Filtros -->
+        <div class="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-2xl font-extrabold mb-1">Leads Recentes</h2>
+                <p class="text-slate-400">Visualize e gerencie os leads capturados.</p>
+            </div>
+            
+            <!-- Barra de Filtros e Busca -->
+            <div class="flex items-center gap-3 flex-wrap">
+                <input type="text" id="buscarLead" placeholder="Buscar por nome ou e-mail..." 
+                    class="bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-orange-500 w-64">
+                <button id="btnBuscar" 
+                    class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Buscar</button>
+                <select id="filtrarStatus" 
+                    class="bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-orange-500">
+                    <option value="">Todos</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="atendido">Atendido</option>
+                </select>
+                <select id="filtrarTag" 
+                    class="bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-orange-500">
+                    <option value="">Todas as Tags</option>
+                </select>
+                <button id="limparFiltros" 
+                    class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Limpar</button>
+            </div>
+        </div>
+
+        <!-- Tabela -->
+        <div class="bg-slate-900 rounded-lg shadow-lg overflow-x-auto border border-slate-800">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Nome</th>
+                        <th class="p-4">E-mail</th>
+                        <th class="p-4">Telefone</th>
+                        <th class="p-4">Empresa</th>
+                        <th class="p-4">Origem</th>
+                        <th class="p-4">Cliente</th>
+                        <th class="p-4">Tags</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaLeads" class="divide-y divide-slate-800">
+                    <!-- Linhas inseridas via JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal de Edição de Lead -->
+    <div id="modalEdicaoLead" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 rounded-lg shadow-2xl border border-slate-800 w-full max-w-lg flex flex-col">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-xl font-bold">Editar Lead</h3>
+                <button id="fecharModalEdicaoLead" class="text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6">
+                <form id="formEdicaoLead">
+                    <input type="hidden" id="editLeadId">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Status</label>
+                        <select id="editLeadStatus" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                            <option value="pendente">Pendente</option>
+                            <option value="atendido">Atendido</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Cliente Vinculado</label>
+                        <select id="editLeadCliente" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                            <option value="">Nenhum</option>
+                            <!-- Clientes inseridos via JS -->
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-colors">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Gerenciamento de Tags -->
+    <div id="modalTags" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 rounded-lg shadow-2xl border border-slate-800 w-full max-w-lg max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-xl font-bold">Gerenciar Tags</h3>
+                <button id="fecharModalTags" class="text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto flex-1">
+                <h4 class="font-bold mb-2 text-slate-300">Tags disponíveis</h4>
+                <div id="listaTagsDisponiveis" class="flex flex-wrap gap-2 mb-6">
+                    <!-- Tags inseridas via JS -->
+                </div>
+
+                <h4 class="font-bold mb-2 text-slate-300">Criar nova tag</h4>
+                <div class="flex gap-2">
+                    <input type="text" id="novaTagNome" placeholder="Ex: Interessado em Tráfego" 
+                        class="flex-1 p-3 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-orange-500">
+                    <button id="btnCriarTag" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">Criar</button>
+                </div>
+                <div id="feedbackTag" class="hidden mt-2 p-2 rounded text-center text-sm font-bold"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Histórico de Interações -->
+    <div id="modalHistorico" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 rounded-lg shadow-2xl border border-slate-800 w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-xl font-bold">Histórico de Interações</h3>
+                <button id="fecharModal" class="text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto flex-1" id="listaInteracoes">
+                <!-- Lista de interações inserida via JS -->
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-800/50">
+                <h4 class="font-bold mb-2">Adicionar Interação</h4>
+                <div class="flex gap-2 mb-2">
+                    <select id="tipoInteracao" class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                        <option value="Ligação">Ligação</option>
+                        <option value="E-mail">E-mail</option>
+                        <option value="Reunião">Reunião</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <textarea id="anotacaoInteracao" rows="2" placeholder="Digite a anotação da interação..." 
+                    class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 mb-2"></textarea>
+                <button id="btnSalvarInteracao" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg transition-colors">Salvar Interação</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/login.html';
+        }
+
+        let todosOsLeads = [];
+        let todasAsTags = [];
+        let todosOsClientes = [];
+        let leadIdAtual = null;
+
+        // --- FUNÇÕES UTILITÁRIAS ---
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // --- CARREGAMENTO DE DADOS ---
+
+        async function carregarClientesSelect() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/clientes', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    todosOsClientes = await response.json();
+                }
+            } catch (error) {
+                console.error('Erro ao carregar clientes:', error);
+            }
+        }
+
+        async function carregarTags() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/tags', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    todasAsTags = await response.json();
+                    popularSelectTags();
+                    renderizarListaTagsDisponiveis();
+                }
+            } catch (error) {
+                console.error('Erro ao carregar tags:', error);
+            }
+        }
+
+        async function carregarTotalClientes() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/metricas', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('totalClientes').textContent = data.totalClientes || 0;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar total de clientes:', error);
+            }
+        }
+
+        // --- CARREGAMENTO PRINCIPAL (ORDEM CORRETA) ---
+        async function carregarTudo() {
+            // 1. Carrega clientes PRIMEIRO (para a coluna "Cliente" funcionar)
+            await carregarClientesSelect();
+            // 2. Carrega tags
+            await carregarTags();
+            // 3. Carrega os leads (agora com clientes já disponíveis)
+            await carregarLeads();
+            // 4. Carrega o total de clientes (card)
+            await carregarTotalClientes();
+        }
+
+        async function carregarLeads() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/leads', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Falha ao buscar leads');
+                const leads = await response.json();
+                todosOsLeads = leads;
+
+                const total = leads.length;
+                const pendentes = leads.filter(l => l.status === 'pendente' || !l.status).length;
+                const atendidos = leads.filter(l => l.status === 'atendido').length;
+
+                document.getElementById('totalLeads').textContent = total;
+                document.getElementById('leadsPendentes').textContent = pendentes;
+                document.getElementById('leadsAtendidos').textContent = atendidos;
+
+                filtrarLeads();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar dados. Verifique o console.');
+            }
+        }
+
+        function popularSelectTags() {
+            const select = document.getElementById('filtrarTag');
+            const valorAtual = select.value;
+            select.innerHTML = '<option value="">Todas as Tags</option>';
+            todasAsTags.forEach(tag => {
+                const option = document.createElement('option');
+                option.value = tag.id;
+                option.textContent = tag.nome;
+                select.appendChild(option);
+            });
+            select.value = valorAtual;
+        }
+
+        function renderizarListaTagsDisponiveis() {
+            const container = document.getElementById('listaTagsDisponiveis');
+            container.innerHTML = '';
+            if (todasAsTags.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 text-sm">Nenhuma tag cadastrada.</p>';
+                return;
+            }
+            todasAsTags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'bg-slate-800 text-slate-300 px-3 py-1 rounded text-sm border border-slate-700';
+                span.textContent = tag.nome;
+                container.appendChild(span);
+            });
+        }
+
+        // --- RENDERIZAÇÃO DA TABELA ---
+
+        function renderizarTabela(leads) {
+            const tbody = document.getElementById('tabelaLeads');
+            tbody.innerHTML = '';
+
+            if (leads.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-400">Nenhum lead encontrado.</td></tr>`;
+                return;
+            }
+
+            leads.forEach(lead => {
+                const statusColor = lead.status === 'atendido' 
+                    ? 'text-green-400 bg-green-400/10' 
+                    : 'text-yellow-400 bg-yellow-400/10';
+                
+                const tagsHtml = (lead.tags || []).map(t => 
+                    `<span class="bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded text-xs font-medium">${escapeHtml(t.nome)}</span>`
+                ).join(' ');
+
+                const cliente = todosOsClientes.find(c => c.id == lead.cliente_id);
+                const clienteNome = cliente ? cliente.nome : '-';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-4 text-slate-400">${lead.id}</td>
+                    <td class="p-4 font-medium">${escapeHtml(lead.nome)}</td>
+                    <td class="p-4 text-blue-400">${escapeHtml(lead.email)}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(lead.telefone) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(lead.empresa) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(lead.origem) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(clienteNome)}</td>
+                    <td class="p-4"><div class="flex flex-wrap gap-1">${tagsHtml || '<span class="text-slate-500 text-xs">Sem tags</span>'}</div></td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${statusColor}">${lead.status || 'pendente'}</span></td>
+                    <td class="p-4 flex gap-2 flex-wrap">
+                        <button onclick="abrirEdicaoLead(${lead.id})" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded text-sm transition-colors">Editar</button>
+                        <button onclick="abrirGerenciarTags(${lead.id})" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors">Tags</button>
+                        <button onclick="abrirHistorico(${lead.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">Histórico</button>
+                        <button onclick="atenderLead(${lead.id})" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">Atender</button>
+                        <button onclick="excluirLead(${lead.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- FILTROS ---
+
+        function filtrarLeads() {
+            const termoBusca = document.getElementById('buscarLead').value.toLowerCase();
+            const statusFiltro = document.getElementById('filtrarStatus').value;
+            const tagFiltro = document.getElementById('filtrarTag').value;
+
+            const leadsFiltrados = todosOsLeads.filter(lead => {
+                const matchBusca = lead.nome.toLowerCase().includes(termoBusca) || 
+                                   lead.email.toLowerCase().includes(termoBusca);
+                const matchStatus = statusFiltro === '' || 
+                                    (lead.status || 'pendente') === statusFiltro;
+                const matchTag = tagFiltro === '' || 
+                                 (lead.tags || []).some(t => t.id == tagFiltro);
+                return matchBusca && matchStatus && matchTag;
+            });
+
+            renderizarTabela(leadsFiltrados);
+        }
+
+        document.getElementById('buscarLead').addEventListener('input', filtrarLeads);
+        document.getElementById('btnBuscar').addEventListener('click', filtrarLeads);
+        document.getElementById('filtrarStatus').addEventListener('change', filtrarLeads);
+        document.getElementById('filtrarTag').addEventListener('change', filtrarLeads);
+        document.getElementById('limparFiltros').addEventListener('click', () => {
+            document.getElementById('buscarLead').value = '';
+            document.getElementById('filtrarStatus').value = '';
+            document.getElementById('filtrarTag').value = '';
+            filtrarLeads();
+        });
+
+        // --- EDIÇÃO DE LEAD ---
+
+        function abrirEdicaoLead(id) {
+            const lead = todosOsLeads.find(l => l.id === id);
+            if (!lead) return;
+
+            document.getElementById('editLeadId').value = lead.id;
+            document.getElementById('editLeadStatus').value = lead.status || 'pendente';
+            
+            const selectCliente = document.getElementById('editLeadCliente');
+            selectCliente.innerHTML = '<option value="">Nenhum</option>';
+            todosOsClientes.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = c.nome;
+                if (c.id == lead.cliente_id) option.selected = true;
+                selectCliente.appendChild(option);
+            });
+
+            document.getElementById('modalEdicaoLead').classList.remove('hidden');
+        }
+
+        document.getElementById('fecharModalEdicaoLead').addEventListener('click', () => {
+            document.getElementById('modalEdicaoLead').classList.add('hidden');
+        });
+
+        document.getElementById('modalEdicaoLead').addEventListener('click', (e) => {
+            if (e.target.id === 'modalEdicaoLead') {
+                document.getElementById('modalEdicaoLead').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('formEdicaoLead').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editLeadId').value;
+            const status = document.getElementById('editLeadStatus').value;
+            const cliente_id = document.getElementById('editLeadCliente').value || null;
+
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`/api/leads/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status, cliente_id })
+                });
+                if (!response.ok) throw new Error('Falha ao atualizar lead');
+                alert('Lead atualizado!');
+                document.getElementById('modalEdicaoLead').classList.add('hidden');
+                await carregarLeads();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao atualizar lead.');
+            }
+        });
+
+        // --- LÓGICA DE TAGS ---
+
+        async function abrirGerenciarTags(id) {
+            leadIdAtual = id;
+            const lead = todosOsLeads.find(l => l.id === id);
+            const leadTags = lead.tags || [];
+
+            document.getElementById('modalTags').classList.remove('hidden');
+            
+            const container = document.getElementById('listaTagsDisponiveis');
+            container.innerHTML = '';
+
+            if (todasAsTags.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 text-sm">Nenhuma tag cadastrada. Crie uma abaixo.</p>';
+                return;
+            }
+
+            todasAsTags.forEach(tag => {
+                const estaSelecionada = leadTags.some(lt => lt.id === tag.id);
+                const label = document.createElement('label');
+                label.className = 'flex items-center gap-2 bg-slate-800 px-3 py-2 rounded border border-slate-700 cursor-pointer hover:border-orange-500 transition-colors';
+                label.innerHTML = `
+                    <input type="checkbox" ${estaSelecionada ? 'checked' : ''} data-tag-id="${tag.id}" onchange="toggleTagLead(${tag.id}, this.checked)" class="accent-orange-500">
+                    <span class="text-sm">${escapeHtml(tag.nome)}</span>
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        async function toggleTagLead(tagId, isChecked) {
+            if (!leadIdAtual) return;
+            const token = localStorage.getItem('token');
+            try {
+                if (isChecked) {
+                    await fetch(`/api/leads/${leadIdAtual}/tags`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ tag_id: tagId })
+                    });
+                } else {
+                    await fetch(`/api/leads/${leadIdAtual}/tags/${tagId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                }
+                await carregarLeads();
+            } catch (error) {
+                console.error('Erro ao alternar tag:', error);
+                alert('Erro ao atualizar tag.');
+            }
+        }
+
+        document.getElementById('btnCriarTag').addEventListener('click', async () => {
+            const nome = document.getElementById('novaTagNome').value;
+            const feedback = document.getElementById('feedbackTag');
+            if (!nome.trim()) {
+                feedback.textContent = 'Digite um nome para a tag.';
+                feedback.className = 'mt-2 p-2 rounded text-center text-sm font-bold bg-red-600 text-white';
+                return;
+            }
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/tags', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ nome })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erro ao criar tag');
+                
+                document.getElementById('novaTagNome').value = '';
+                feedback.textContent = 'Tag criada com sucesso!';
+                feedback.className = 'mt-2 p-2 rounded text-center text-sm font-bold bg-green-600 text-white';
+                
+                await carregarTags();
+                if (leadIdAtual) await abrirGerenciarTags(leadIdAtual);
+                await carregarLeads();
+            } catch (error) {
+                feedback.textContent = error.message;
+                feedback.className = 'mt-2 p-2 rounded text-center text-sm font-bold bg-red-600 text-white';
+            }
+        });
+
+        document.getElementById('fecharModalTags').addEventListener('click', () => {
+            document.getElementById('modalTags').classList.add('hidden');
+        });
+
+        document.getElementById('modalTags').addEventListener('click', (e) => {
+            if (e.target.id === 'modalTags') {
+                document.getElementById('modalTags').classList.add('hidden');
+            }
+        });
+
+        // --- HISTÓRICO DE INTERAÇÕES ---
+
+        async function abrirHistorico(id) {
+            leadIdAtual = id;
+            document.getElementById('modalHistorico').classList.remove('hidden');
+            await carregarInteracoes(id);
+        }
+
+        async function carregarInteracoes(leadId) {
+            const token = localStorage.getItem('token');
+            const lista = document.getElementById('listaInteracoes');
+            lista.innerHTML = '<p class="text-slate-400">Carregando...</p>';
+
+            try {
+                const response = await fetch(`/api/interacoes/${leadId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Falha ao buscar interações');
+                const interacoes = await response.json();
+
+                if (interacoes.length === 0) {
+                    lista.innerHTML = '<p class="text-slate-400 text-center py-4">Nenhuma interação registrada ainda.</p>';
+                    return;
+                }
+
+                lista.innerHTML = '';
+                interacoes.forEach(i => {
+                    const dataFormatada = new Date(i.data_criacao).toLocaleString('pt-BR');
+                    const div = document.createElement('div');
+                    div.className = 'bg-slate-800 p-3 rounded-lg mb-2 border border-slate-700';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold text-orange-400">${escapeHtml(i.tipo)}</span>
+                            <span class="text-xs text-slate-400">${dataFormatada}</span>
+                        </div>
+                        <p class="text-slate-200 text-sm">${escapeHtml(i.anotacao)}</p>
+                    `;
+                    lista.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                lista.innerHTML = '<p class="text-red-400">Erro ao carregar interações.</p>';
+            }
+        }
+
+        document.getElementById('btnSalvarInteracao').addEventListener('click', async () => {
+            if (!leadIdAtual) return;
+            const token = localStorage.getItem('token');
+            const tipo = document.getElementById('tipoInteracao').value;
+            const anotacao = document.getElementById('anotacaoInteracao').value;
+
+            if (!anotacao.trim()) {
+                alert('Digite uma anotação antes de salvar.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/interacoes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ lead_id: leadIdAtual, tipo, anotacao })
+                });
+                if (!response.ok) throw new Error('Falha ao salvar interação');
+                
+                document.getElementById('anotacaoInteracao').value = '';
+                await carregarInteracoes(leadIdAtual);
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao salvar interação.');
+            }
+        });
+
+        document.getElementById('fecharModal').addEventListener('click', () => {
+            document.getElementById('modalHistorico').classList.add('hidden');
+            leadIdAtual = null;
+        });
+
+        document.getElementById('modalHistorico').addEventListener('click', (e) => {
+            if (e.target.id === 'modalHistorico') {
+                document.getElementById('modalHistorico').classList.add('hidden');
+                leadIdAtual = null;
+            }
+        });
+
+        // --- AÇÕES ---
+
+        async function atenderLead(id) {
+            if (!confirm('Marcar como atendido?')) return;
+            const token = localStorage.getItem('token');
+            await fetch(`/api/leads/${id}`, { 
+                method: 'PUT', 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ status: 'atendido', cliente_id: null })
+            });
+            carregarLeads();
+        }
+
+        async function excluirLead(id) {
+            if (!confirm('Excluir este lead?')) return;
+            const token = localStorage.getItem('token');
+            await fetch(`/api/leads/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            carregarLeads();
+        }
+
+        document.getElementById('btnSair').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        // --- INICIALIZAÇÃO (ordem correta) ---
+        carregarTudo();
+    </script>
+</body>
+</html>

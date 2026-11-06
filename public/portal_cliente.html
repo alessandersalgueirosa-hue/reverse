@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Cliente - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .pyside-button { transition: all 0.2s ease; border-radius: 0.375rem; font-weight: 500; }
+        .pyside-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2); }
+    </style>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+            
+    <!-- VERIFICAÇÃO DE SEGURANÇA: SE NÃO TIVER TOKEN, REDIRECIONA PARA O LOGIN -->
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/login.html';
+        }
+    </script>
+
+    <!-- MENU ADMIN -->
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MENU CLIENTE -->
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            if (isCliente) {
+                document.getElementById('menu-admin').style.display = 'none';
+                document.getElementById('menu-cliente').classList.remove('hidden');
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
+                };
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+            } else {
+                document.getElementById('menu-cliente').style.display = 'none';
+                document.getElementById('menu-admin').classList.remove('hidden');
+            }
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <div id="cardBoasVindas" class="bg-gradient-to-r from-orange-900/40 to-slate-900 p-6 rounded-lg border border-orange-500/50 mb-8 relative shadow-2xl">
+            <button onclick="document.getElementById('cardBoasVindas').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors" title="Fechar Tour">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-3 bg-orange-500 rounded-full text-white shadow-lg">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-extrabold text-white">Bem-vindo(a) à sua Área Exclusiva! 🚀</h2>
+                    <p class="text-orange-200 text-sm">Estamos muito felizes em ter você como cliente. Veja como usar o seu portal:</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700">
+                    <h4 class="font-bold text-white mb-2 flex items-center gap-2">
+                        <span class="bg-blue-500/20 text-blue-400 p-1 rounded">📋</span> Minhas Tarefas
+                    </h4>
+                    <p class="text-sm text-slate-400">Acompanhe em tempo real tudo o que a agência está produzindo para você, com prazos e status.</p>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700">
+                    <h4 class="font-bold text-white mb-2 flex items-center gap-2">
+                        <span class="bg-purple-500/20 text-purple-400 p-1 rounded">🎨</span> Aprovação de Criativos
+                    </h4>
+                    <p class="text-sm text-slate-400">Veja as artes, vídeos e campanhas antes de irem ao ar. Aprove ou solicite alterações com um clique.</p>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700">
+                    <h4 class="font-bold text-white mb-2 flex items-center gap-2">
+                        <span class="bg-green-500/20 text-green-400 p-1 rounded">📊</span> Resultados
+                    </h4>
+                    <p class="text-sm text-slate-400">Acesse os gráficos de investimento, cliques e conversões das suas campanhas de tráfego.</p>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+                <button onclick="document.getElementById('cardBoasVindas').classList.add('hidden')" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-lg">
+                    Entendi, vamos começar!
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    <span id="clienteInicial">C</span>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white" id="clienteNome">Carregando...</h2>
+                    <p class="text-sm text-slate-400" id="clienteEmail">...</p>
+                </div>
+            </div>
+            <div class="text-right flex flex-wrap items-center gap-3">
+                <span class="text-xs text-slate-500 uppercase font-bold tracking-wider hidden md:block">Área do Cliente</span>
+                <button onclick="abrirModalSenha()" class="pyside-button bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                    Alterar Senha
+                </button>
+                <button onclick="baixarRelatorio()" class="pyside-button bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Baixar Relatório
+                </button>
+            </div>
+        </div>
+
+        <div class="flex border-b border-slate-700 mb-8 overflow-x-auto bg-slate-900/50 rounded-t-lg">
+            <button onclick="mudarAba('tarefas')" id="tab-tarefas" class="py-4 px-6 font-bold text-orange-500 border-b-2 border-orange-500 transition-colors whitespace-nowrap flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                Minhas Tarefas
+            </button>
+            <button onclick="mudarAba('criativos')" id="tab-criativos" class="py-4 px-6 font-bold text-slate-400 hover:text-white transition-colors whitespace-nowrap flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Aprovação de Criativos
+            </button>
+            <button onclick="mudarAba('posts')" id="tab-posts" class="py-4 px-6 font-bold text-slate-400 hover:text-white transition-colors whitespace-nowrap flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Aprovação de Posts
+            </button>
+            <button onclick="mudarAba('metricas')" id="tab-metricas" class="py-4 px-6 font-bold text-slate-400 hover:text-white transition-colors whitespace-nowrap flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Resultados
+            </button>
+            <button onclick="mudarAba('briefing')" id="tab-briefing" class="py-4 px-6 font-bold text-slate-400 hover:text-white transition-colors whitespace-nowrap flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Briefing
+            </button>
+        </div>
+
+        <!-- Tarefas -->
+        <div id="conteudo-tarefas" class="bg-slate-900 rounded-lg border border-slate-800 overflow-hidden shadow-lg">
+            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                <div>
+                    <h2 class="text-xl font-bold">Acompanhamento de Tarefas</h2>
+                    <p class="text-sm text-slate-400 mt-1">Veja o andamento dos serviços contratados em tempo real.</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-slate-400">
+                    <thead class="text-left text-slate-500 bg-slate-900/50 border-b border-slate-800">
+                        <tr><th class="p-4">Tarefa</th><th class="p-4">Descrição</th><th class="p-4">Prazo</th><th class="p-4">Status</th><th class="p-4 text-right">Ações</th></tr>
+                    </thead>
+                    <tbody id="tabelaTarefas"><tr><td colspan="5" class="p-4 text-center">Carregando tarefas...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Criativos -->
+        <div id="conteudo-criativos" class="hidden">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 mb-6 shadow-lg flex items-center gap-3">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <div>
+                    <h2 class="text-xl font-bold">Aprovação de Criativos</h2>
+                    <p class="text-sm text-slate-400 mt-1">Aprove ou solicite alterações nas peças criadas pela agência.</p>
+                </div>
+            </div>
+            <div id="gridCriativos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- Posts -->
+        <div id="conteudo-posts" class="hidden">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 mb-6 shadow-lg flex items-center gap-3">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <div>
+                    <h2 class="text-xl font-bold">Aprovação de Posts</h2>
+                    <p class="text-sm text-slate-400 mt-1">Aprove ou solicite alterações nos posts do seu calendário editorial.</p>
+                </div>
+            </div>
+            <div id="gridPosts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- Métricas -->
+        <div id="conteudo-metricas" class="hidden">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 mb-6 shadow-lg flex items-center gap-3">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <div>
+                    <h2 class="text-xl font-bold">Desempenho das Campanhas</h2>
+                    <p class="text-sm text-slate-400 mt-1">Acompanhe os resultados reais do seu investimento.</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg"><h3 class="text-md font-bold mb-4 text-center">Investimento vs. Conversões</h3><canvas id="graficoInvestimento"></canvas></div>
+                <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg"><h3 class="text-md font-bold mb-4 text-center">Cliques Gerados</h3><canvas id="graficoCliques"></canvas></div>
+            </div>
+        </div>
+
+        <!-- Briefing -->
+        <div id="conteudo-briefing" class="hidden">
+            <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 mb-6 shadow-lg flex items-center gap-3">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <div>
+                    <h2 class="text-xl font-bold">Briefing da Empresa</h2>
+                    <p class="text-sm text-slate-400 mt-1">Preencha os dados abaixo para iniciarmos sua campanha.</p>
+                </div>
+            </div>
+            <form id="formBriefing" class="bg-slate-900 p-6 rounded-lg border border-slate-800 space-y-6 shadow-lg">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="block text-sm font-medium mb-2 text-slate-300">Nome da Empresa</label><input type="text" id="b_empresa" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></div>
+                    <div><label class="block text-sm font-medium mb-2 text-slate-300">Segmento</label><input type="text" id="b_segmento" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></div>
+                </div>
+                <div><label class="block text-sm font-medium mb-2 text-slate-300">Público-Alvo</label><textarea id="b_publico" rows="2" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea></div>
+                <div><label class="block text-sm font-medium mb-2 text-slate-300">Principais Concorrentes</label><textarea id="b_concorrentes" rows="2" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea></div>
+                <div><label class="block text-sm font-medium mb-2 text-slate-300">Diferenciais Competitivos</label><textarea id="b_diferenciais" rows="2" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="block text-sm font-medium mb-2 text-slate-300">Identidade Visual</label><input type="text" id="b_identidade" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></div>
+                    <div><label class="block text-sm font-medium mb-2 text-slate-300">Redes Sociais</label><input type="text" id="b_redes" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></div>
+                </div>
+                <div><label class="block text-sm font-medium mb-2 text-slate-300">Site</label><input type="text" id="b_site" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></div>
+                <button type="submit" class="pyside-button w-full py-3 bg-orange-500 hover:bg-orange-400 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Salvar Briefing
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Modal de Alterar Senha -->
+    <div id="modalSenha" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+        <div class="bg-slate-900 p-8 rounded-lg border border-slate-800 w-full max-w-md shadow-2xl">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                Alterar Senha
+            </h2>
+            <form id="formSenha">
+                <div class="mb-4"><label class="block text-sm font-medium mb-2 text-slate-300">Senha Atual</label><input type="password" id="senhaAtual" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500"></div>
+                <div class="mb-4"><label class="block text-sm font-medium mb-2 text-slate-300">Nova Senha</label><input type="password" id="novaSenha" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500"></div>
+                <div class="mb-6"><label class="block text-sm font-medium mb-2 text-slate-300">Confirmar Nova Senha</label><input type="password" id="confirmarSenha" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500"></div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="fecharModalSenha()" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Cancelar</button>
+                    <button type="submit" class="pyside-button px-6 py-2 bg-orange-500 hover:bg-orange-400 text-white font-bold rounded-lg transition-colors">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CHAT -->
+    <div id="modalChat" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-lg p-6 relative flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
+                <h3 class="text-xl font-bold text-orange-400" id="chatTitulo">Chat</h3>
+                <button onclick="fecharChat()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div id="chatMensagens" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-4">
+                <p class="text-slate-500 text-sm text-center">Carregando...</p>
+            </div>
+
+            <div class="flex gap-2">
+                <input type="text" id="inputMensagem" placeholder="Digite sua mensagem..." class="flex-1 p-3 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500">
+                <button onclick="enviarMensagem()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        let chartInvestimento = null;
+        let chartCliques = null;
+        let tipoChatAtual = null;
+        let idChatAtual = null;
+
+        function mudarAba(aba) {
+            ['tarefas', 'criativos', 'posts', 'metricas', 'briefing'].forEach(a => {
+                const conteudo = document.getElementById('conteudo-' + a);
+                if (conteudo) conteudo.classList.add('hidden');
+                const tab = document.getElementById('tab-' + a);
+                if (tab) {
+                    tab.classList.remove('text-orange-500', 'border-orange-500', 'border-b-2');
+                    tab.classList.add('text-slate-400');
+                }
+            });
+
+            document.getElementById('conteudo-' + aba).classList.remove('hidden');
+            const abaAtiva = document.getElementById('tab-' + aba);
+            abaAtiva.classList.remove('text-slate-400');
+            abaAtiva.classList.add('text-orange-500', 'border-orange-500', 'border-b-2');
+
+            if (aba === 'criativos') carregarCriativos();
+            if (aba === 'posts') carregarPosts();
+            if (aba === 'metricas') carregarMetricas();
+            if (aba === 'briefing') carregarBriefing();
+        }
+
+        async function carregarInfoCliente() {
+            try { 
+                const response = await fetch('/api/portal/perfil', { headers: { 'Authorization': `Bearer ${token}` } }); 
+                if (response.ok) { 
+                    const c = await response.json(); 
+                    document.getElementById('clienteNome').innerText = c.nome; 
+                    document.getElementById('clienteEmail').innerText = c.email; 
+                    document.getElementById('clienteInicial').innerText = c.nome.charAt(0).toUpperCase(); 
+                } 
+            } catch (error) { 
+                console.error("Erro ao carregar info cliente", error);
+            }
+        }
+
+        async function carregarTarefas() {
+            try { 
+                const response = await fetch('/api/portal/tarefas', { headers: { 'Authorization': `Bearer ${token}` } }); 
+                if (!response.ok) throw new Error("Erro na resposta do servidor"); 
+                const tarefas = await response.json(); 
+                const tbody = document.getElementById('tabelaTarefas'); 
+                tbody.innerHTML = ''; 
+                if (tarefas.length === 0) { 
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">Nenhuma tarefa pendente no momento.</td></tr>'; 
+                    return; 
+                } 
+                tarefas.forEach(tarefa => { 
+                    const tr = document.createElement('tr'); 
+                    tr.className = 'border-b border-slate-800 hover:bg-slate-800/30 transition-colors'; 
+                    tr.innerHTML = `
+                        <td class="p-4 text-white font-medium">${tarefa.titulo}</td>
+                        <td class="p-4">${tarefa.descricao || '-'}</td>
+                        <td class="p-4">${tarefa.data_vencimento ? new Date(tarefa.data_vencimento).toLocaleDateString('pt-BR') : '-'}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${tarefa.concluida ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}">${tarefa.concluida ? 'Concluída' : 'Em Andamento'}</span></td>
+                        <td class="p-4 text-right"><button onclick="abrirChat('tarefa', ${tarefa.id}, '${tarefa.titulo}')" class="bg-orange-500/20 hover:bg-orange-500/40 text-orange-400 px-3 py-1 rounded text-xs font-bold transition-colors">Chat</button></td>
+                    `; 
+                    tbody.appendChild(tr); 
+                }); 
+            } catch (error) { 
+                console.error("Erro ao carregar tarefas:", error);
+                document.getElementById('tabelaTarefas').innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Erro ao carregar as tarefas.</td></tr>'; 
+            }
+        }
+
+        async function carregarCriativos() {
+            try { 
+                const response = await fetch('/api/portal/criativos', { headers: { 'Authorization': `Bearer ${token}` } }); 
+                if (!response.ok) throw new Error(); 
+                const criativos = await response.json(); 
+                const grid = document.getElementById('gridCriativos'); 
+                grid.innerHTML = ''; 
+                if (criativos.length === 0) { 
+                    grid.innerHTML = '<div class="col-span-full text-center p-8 text-slate-500 border border-slate-800 rounded-lg">Nenhum criativo pendente para aprovação.</div>'; 
+                    return; 
+                } 
+                criativos.forEach(criativo => { 
+                    const card = document.createElement('div'); 
+                    card.className = 'bg-slate-900 rounded-lg border border-slate-800 overflow-hidden flex flex-col shadow-lg'; 
+                    const isImagem = criativo.url_arquivo && criativo.url_arquivo.match(/\.(jpeg|jpg|gif|png)$/i) != null; 
+                    const midia = isImagem ? `<img src="${criativo.url_arquivo}" class="w-full h-48 object-cover" alt="${criativo.titulo}">` : `<div class="w-full h-48 bg-slate-800 flex items-center justify-center text-slate-500">Visualização não disponível</div>`; 
+                    let botoes = ''; 
+                    if (criativo.status === 'pendente') { 
+                        botoes = `
+                            <div class="flex gap-2 mt-4">
+                                <button onclick="aprovarCriativo(${criativo.id})" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded font-bold text-sm">Aprovar</button>
+                                <button onclick="recusarCriativo(${criativo.id})" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded font-bold text-sm">Alteração</button>
+                            </div>
+                        `; 
+                    } else { 
+                        const cor = criativo.status === 'aprovado' ? 'text-green-400' : 'text-red-400'; 
+                        botoes = `<div class="mt-4 text-center font-bold ${cor}">Status: ${criativo.status.toUpperCase()}</div>`; 
+                        if (criativo.feedback_cliente) { 
+                            botoes += `<div class="mt-2 text-xs text-slate-300 bg-slate-800 p-3 rounded border border-slate-700"><strong>Seu feedback:</strong> ${criativo.feedback_cliente}</div>`; 
+                        } 
+                    } 
+                    card.innerHTML = `
+                        ${midia}
+                        <div class="p-4 flex flex-col flex-1">
+                            <span class="text-xs font-bold text-orange-500 uppercase mb-1">${criativo.cliente_nome || 'Cliente'}</span>
+                            <h3 class="text-lg font-bold text-white mb-2">${criativo.titulo}</h3>
+                            <button onclick="abrirChat('criativo', ${criativo.id}, '${criativo.titulo}')" class="bg-orange-500/20 hover:bg-orange-500/40 text-orange-400 py-2 rounded text-xs font-bold transition-colors mb-2">Chat / Comentários</button>
+                            ${botoes}
+                        </div>
+                    `; 
+                    grid.appendChild(card); 
+                }); 
+            } catch (error) { 
+                document.getElementById('gridCriativos').innerHTML = '<div class="col-span-full text-center p-4 text-red-500">Erro ao carregar os criativos.</div>'; 
+            }
+        }
+
+        async function aprovarCriativo(id) { 
+            const feedback = prompt('Opcional: Descreva o motivo da aprovação:'); 
+            if (feedback === null) return; 
+            try { 
+                const response = await fetch(`/api/portal/criativos/${id}/aprovar`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify({ feedback_cliente: feedback }) 
+                }); 
+                
+                if (response.ok) { 
+                    alert('Criativo aprovado com sucesso!'); 
+                    carregarCriativos(); 
+                } else { 
+                    const errData = await response.json().catch(() => ({})); 
+                    alert('ERRO: ' + (errData.error || 'Falha desconhecida no servidor.')); 
+                } 
+            } catch (error) { 
+                alert('ERRO DE CONEXÃO: O servidor está rodando?'); 
+            } 
+        }
+
+        async function recusarCriativo(id) { 
+            const feedback = prompt('Por favor, descreva o motivo da alteração:'); 
+            if (feedback === null) return; 
+            if (feedback.trim() === '') return alert('O feedback é obrigatório.'); 
+            try { 
+                const response = await fetch(`/api/portal/criativos/${id}/recusar`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify({ feedback_cliente: feedback }) 
+                }); 
+                
+                if (response.ok) { 
+                    alert('Alteração solicitada com sucesso!'); 
+                    carregarCriativos(); 
+                } else { 
+                    const errData = await response.json().catch(() => ({})); 
+                    alert('ERRO: ' + (errData.error || 'Falha desconhecida no servidor.')); 
+                } 
+            } catch (error) { 
+                alert('ERRO DE CONEXÃO: O servidor está rodando?'); 
+            } 
+        }
+
+        // ==================== POSTS ====================
+        async function carregarPosts() {
+            try {
+                const response = await fetch('/api/portal/posts', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) throw new Error();
+                const posts = await response.json();
+                const grid = document.getElementById('gridPosts');
+                grid.innerHTML = '';
+                if (posts.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center p-8 text-slate-500 border border-slate-800 rounded-lg">Nenhum post agendado para aprovação.</div>';
+                    return;
+                }
+                posts.forEach(post => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-900 rounded-lg border border-slate-800 overflow-hidden flex flex-col shadow-lg';
+                    let dataFormatada = '-';
+                    if (post.data_publicacao) {
+                        const dateStr = post.data_publicacao.split('T')[0];
+                        const parts = dateStr.split('-');
+                        if(parts.length === 3) dataFormatada = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                    let midia = `<div class="w-full h-48 bg-slate-800 flex items-center justify-center text-slate-500 text-sm px-4 text-center">${post.conteudo ? post.conteudo.substring(0, 120) + '...' : 'Sem prévia'}</div>`;
+                    
+                    if (post.imagem_url || post.url_midia) {
+                        const urlArquivo = post.imagem_url || post.url_midia;
+                        const isImagem = urlArquivo.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
+                        
+                        if (isImagem) {
+                            midia = `<img src="${urlArquivo}" class="w-full h-48 object-cover" alt="${post.titulo}">`;
+                        } else {
+                            midia = `<div class="w-full h-48 bg-slate-800 flex flex-col items-center justify-center p-4 border-b border-slate-700">
+                                        <svg class="w-12 h-12 text-orange-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                        <a href="${urlArquivo}" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded text-sm transition-colors">Abrir Documento</a>
+                                     </div>`;
+                        }
+                    }
+
+                    let botoes = '';
+                    if (post.status === 'pendente' || !post.status) {
+                        botoes = `
+                            <div class="flex gap-2 mt-4">
+                                <button onclick="aprovarPost(${post.id})" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded font-bold text-sm">Aprovar</button>
+                                <button onclick="recusarPost(${post.id})" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded font-bold text-sm">Alteração</button>
+                            </div>`;
+                    } else {
+                        const cor = post.status === 'aprovado' ? 'text-green-400' : 'text-red-400';
+                        botoes = `<div class="mt-4 text-center font-bold ${cor}">Status: ${post.status.toUpperCase()}</div>`;
+                        if (post.feedback_cliente) {
+                            botoes += `<div class="mt-2 text-xs text-slate-300 bg-slate-800 p-3 rounded border border-slate-700"><strong>Seu feedback:</strong> ${post.feedback_cliente}</div>`;
+                        }
+                    }
+
+                    card.innerHTML = `
+                        ${midia}
+                        <div class="p-4 flex flex-col flex-1">
+                            <span class="text-xs font-bold text-orange-500 uppercase mb-1">📅 ${dataFormatada}${post.plataforma ? ' · ' + post.plataforma : ''}</span>
+                            <h3 class="text-lg font-bold text-white mb-2">${post.titulo}</h3>
+                            <button onclick="abrirChat('post', ${post.id}, '${post.titulo}')" class="bg-orange-500/20 hover:bg-orange-500/40 text-orange-400 py-2 rounded text-xs font-bold transition-colors mb-2 w-full">Chat / Comentários</button>
+                            ${botoes}
+                        </div>`;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                document.getElementById('gridPosts').innerHTML = '<div class="col-span-full text-center p-4 text-red-500">Erro ao carregar os posts.</div>';
+            }
+        }
+
+        async function aprovarPost(id) {
+            const feedback = prompt('Opcional: Descreva o motivo da aprovação:');
+            if (feedback === null) return;
+            try {
+                const response = await fetch(`/api/portal/posts/${id}/aprovar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ feedback_cliente: feedback })
+                });
+                if (response.ok) { alert('Post aprovado com sucesso!'); carregarPosts(); }
+                else {
+                    const errData = await response.json().catch(() => ({}));
+                    alert('ERRO: ' + (errData.error || 'Falha desconhecida no servidor.'));
+                }
+            } catch (error) { alert('ERRO DE CONEXÃO: O servidor está rodando?'); }
+        }
+
+        async function recusarPost(id) {
+            const feedback = prompt('Por favor, descreva o motivo da alteração:');
+            if (feedback === null) return;
+            if (feedback.trim() === '') return alert('O feedback é obrigatório.');
+            try {
+                const response = await fetch(`/api/portal/posts/${id}/recusar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ feedback_cliente: feedback })
+                });
+                if (response.ok) { alert('Alteração solicitada com sucesso!'); carregarPosts(); }
+                else {
+                    const errData = await response.json().catch(() => ({}));
+                    alert('ERRO: ' + (errData.error || 'Falha desconhecida no servidor.'));
+                }
+            } catch (error) { alert('ERRO DE CONEXÃO: O servidor está rodando?'); }
+        }
+        // ==================== FIM POSTS ====================
+
+        async function carregarMetricas() {
+            try { 
+                const response = await fetch('/api/portal/metricas', { headers: { 'Authorization': `Bearer ${token}` } }); 
+                if (!response.ok) throw new Error(); 
+                const dados = await response.json(); 
+                if (dados.length === 0) { 
+                    document.getElementById('conteudo-metricas').innerHTML = '<div class="bg-slate-900 p-6 rounded-lg border border-slate-800 text-center text-slate-500">Nenhum dado de campanha encontrado para o seu perfil.</div>'; 
+                    return; 
+                } 
+                const nomesCampanhas = dados.map(d => d.nome_campanha || 'Geral'); 
+                const investimentos = dados.map(d => parseFloat(d.investimento_total) || 0); 
+                const conversoes = dados.map(d => parseInt(d.conversoes) || 0); 
+                const cliques = dados.map(d => parseInt(d.cliques) || 0); 
+                if (chartInvestimento) chartInvestimento.destroy(); 
+                if (chartCliques) chartCliques.destroy(); 
+                chartInvestimento = new Chart(document.getElementById('graficoInvestimento').getContext('2d'), { type: 'bar', data: { labels: nomesCampanhas, datasets: [ { label: 'Investimento (R$)', data: investimentos, backgroundColor: '#f97316' }, { label: 'Conversões', data: conversoes, backgroundColor: '#22c55e' } ] }, options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } } } }); 
+                chartCliques = new Chart(document.getElementById('graficoCliques').getContext('2d'), { type: 'line', data: { labels: nomesCampanhas, datasets: [ { label: 'Cliques', data: cliques, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.2)', fill: true, tension: 0.3 } ] }, options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } } } }); 
+            } catch (error) { 
+                document.getElementById('conteudo-metricas').innerHTML = '<div class="bg-slate-900 p-6 rounded-lg border border-slate-800 text-center text-red-500">Erro ao carregar os gráficos.</div>'; 
+            }
+        }
+
+        async function carregarBriefing() { 
+            try { 
+                const response = await fetch('/api/portal/briefing', { headers: { 'Authorization': `Bearer ${token}` } }); 
+                const dados = await response.json(); 
+                if (dados && dados.id) { 
+                    document.getElementById('b_empresa').value = dados.empresa || ''; 
+                    document.getElementById('b_segmento').value = dados.segmento || ''; 
+                    document.getElementById('b_publico').value = dados.publico_alvo || ''; 
+                    document.getElementById('b_concorrentes').value = dados.concorrentes || ''; 
+                    document.getElementById('b_diferenciais').value = dados.diferenciais || ''; 
+                    document.getElementById('b_identidade').value = dados.identidade_visual || ''; 
+                    document.getElementById('b_redes').value = dados.redes_sociais || ''; 
+                    document.getElementById('b_site').value = dados.site || ''; 
+                } 
+            } catch (error) { 
+                console.error("Erro ao carregar briefing", error);
+            } 
+        }
+
+        document.getElementById('formBriefing').addEventListener('submit', async function(e) { 
+            e.preventDefault(); 
+            const dados = { 
+                empresa: document.getElementById('b_empresa').value, 
+                segmento: document.getElementById('b_segmento').value, 
+                publico_alvo: document.getElementById('b_publico').value, 
+                concorrentes: document.getElementById('b_concorrentes').value, 
+                diferenciais: document.getElementById('b_diferenciais').value, 
+                identidade_visual: document.getElementById('b_identidade').value, 
+                redes_sociais: document.getElementById('b_redes').value, 
+                site: document.getElementById('b_site').value 
+            }; 
+            try { 
+                const response = await fetch('/api/portal/briefing', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(dados) }); 
+                if (response.ok) { alert('Briefing salvo com sucesso!'); } 
+                else { alert('Erro ao salvar briefing.'); } 
+            } catch (error) { alert('Erro de conexão.'); } 
+        });
+
+        function abrirModalSenha() { document.getElementById('modalSenha').classList.remove('hidden'); document.getElementById('modalSenha').classList.add('flex'); }
+        function fecharModalSenha() { document.getElementById('modalSenha').classList.add('hidden'); document.getElementById('modalSenha').classList.remove('flex'); document.getElementById('formSenha').reset(); }
+
+        document.getElementById('formSenha').addEventListener('submit', async function(e) { 
+            e.preventDefault(); 
+            const senhaAtual = document.getElementById('senhaAtual').value; 
+            const novaSenha = document.getElementById('novaSenha').value; 
+            const confirmarSenha = document.getElementById('confirmarSenha').value; 
+            if (novaSenha !== confirmarSenha) { alert('A nova senha e a confirmação não batem.'); return; } 
+            try { 
+                const response = await fetch('/api/portal/alterar-senha', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ senhaAtual, novaSenha }) }); 
+                const data = await response.json(); 
+                if (response.ok) { alert('Senha alterada com sucesso!'); fecharModalSenha(); } 
+                else { alert(data.error || 'Erro ao alterar senha.'); } 
+            } catch (error) { alert('Erro de conexão.'); } 
+        });
+
+        async function baixarRelatorio() { 
+            try { 
+                const response = await fetch('/api/portal/relatorio', { headers: { 'Authorization': `Bearer ${token}` } }); 
+                if (!response.ok) { 
+                    const erro = await response.json().catch(() => ({})); 
+                    alert('Erro ao gerar relatório: ' + (erro.error || 'Tente novamente.')); 
+                    return; 
+                } 
+                const blob = await response.blob(); 
+                const url = window.URL.createObjectURL(blob); 
+                const a = document.createElement('a'); 
+                a.href = url; 
+                a.download = 'relatorio-reverse-marketing.pdf'; 
+                document.body.appendChild(a); 
+                a.click(); 
+                a.remove(); 
+                window.URL.revokeObjectURL(url); 
+            } catch (error) { 
+                alert('Erro de conexão ao baixar o relatório.'); 
+            } 
+        }
+
+        // --- LÓGICA DO CHAT ---
+        async function abrirChat(tipo, id, titulo) {
+            tipoChatAtual = tipo;
+            idChatAtual = id;
+            document.getElementById('chatTitulo').innerText = `Chat: ${titulo}`;
+            document.getElementById('modalChat').classList.remove('hidden');
+            document.getElementById('modalChat').classList.add('flex');
+            
+            const divMensagens = document.getElementById('chatMensagens');
+            divMensagens.innerHTML = '<p class="text-slate-500 text-sm text-center">Carregando...</p>';
+
+            try {
+                const res = await fetch(`/api/comentarios/${tipo}/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const mensagens = await res.json();
+                
+                if (mensagens.length === 0) {
+                    divMensagens.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">Nenhum comentário ainda. Seja o primeiro a enviar!</p>';
+                    return;
+                }
+
+                divMensagens.innerHTML = mensagens.map(m => {
+                    const isAdmin = m.usuario_tipo === 'admin';
+                    const alinhamento = isAdmin ? 'ml-auto bg-slate-800 border-slate-600 text-right' : 'mr-auto bg-orange-500/20 border-orange-500/50 text-left';
+                    const autor = isAdmin ? 'Agência' : 'Você';
+                    const corAutor = isAdmin ? 'text-blue-400' : 'text-orange-400';
+                    
+                    return `
+                        <div class="p-3 rounded-lg border max-w-[80%] ${alinhamento}">
+                            <p class="text-xs font-bold mb-1 ${corAutor}">${autor}</p>
+                            <p class="text-sm text-white break-words">${m.mensagem}</p>
+                        </div>
+                    `;
+                }).join('');
+                
+                divMensagens.scrollTop = divMensagens.scrollHeight;
+
+            } catch (err) {
+                divMensagens.innerHTML = '<p class="text-red-400 text-sm text-center">Erro ao carregar mensagens.</p>';
+            }
+        }
+
+        function fecharChat() {
+            document.getElementById('modalChat').classList.add('hidden');
+            document.getElementById('modalChat').classList.remove('flex');
+            document.getElementById('inputMensagem').value = '';
+            tipoChatAtual = null;
+            idChatAtual = null;
+        }
+
+        async function enviarMensagem() {
+            if (!tipoChatAtual || !idChatAtual) return;
+            
+            const input = document.getElementById('inputMensagem');
+            const mensagem = input.value.trim();
+            if (!mensagem) return;
+
+            input.value = '';
+
+            const payload = { mensagem };
+            if (tipoChatAtual === 'tarefa') payload.tarefa_id = idChatAtual;
+            else if (tipoChatAtual === 'criativo') payload.criativo_id = idChatAtual;
+            else if (tipoChatAtual === 'post') payload.post_id = idChatAtual;
+
+            try {
+                const res = await fetch('/api/comentarios', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const resLista = await fetch(`/api/comentarios/${tipoChatAtual}/${idChatAtual}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const mensagens = await resLista.json();
+                    const divMensagens = document.getElementById('chatMensagens');
+
+                    divMensagens.innerHTML = mensagens.map(m => {
+                        const isAdmin = m.usuario_tipo === 'admin';
+                        const alinhamento = isAdmin ? 'ml-auto bg-slate-800 border-slate-600 text-right' : 'mr-auto bg-orange-500/20 border-orange-500/50 text-left';
+                        const autor = isAdmin ? 'Agência' : 'Você';
+                        const corAutor = isAdmin ? 'text-blue-400' : 'text-orange-400';
+                        
+                        return `
+                            <div class="p-3 rounded-lg border max-w-[80%] ${alinhamento}">
+                                <p class="text-xs font-bold mb-1 ${corAutor}">${autor}</p>
+                                <p class="text-sm text-white break-words">${m.mensagem}</p>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    divMensagens.scrollTop = divMensagens.scrollHeight;
+                } else {
+                    alert('Erro ao enviar mensagem.');
+                }
+            } catch (err) {
+                alert('Erro de conexão.');
+            }
+        }
+
+        document.getElementById('inputMensagem').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') enviarMensagem();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            carregarTarefas(); 
+            carregarInfoCliente(); 
+        });
+    </script>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.tipo === 'cliente') {
+                    const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html', 'branding.html', 'permissoes.html'];
+                    const urlAtual = window.location.pathname.split('/').pop();
+                    if (paginasAdmin.includes(urlAtual)) {
+                        alert('Acesso negado. Esta área é restrita.');
+                        window.location.href = '/portal_cliente.html';
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+</body>
+</html>

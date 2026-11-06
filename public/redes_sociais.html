@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redes Sociais - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .pyside-button { transition: all 0.2s ease; border-radius: 0.375rem; font-weight: 500; }
+        .pyside-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2); }
+    </style>
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            /* No celular, os submenus ficam sempre abertos para facilitar o toque */
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+            
+    <!-- MENU ADMIN -->
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white font-bold text-orange-400">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MENU CLIENTE -->
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            if (isCliente) {
+                document.getElementById('menu-admin').style.display = 'none';
+                document.getElementById('menu-cliente').classList.remove('hidden');
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
+                };
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+            } else {
+                document.getElementById('menu-cliente').style.display = 'none';
+                document.getElementById('menu-admin').classList.remove('hidden');
+            }
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <!-- Cabeçalho da Página -->
+        <div class="flex items-center gap-4 mb-8 bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+            <div class="p-3 bg-orange-500/20 rounded-lg text-orange-500">
+                <!-- ÍCONE DE CURTIDA / JOINHA (REDES SOCIAIS) -->
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.514"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Gestão de Redes Sociais</h1>
+                <p class="text-slate-400 text-sm">Gerencie as ações de redes sociais por clientes e campanhas.</p>
+            </div>
+        </div>
+
+        <!-- Formulário de Cadastro -->
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-8">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                <h2 class="text-xl font-bold text-white">Nova Ação de Rede Social</h2>
+            </div>
+
+            <form id="formAcaoSocial" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Cliente *</label>
+                    <select id="cliente_id" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                        <option value="">Selecionar...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Campanha (opcional)</label>
+                    <select id="campanha_id" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                        <option value="">Nenhuma</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Tipo de Ação</label>
+                    <select id="tipo" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                        <option value="Feed">Feed</option>
+                        <option value="Reels">Reels</option>
+                        <option value="Stories">Stories</option>
+                        <option value="Post Carrossel">Post Carrossel</option>
+                        <option value="Vídeo">Vídeo</option>
+                        <option value="Live">Live</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Título *</label>
+                    <input type="text" id="titulo" required placeholder="Ex: Post de lançamento" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1">Descrição</label>
+                    <textarea id="descricao" rows="2" placeholder="Descreva a ação..." class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Data de Publicação</label>
+                    <input type="date" id="data_publicacao" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Status</label>
+                    <select id="status" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                        <option value="planejado">Planejado</option>
+                        <option value="em_producao">Em Produção</option>
+                        <option value="publicado">Publicado</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1">Link (opcional)</label>
+                    <input type="url" id="link" placeholder="https://..." class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div class="md:col-span-2 flex justify-end">
+                    <button type="submit" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Criar Ação
+                    </button>
+                </div>
+            </form>
+            <div id="feedback" class="hidden mt-4 p-3 rounded-lg text-center font-bold"></div>
+        </div>
+
+        <!-- Tabela de Ações -->
+        <div class="bg-slate-900 rounded-lg border border-slate-800 shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                <h2 class="text-xl font-bold text-white">Ações Cadastradas</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                            <th class="p-4">ID</th>
+                            <th class="p-4">Título</th>
+                            <th class="p-4">Tipo</th>
+                            <th class="p-4">Cliente</th>
+                            <th class="p-4">Campanha</th>
+                            <th class="p-4">Data Pub.</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaAcoes" class="divide-y divide-slate-800">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        if (!localStorage.getItem('token')) window.location.href = '/login.html';
+        const token = localStorage.getItem('token');
+        let todasAsAcoes = [];
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function statusClass(status) {
+            if (status === 'publicado') return 'bg-green-500/20 text-green-400';
+            if (status === 'em_producao') return 'bg-yellow-500/20 text-yellow-400';
+            if (status === 'cancelado') return 'bg-red-500/20 text-red-400';
+            return 'bg-blue-500/20 text-blue-400';
+        }
+
+        async function carregarDados() {
+            try {
+                const [resAcoes, resClientes, resCampanhas] = await Promise.all([
+                    fetch('/api/acoes-sociais', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/clientes', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/campanhas', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+
+                todasAsAcoes = await resAcoes.json();
+                const todosOsClientes = await resClientes.json();
+                const todasAsCampanhas = await resCampanhas.json();
+
+                const selectCliente = document.getElementById('cliente_id');
+                selectCliente.innerHTML = '<option value="">Selecionar...</option>';
+                todosOsClientes.forEach(c => {
+                    selectCliente.innerHTML += `<option value="${c.id}">${escapeHtml(c.nome)}</option>`;
+                });
+
+                const selectCampanha = document.getElementById('campanha_id');
+                selectCampanha.innerHTML = '<option value="">Nenhuma</option>';
+                todasAsCampanhas.forEach(c => {
+                    selectCampanha.innerHTML += `<option value="${c.id}">${escapeHtml(c.nome)}</option>`;
+                });
+
+                renderizarTabela(todasAsAcoes);
+            } catch (erro) {
+                console.error('Erro ao carregar dados:', erro);
+                document.getElementById('tabelaAcoes').innerHTML = '<tr><td colspan="8" class="p-4 text-center text-red-400">Erro ao carregar dados.</td></tr>';
+            }
+        }
+
+        function renderizarTabela(acoes) {
+            const tbody = document.getElementById('tabelaAcoes');
+            tbody.innerHTML = '';
+            if (acoes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Nenhuma ação cadastrada.</td></tr>';
+                return;
+            }
+            acoes.forEach(a => {
+                const dataFormatada = a.data_publicacao ? new Date(a.data_publicacao).toLocaleDateString('pt-BR') : '-';
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-4 text-slate-400">${a.id}</td>
+                    <td class="p-4 font-medium text-white">${escapeHtml(a.titulo)}</td>
+                    <td class="p-4 text-slate-300">${a.tipo}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(a.cliente_nome) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(a.campanha_nome) || '-'}</td>
+                    <td class="p-4 text-slate-300">${dataFormatada}</td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${statusClass(a.status)}">${a.status}</span></td>
+                    <td class="p-4 text-center"><button onclick="excluirAcao(${a.id})" class="text-red-500 hover:text-red-400 text-xs font-bold">Excluir</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('formAcaoSocial').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'hidden';
+            const dados = {
+                cliente_id: document.getElementById('cliente_id').value,
+                campanha_id: document.getElementById('campanha_id').value || null,
+                tipo: document.getElementById('tipo').value,
+                titulo: document.getElementById('titulo').value,
+                descricao: document.getElementById('descricao').value || null,
+                data_publicacao: document.getElementById('data_publicacao').value || null,
+                status: document.getElementById('status').value,
+                link: document.getElementById('link').value || null
+            };
+            try {
+                const resposta = await fetch('/api/acoes-sociais', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(dados)
+                });
+                if (!resposta.ok) throw new Error('Falha ao criar ação');
+                feedback.textContent = 'Ação criada com sucesso!';
+                feedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-green-600 text-white';
+                document.getElementById('formAcaoSocial').reset();
+                carregarDados();
+            } catch (erro) {
+                feedback.textContent = 'Erro ao criar ação.';
+                feedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-red-600 text-white';
+            }
+        });
+
+        async function excluirAcao(id) {
+            if (!confirm('Excluir esta ação?')) return;
+            try {
+                await fetch(`/api/acoes-sociais/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                carregarDados();
+            } catch (erro) { alert('Erro ao excluir.'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarDados);
+    </script>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.tipo === 'cliente') {
+                    const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html', 'branding.html', 'permissoes.html'];
+                    const urlAtual = window.location.pathname.split('/').pop();
+                    if (paginasAdmin.includes(urlAtual)) {
+                        alert('Acesso negado. Esta área é restrita.');
+                        window.location.href = '/portal_cliente.html';
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+
+</body>
+</html>

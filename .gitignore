@@ -1,0 +1,51 @@
+# Ignorar arquivos de ambiente
+.env
+
+# Ignorar dependências
+node_modules/
+
+# Ignorar arquivos de backup e temporários
+*.backup
+*.bak
+*.tmp
+backup/
+backups/
+*.sql.txt
+
+# Ignorar logs
+error.log
+
+# Ignorar arquivos de credenciais
+google-credentials.json
+
+# Ignorar arquivos de download/zip
+*.zip
+
+# Ignorar imagens temporárias
+temp_check.txt
+temp_db.js
+
+# Ignorar capturas de tela/prints
+trafego_pago.html
+
+# Ignorar pastas de backup de servidor
+server_backup/
+server_backup_0111/
+
+# Ignorar arquivos de cópia
+server - Copia*.js
+server - Copia (3).js
+
+# Ignorar extensões de backup Python
+.py.bak
+
+# Ignorar arquivos de seed/backup de banco
+seed.sql
+backup_completo.sql
+
+# Ignorar pasta database (se contiver arquivos grandes)
+database/
+db/
+
+# Ignorar submodules separados
+reverse/

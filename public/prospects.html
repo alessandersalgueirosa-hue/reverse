@@ -1,0 +1,591 @@
+﻿﻿﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prospects - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .pyside-button { transition: all 0.2s ease; border-radius: 0.375rem; font-weight: 500; }
+        .pyside-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2); }
+        .status-novo { background: #3b82f6; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-contatado { background: #eab308; color: #1e293b; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-qualificado { background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-perdido { background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+    </style>
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            /* No celular, os submenus ficam sempre abertos para facilitar o toque */
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+            
+    <!-- MENU ADMIN -->
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white font-bold text-orange-400">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MENU CLIENTE -->
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- SCRIPT DO MENU -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            if (isCliente) {
+                document.getElementById('menu-admin').style.display = 'none';
+                document.getElementById('menu-cliente').classList.remove('hidden');
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
+                };
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+            } else {
+                document.getElementById('menu-cliente').style.display = 'none';
+                document.getElementById('menu-admin').classList.remove('hidden');
+            }
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <!-- Cabeçalho da Página -->
+        <div class="flex items-center gap-4 mb-8 bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+            <div class="p-3 bg-orange-500/20 rounded-lg text-orange-500">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Gestão de Prospects</h1>
+                <p class="text-slate-400 text-sm">Gerencie os contatos que ainda não são leads qualificados.</p>
+            </div>
+        </div>
+
+        <!-- Formulário de Cadastro -->
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-8">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                <h2 class="text-xl font-bold text-white">Novo Prospect</h2>
+            </div>
+
+            <form id="prospectForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Nome *</label>
+                        <input type="text" id="nome" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="Nome completo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">E-mail</label>
+                        <input type="email" id="email" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="exemplo@empresa.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Telefone</label>
+                        <input type="text" id="telefone" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="(00) 00000-0000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Empresa</label>
+                        <input type="text" id="empresa" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="Nome da empresa">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Cargo</label>
+                        <input type="text" id="cargo" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="Ex: Diretor">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Origem</label>
+                        <select id="origem" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                            <option value="">Selecione...</option>
+                            <option value="Google">Google</option>
+                            <option value="Indicação">Indicação</option>
+                            <option value="Redes Sociais">Redes Sociais</option>
+                            <option value="Evento">Evento</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Status</label>
+                        <select id="status" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                            <option value="novo">Novo</option>
+                            <option value="contatado">Contatado</option>
+                            <option value="qualificado">Qualificado</option>
+                            <option value="perdido">Perdido</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Observações</label>
+                        <textarea id="observacoes" rows="2" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="Observações..."></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Salvar Prospect
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabela de Prospects -->
+        <div class="bg-slate-900 rounded-lg border border-slate-800 shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-slate-800 flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                    <h2 class="text-xl font-bold text-white">Prospects Cadastrados</h2>
+                </div>
+                <div class="flex flex-wrap gap-2 items-center">
+                    <input type="text" id="buscarProspect" placeholder="Buscar por nome ou e-mail..." class="p-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500">
+                    <select id="filtrarStatus" class="p-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500">
+                        <option value="">Todos os Status</option>
+                        <option value="novo">Novo</option>
+                        <option value="contatado">Contatado</option>
+                        <option value="qualificado">Qualificado</option>
+                        <option value="perdido">Perdido</option>
+                    </select>
+                    <button onclick="exportarCSVProspects()" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2 text-sm whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Exportar CSV
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
+                            <th class="p-4">ID</th>
+                            <th class="p-4">Nome</th>
+                            <th class="p-4">E-mail</th>
+                            <th class="p-4">Telefone</th>
+                            <th class="p-4">Empresa</th>
+                            <th class="p-4">Cargo</th>
+                            <th class="p-4">Origem</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaProspects" class="divide-y divide-slate-800">
+                        <!-- Linhas inseridas via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Edição -->
+    <div id="modalEdicao" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 rounded-lg shadow-2xl border border-slate-800 w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-orange-400">Editar Prospect</h3>
+                <button id="fecharModalEdicao" class="text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1">
+                <form id="formEdicao">
+                    <input type="hidden" id="editId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-slate-300">Nome</label>
+                            <input type="text" id="editNome" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-slate-300">E-mail</label>
+                            <input type="email" id="editEmail" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-slate-300">Telefone</label>
+                            <input type="text" id="editTelefone" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-slate-300">Empresa</label>
+                            <input type="text" id="editEmpresa" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-slate-300">Cargo</label>
+                            <input type="text" id="editCargo" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-slate-300">Origem</label>
+                            <select id="editOrigem" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                                <option value="">Selecione...</option>
+                                <option value="Google">Google</option>
+                                <option value="Indicação">Indicação</option>
+                                <option value="Redes Sociais">Redes Sociais</option>
+                                <option value="Evento">Evento</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-slate-300">Status</label>
+                            <select id="editStatus" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                                <option value="novo">Novo</option>
+                                <option value="contatado">Contatado</option>
+                                <option value="qualificado">Qualificado</option>
+                                <option value="perdido">Perdido</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-2 text-slate-300">Observações</label>
+                            <textarea id="editObservacoes" rows="2" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors w-full flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Salvar Alterações
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('token')) window.location.href = '/login.html';
+        const token = localStorage.getItem('token');
+        let todosOsProspects = [];
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getStatusClass(status) {
+            if (status === 'novo') return 'status-novo';
+            if (status === 'contatado') return 'status-contatado';
+            if (status === 'qualificado') return 'status-qualificado';
+            return 'status-perdido';
+        }
+
+        async function carregarProspects() {
+            try {
+                const response = await fetch('/api/prospects', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) throw new Error('Falha ao buscar prospects');
+                todosOsProspects = await response.json();
+                renderizarTabela(todosOsProspects);
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('tabelaProspects').innerHTML = '<tr><td colspan="9" class="p-4 text-center text-red-500">Erro ao carregar prospects.</td></tr>';
+            }
+        }
+
+        function renderizarTabela(prospects) {
+            const tbody = document.getElementById('tabelaProspects');
+            tbody.innerHTML = '';
+            if (prospects.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum prospect encontrado.</td></tr>`;
+                return;
+            }
+            prospects.forEach(p => {
+                const statusClass = getStatusClass(p.status);
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-4 text-slate-400">${p.id}</td>
+                    <td class="p-4 font-medium text-white">${escapeHtml(p.nome)}</td>
+                    <td class="p-4 text-blue-400">${escapeHtml(p.email) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(p.telefone) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(p.empresa) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(p.cargo) || '-'}</td>
+                    <td class="p-4 text-slate-300">${escapeHtml(p.origem) || '-'}</td>
+                    <td class="p-4"><span class="${statusClass}">${p.status}</span></td>
+                    <td class="p-4 text-right whitespace-nowrap">
+                        <button onclick="abrirEdicao(${p.id})" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold mr-3">Editar</button>
+                        <button onclick="excluirProspect(${p.id})" class="text-red-500 hover:text-red-400 text-xs font-bold">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('prospectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const dados = {
+                nome: document.getElementById('nome').value,
+                email: document.getElementById('email').value || null,
+                telefone: document.getElementById('telefone').value || null,
+                empresa: document.getElementById('empresa').value || null,
+                cargo: document.getElementById('cargo').value || null,
+                origem: document.getElementById('origem').value || null,
+                status: document.getElementById('status').value,
+                observacoes: document.getElementById('observacoes').value || null
+            };
+            try {
+                const response = await fetch('/api/prospects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(dados)
+                });
+                if (!response.ok) throw new Error('Falha ao criar prospect');
+                alert('Prospect salvo com sucesso!');
+                document.getElementById('prospectForm').reset();
+                carregarProspects();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao salvar prospect.');
+            }
+        });
+
+        function abrirEdicao(id) {
+            const p = todosOsProspects.find(x => x.id === id);
+            if (!p) return;
+            document.getElementById('editId').value = p.id;
+            document.getElementById('editNome').value = p.nome;
+            document.getElementById('editEmail').value = p.email || '';
+            document.getElementById('editTelefone').value = p.telefone || '';
+            document.getElementById('editEmpresa').value = p.empresa || '';
+            document.getElementById('editCargo').value = p.cargo || '';
+            document.getElementById('editOrigem').value = p.origem || '';
+            document.getElementById('editStatus').value = p.status;
+            document.getElementById('editObservacoes').value = p.observacoes || '';
+            document.getElementById('modalEdicao').classList.remove('hidden');
+        }
+
+        document.getElementById('fecharModalEdicao').addEventListener('click', () => { document.getElementById('modalEdicao').classList.add('hidden'); });
+        document.getElementById('modalEdicao').addEventListener('click', (e) => { if (e.target.id === 'modalEdicao') document.getElementById('modalEdicao').classList.add('hidden'); });
+
+        document.getElementById('formEdicao').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const dados = {
+                nome: document.getElementById('editNome').value,
+                email: document.getElementById('editEmail').value || null,
+                telefone: document.getElementById('editTelefone').value || null,
+                empresa: document.getElementById('editEmpresa').value || null,
+                cargo: document.getElementById('editCargo').value || null,
+                origem: document.getElementById('editOrigem').value || null,
+                status: document.getElementById('editStatus').value,
+                observacoes: document.getElementById('editObservacoes').value || null
+            };
+            try {
+                const response = await fetch(`/api/prospects/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(dados)
+                });
+                if (!response.ok) throw new Error('Falha ao atualizar prospect');
+                alert('Prospect atualizado!');
+                document.getElementById('modalEdicao').classList.add('hidden');
+                carregarProspects();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao atualizar prospect.');
+            }
+        });
+
+        async function excluirProspect(id) {
+            if (!confirm('Excluir este prospect?')) return;
+            try {
+                const response = await fetch(`/api/prospects/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) throw new Error('Falha ao excluir');
+                alert('Prospect excluído!');
+                carregarProspects();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao excluir prospect.');
+            }
+        }
+
+        function filtrarProspects() {
+            const termo = document.getElementById('buscarProspect').value.toLowerCase();
+            const status = document.getElementById('filtrarStatus').value;
+            const filtrados = todosOsProspects.filter(p => 
+                (p.nome.toLowerCase().includes(termo) || (p.email && p.email.toLowerCase().includes(termo))) &&
+                (!status || p.status === status)
+            );
+            renderizarTabela(filtrados);
+        }
+
+        document.getElementById('buscarProspect').addEventListener('input', filtrarProspects);
+        document.getElementById('filtrarStatus').addEventListener('change', filtrarProspects);
+        document.addEventListener('DOMContentLoaded', carregarProspects);
+
+        // --- EXPORTAÇÃO CSV ---
+        function exportarCSVProspects() {
+            if (todosOsProspects.length === 0) {
+                return alert('Não há prospects para exportar.');
+            }
+
+            const cabecalhos = ['ID', 'Nome', 'E-mail', 'Telefone', 'Empresa', 'Cargo', 'Origem', 'Status'];
+            const linhas = [];
+
+            todosOsProspects.forEach(p => {
+                const linha = [
+                    p.id,
+                    `"${(p.nome || '').replace(/"/g, '""')}"`,
+                    `"${(p.email || '').replace(/"/g, '""')}"`,
+                    `"${(p.telefone || '').replace(/"/g, '""')}"`,
+                    `"${(p.empresa || '').replace(/"/g, '""')}"`,
+                    `"${(p.cargo || '').replace(/"/g, '""')}"`,
+                    `"${(p.origem || '').replace(/"/g, '""')}"`,
+                    p.status || 'novo'
+                ];
+                linhas.push(linha);
+            });
+
+            let csvContent = cabecalhos.join(';') + '\n';
+            linhas.forEach(linha => { csvContent += linha.join(';') + '\n'; });
+
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `prospects_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+
+</body>
+</html>

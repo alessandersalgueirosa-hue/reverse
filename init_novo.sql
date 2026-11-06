@@ -1,0 +1,7 @@
+﻿CREATE TABLE IF NOT EXISTS leads (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    mensagem TEXT,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .pyside-button { transition: all 0.2s ease; border-radius: 0.375rem; font-weight: 500; }
+        .pyside-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2); }
+    </style>
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            /* No celular, os submenus ficam sempre abertos para facilitar o toque */
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased">
+            
+    <!-- MENU ADMIN -->
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white font-bold text-orange-400">Produtos</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MENU CLIENTE -->
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            if (isCliente) {
+                document.getElementById('menu-admin').style.display = 'none';
+                document.getElementById('menu-cliente').classList.remove('hidden');
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
+                };
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+            } else {
+                document.getElementById('menu-cliente').style.display = 'none';
+                document.getElementById('menu-admin').classList.remove('hidden');
+            }
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <div class="flex items-center gap-4 mb-8 bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+            <div class="p-3 bg-orange-500/20 rounded-lg text-orange-500">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Gestão de Produtos</h1>
+                <p class="text-slate-400 text-sm">Controle o catálogo de produtos, preços e estoque da sua agência.</p>
+            </div>
+        </div>
+
+        <!-- Formulário de Cadastro -->
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-8">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                <h2 class="text-xl font-bold text-white" id="tituloForm">Cadastrar Novo Produto</h2>
+            </div>
+
+            <form id="formProduto" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="hidden" id="produtoId">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Nome *</label>
+                    <input type="text" id="nome" required maxlength="120" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Categoria</label>
+                    <input type="text" id="categoria" maxlength="80" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Descrição</label>
+                    <textarea id="descricao" rows="2" maxlength="500" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Preço *</label>
+                    <input type="number" step="0.01" min="0" id="preco" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">SKU</label>
+                    <input type="text" id="sku" maxlength="60" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Estoque</label>
+                    <input type="number" min="0" id="estoque" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Status</label>
+                    <select id="status" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500">
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2 flex justify-end gap-3">
+                    <button type="button" id="btnCancelar" onclick="resetForm()" class="hidden py-3 px-6 bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-600 transition-colors pyside-button">Cancelar</button>
+                    <button type="submit" id="btnSalvar" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Salvar Produto
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabela de Produtos -->
+        <div class="bg-slate-900 rounded-lg border border-slate-800 shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-slate-800 flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                    <h2 class="text-xl font-bold text-white">Lista de Produtos</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="criarProdutoTeste()" class="bg-green-900/50 hover:bg-green-800 text-green-400 text-xs font-bold py-2 px-4 rounded-lg border border-green-500/30 transition-colors">+ Produto de Teste</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-slate-400">
+                    <thead class="text-left text-slate-500 border-b border-slate-700 bg-slate-800/50">
+                        <tr>
+                            <th class="p-4">Nome</th>
+                            <th class="p-4">Categoria</th>
+                            <th class="p-4">Preço</th>
+                            <th class="p-4">Estoque</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaProdutos" class="divide-y divide-slate-800">
+                        <tr><td colspan="6" class="p-4 text-center">Carregando produtos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = '/api/produtos';
+
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function formatPreco(v) {
+            const n = parseFloat(v);
+            return isNaN(n) ? 'R$ 0,00' : 'R$ ' + n.toFixed(2).replace('.', ',');
+        }
+
+        function resetForm() {
+            document.getElementById('formProduto').reset();
+            document.getElementById('produtoId').value = '';
+            document.getElementById('tituloForm').innerText = 'Cadastrar Novo Produto';
+            document.getElementById('btnCancelar').classList.add('hidden');
+        }
+
+        async function criarProdutoTeste() {
+            const dados = {
+                nome: 'Produto de Teste ' + Math.floor(Math.random() * 1000),
+                descricao: 'Teste automático', preco: 99.90, categoria: 'Teste',
+                sku: 'TESTE-' + Math.floor(Math.random() * 1000), estoque: 10, status: 'ativo'
+            };
+            try {
+                const response = await fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(dados) 
+                });
+                if (response.ok) {
+                    alert('Produto de teste criado com sucesso!');
+                    carregarProdutos();
+                } else {
+                    alert('Erro do servidor ao criar produto de teste.');
+                }
+            } catch (error) { alert('Erro de conexão ao criar teste.'); }
+        }
+
+        async function carregarProdutos() {
+            const tbody = document.getElementById('tabelaProdutos');
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Carregando...</td></tr>';
+            try {
+                const response = await fetch(API_URL); // GET sem token
+                if (!response.ok) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-400">Erro ${response.status} ao carregar produtos.</td></tr>`;
+                    return;
+                }
+                const data = await response.json();
+                const produtos = Array.isArray(data) ? data : (Array.isArray(data.produtos) ? data.produtos : []);
+                tbody.innerHTML = '';
+                if (produtos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Nenhum produto cadastrado.</td></tr>';
+                    return;
+                }
+                produtos.forEach(produto => {
+                    const status = (produto.status || 'inativo').toLowerCase();
+                    const ativo = status === 'ativo';
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-slate-800 hover:bg-slate-800/50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="p-4 text-white">${escapeHtml(produto.nome)}</td>
+                        <td class="p-4">${escapeHtml(produto.categoria || '-')}</td>
+                        <td class="p-4">${formatPreco(produto.preco)}</td>
+                        <td class="p-4">${escapeHtml(produto.estoque ?? 0)}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${ativo ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">${escapeHtml(status)}</span></td>
+                        <td class="p-4 text-right whitespace-nowrap">
+                            <button data-acao="editar" data-id="${produto.id}" class="text-orange-400 hover:text-orange-300 text-xs font-bold mr-3">Editar</button>
+                            <button data-acao="excluir" data-id="${produto.id}" class="text-red-400 hover:text-red-300 text-xs font-bold">Excluir</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                tbody.querySelectorAll('button[data-acao="editar"]').forEach(btn => btn.addEventListener('click', () => editarProduto(btn.dataset.id)));
+                tbody.querySelectorAll('button[data-acao="excluir"]').forEach(btn => btn.addEventListener('click', () => excluirProduto(btn.dataset.id)));
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-400">Falha de conexão com o servidor.</td></tr>';
+            }
+        }
+
+        document.getElementById('formProduto').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('produtoId').value;
+            const dados = {
+                nome: document.getElementById('nome').value.trim(),
+                descricao: document.getElementById('descricao').value.trim(),
+                preco: parseFloat(document.getElementById('preco').value),
+                categoria: document.getElementById('categoria').value.trim(),
+                sku: document.getElementById('sku').value.trim(),
+                estoque: parseInt(document.getElementById('estoque').value || '0', 10),
+                status: document.getElementById('status').value
+            };
+            if (!dados.nome) return alert('Informe o nome do produto.');
+            if (isNaN(dados.preco) || dados.preco < 0) return alert('Preço inválido.');
+
+            const url = id ? `${API_URL}/${id}` : API_URL;
+            const method = id ? 'PUT' : 'POST';
+            const btn = document.getElementById('btnSalvar');
+            btn.disabled = true;
+            btn.innerHTML = 'Salvando...';
+
+            try {
+                const response = await fetch(url, { 
+                    method, 
+                    headers: { 'Content-Type': 'application/json' }, // Sem token!
+                    body: JSON.stringify(dados) 
+                });
+                
+                if (response.ok) {
+                    alert(id ? 'Produto atualizado!' : 'Produto salvo com sucesso!');
+                    resetForm();
+                    carregarProdutos();
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    alert('Erro no servidor: ' + (errorData.error || response.status));
+                }
+            } catch (error) { 
+                console.error("Detalhes do erro:", error);
+                alert('Erro de conexão. Motivo: ' + error.message); 
+            } finally { 
+                btn.disabled = false; 
+                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Salvar Produto`; 
+            }
+        });
+
+        async function editarProduto(id) {
+            try {
+                const response = await fetch(`${API_URL}/${id}`);
+                if (!response.ok) return alert('Não foi possível carregar o produto.');
+                const p = await response.json();
+                document.getElementById('produtoId').value = p.id;
+                document.getElementById('nome').value = p.nome || '';
+                document.getElementById('categoria').value = p.categoria || '';
+                document.getElementById('descricao').value = p.descricao || '';
+                document.getElementById('preco').value = p.preco ?? '';
+                document.getElementById('sku').value = p.sku || '';
+                document.getElementById('estoque').value = p.estoque ?? 0;
+                document.getElementById('status').value = (p.status || 'ativo').toLowerCase();
+                document.getElementById('tituloForm').innerText = 'Editar Produto';
+                document.getElementById('btnCancelar').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (err) { alert('Erro ao carregar produto para edição.'); }
+        }
+
+        async function excluirProduto(id) {
+            if (!confirm('Excluir este produto?')) return;
+            try {
+                const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                if (response.ok) carregarProdutos();
+                else alert('Erro ao excluir (status ' + response.status + ').');
+            } catch (error) { alert('Erro de conexão ao excluir.'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarProdutos);
+    </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+
+</body>
+</html>

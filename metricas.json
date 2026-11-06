@@ -1,0 +1,154 @@
+{
+  "categorias": [
+    {
+      "nome": "Custo e Investimento",
+      "icone": "💰",
+      "metricas": [
+        {
+          "nome": "CPM",
+          "mede": "Custo por mil impressões",
+          "formula": "(Investimento ÷ Impressões) × 1.000",
+          "obs": "Mede o custo efetivo para cada 1.000 vezes que o anúncio é exibido"
+        },
+        {
+          "nome": "CPC",
+          "mede": "Custo por clique",
+          "formula": "Investimento ÷ Cliques",
+          "obs": "Quanto você paga, em média, por cada clique na sua campanha"
+        },
+        {
+          "nome": "CPA / CPL",
+          "mede": "Custo por aquisição ou por lead",
+          "formula": "Investimento ÷ Conversões",
+          "obs": "Quanto custa, em média, cada ação desejada (venda, cadastro, etc.)"
+        },
+        {
+          "nome": "Investimento Total",
+          "mede": "Valor total gasto na campanha",
+          "formula": "Soma de todos os valores investidos",
+          "obs": "O montante total aplicado em mídia ao longo do período analisado"
+        }
+      ]
+    },
+    {
+      "nome": "Impressões e Alcance",
+      "icone": "👁️",
+      "metricas": [
+        {
+          "nome": "Impressões",
+          "mede": "Número total de vezes que o anúncio foi exibido",
+          "formula": "Contagem direta do display do anúncio",
+          "obs": "Não confunda com alcance — mesma pessoa pode gerar múltiplas impressões"
+        },
+        {
+          "nome": "Alcance",
+          "mede": "Número de pessoas únicas que viram o anúncio",
+          "formula": "Contagem de indivíduos alcançados",
+          "obs": "Indica a dimensão da audiência exposta à sua mensagem"
+        },
+        {
+          "nome": "Frequência",
+          "mede": "Quantas vezes, em média, cada pessoa viu o anúncio",
+          "formula": "Impressões ÷ Alcance",
+          "obs": "Útil para verificar se a mensagem está sendo repetida adequada ou excessivamente"
+        }
+      ]
+    },
+    {
+      "nome": "Cliques e Engajamento",
+      "icone": "📊",
+      "metricas": [
+        {
+          "nome": "CTR",
+          "mede": "Taxa de cliques",
+          "formula": "(Cliques ÷ Impressões) × 100",
+          "obs": "Percentual de pessoas que clicaram após ver o anúncio — indica relevância"
+        },
+        {
+          "nome": "Cliques",
+          "mede": "Número total de cliques no anúncio",
+          "formula": "Contagem direta de interações",
+          "obs": "Mede o nível de interesse inicial gerado pelo seu conteúdo"
+        },
+        {
+          "nome": "Clicks por Impressão",
+          "mede": "Média de cliques por cada impressão",
+          "formula": "Cliques ÷ Impressões",
+          "obs": "Variante do CTR sem conversão para porcentagem"
+        }
+      ]
+    },
+    {
+      "nome": "Conversões e Vendas",
+      "icone": "🛒",
+      "metricas": [
+        {
+          "nome": "Conversões",
+          "mede": "Número de ações desejadas completadas",
+          "formula": "Contagem de eventos de conversão registrados",
+          "obs": "Pode ser venda, cadastro, download, lead — depende do objetivo da campanha"
+        },
+        {
+          "nome": "Taxa de Conversão (CR)",
+          "mede": "Percentual de cliques que resultaram em conversão",
+          "formula": "(Conversões ÷ Cliques) × 100",
+          "obs": "Indica a eficácia da página de destino e da oferta apresentada"
+        },
+        {
+          "nome": "Valor por Conversão",
+          "mede": "Receita média gerada por conversão",
+          "formula": "Receita Total ÷ Conversões",
+          "obs": "Ajuda a entender o valor de cada ação realizada"
+        }
+      ]
+    },
+    {
+      "nome": "ROI e Rentabilidade",
+      "icone": "📈",
+      "metricas": [
+        {
+          "nome": "ROAS",
+          "mede": "Retorno sobre o investimento em anúncios",
+          "formula": "Receita ÷ Investimento",
+          "obs": "Quantos reais são retornados para cada real investido em mídia"
+        },
+        {
+          "nome": "ROI",
+          "mede": "Retorno sobre o investimento",
+          "formula": "((Receita − Investimento) ÷ Investimento) × 100",
+          "obs": "Percentual de lucro ou prejuízo gerado pela campanha após custos"
+        },
+        {
+          "nome": "LTV / CAC Ratio",
+          "mede": "Relação entre lifetime value e custo de aquisição",
+          "formula": "LTV ÷ CPA",
+          "obs": "Indica a sustentabilidade a longo prazo do modelo de aquisição de clientes"
+        }
+      ]
+    },
+    {
+      "nome": "Métricas Auxiliares",
+      "icone": "📋",
+      "metricas": [
+        {
+          "nome": "EPC",
+          "mede": "Ganhos por clique",
+          "formula": "Receita ÷ Cliques",
+          "obs": "Quanto cada clique gerou de receita, em média"
+        },
+        {
+          "nome": "RPM",
+          "mede": "Receita por mil impressões",
+          "formula": "(Receita ÷ Impressões) × 1.000",
+          "obs": "Mede o quanto cada 1.000 exibições gerou de receita — comum em mídia programática"
+        },
+        {
+          "nome": "CR por Segmento",
+          "mede": "Taxa de conversão por segmento de audiência",
+          "formula": "Conversões por segmento ÷ Cliques por segmento",
+          "obs": "Permite identificar quais grupos de audiênciaperformam melhor"
+        }
+      ]
+    }
+  ]
+}

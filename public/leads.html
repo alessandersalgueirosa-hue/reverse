@@ -1,0 +1,561 @@
+﻿﻿﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads (Kanban) - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .coluna-kanban { min-height: 500px; transition: background-color 0.2s; }
+        .coluna-kanban.drag-over { background-color: rgba(255, 255, 255, 0.05); border-color: #f97316; }
+        .cartao-lead { cursor: grab; transition: transform 0.1s, opacity 0.2s; }
+        .cartao-lead:active { cursor: grabbing; }
+        .cartao-lead.dragging { opacity: 0.5; transform: scale(0.98); }
+        .pyside-button {
+            transition: all 0.2s ease;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+        .pyside-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2);
+        }
+    </style>
+
+    <style id="mobile-menu-style">
+        @media (max-width: 768px) {
+            #menu-admin nav, #menu-cliente nav {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                background-color: #0f172a;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                border: 1px solid #1e293b;
+            }
+            #menu-admin nav.active, #menu-cliente nav.active {
+                display: flex !important;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            /* No celular, os submenus ficam sempre abertos para facilitar o toque */
+            .relative.group > div {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
+                flex-direction: column;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding-left: 1rem;
+            }
+            .relative.group button {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn { display: none !important; }
+        }
+    </style>
+
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased overflow-x-hidden">
+            
+    <!-- MENU ADMIN -->
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white font-bold text-orange-400">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MENU CLIENTE -->
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            let isCliente = false;
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') isCliente = true;
+                } catch(e) {}
+            }
+            if (isCliente) {
+                document.getElementById('menu-admin').style.display = 'none';
+                document.getElementById('menu-cliente').classList.remove('hidden');
+                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                const nav = document.getElementById('nav-cliente');
+                const btnSair = nav.querySelector('.btn-sair');
+                const addLink = (href, texto) => {
+                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
+                };
+                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
+                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
+                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
+                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
+                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
+            } else {
+                document.getElementById('menu-cliente').style.display = 'none';
+                document.getElementById('menu-admin').classList.remove('hidden');
+            }
+            document.querySelectorAll('.btn-sair').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+                });
+            });
+        })();
+    </script>
+
+    <main class="max-w-[1400px] w-full mx-auto p-4 md:p-8">
+        
+        <!-- Cabeçalho da Página -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-orange-500/20 rounded-lg text-orange-500">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white">Gestão de Leads (Kanban)</h1>
+                    <p class="text-slate-400 text-sm">Arraste os cartões para atualizar o status do funil.</p>
+                </div>
+            </div>
+            <div class="flex gap-3 w-full md:w-auto">
+                <button onclick="exportarCSVLeads()" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Exportar CSV
+                </button>
+                <button onclick="abrirModalNovoLead()" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-lg flex items-center gap-2 whitespace-nowrap">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Novo Lead
+                </button>
+            </div>
+        </div>
+
+        <!-- Quadro Kanban -->
+        <div class="flex gap-4 overflow-x-auto pb-4 items-start snap-x">
+            
+            <!-- NOVO -->
+            <div class="w-80 flex-shrink-0 bg-slate-900/50 rounded-xl border border-slate-800 flex flex-col snap-start shadow-lg">
+                <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-xl">
+                    <h3 class="font-bold text-blue-400 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                        Novo
+                    </h3>
+                    <span id="badge-novo" class="bg-slate-700 text-white text-xs px-2 py-1 rounded-full font-bold">0</span>
+                </div>
+                <div id="col-novo" class="coluna-kanban p-3 flex flex-col gap-3 overflow-y-auto" data-status="novo" ondragover="permitirDrop(event)" ondragleave="sairDrop(event)" ondrop="soltarCartao(event)"></div>
+            </div>
+
+            <!-- EM ATENDIMENTO -->
+            <div class="w-80 flex-shrink-0 bg-slate-900/50 rounded-xl border border-slate-800 flex flex-col snap-start shadow-lg">
+                <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-xl">
+                    <h3 class="font-bold text-yellow-400 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                        Em Atendimento
+                    </h3>
+                    <span id="badge-em_atendimento" class="bg-slate-700 text-white text-xs px-2 py-1 rounded-full font-bold">0</span>
+                </div>
+                <div id="col-em_atendimento" class="coluna-kanban p-3 flex flex-col gap-3 overflow-y-auto" data-status="em_atendimento" ondragover="permitirDrop(event)" ondragleave="sairDrop(event)" ondrop="soltarCartao(event)"></div>
+            </div>
+
+            <!-- CONVERTIDO -->
+            <div class="w-80 flex-shrink-0 bg-slate-900/50 rounded-xl border border-slate-800 flex flex-col snap-start shadow-lg">
+                <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-xl">
+                    <h3 class="font-bold text-green-400 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                        Fechado (Convertido)
+                    </h3>
+                    <span id="badge-convertido" class="bg-slate-700 text-white text-xs px-2 py-1 rounded-full font-bold">0</span>
+                </div>
+                <div id="col-convertido" class="coluna-kanban p-3 flex flex-col gap-3 overflow-y-auto" data-status="convertido" ondragover="permitirDrop(event)" ondragleave="sairDrop(event)" ondrop="soltarCartao(event)"></div>
+            </div>
+
+            <!-- PERDIDO -->
+            <div class="w-80 flex-shrink-0 bg-slate-900/50 rounded-xl border border-slate-800 flex flex-col snap-start shadow-lg">
+                <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-xl">
+                    <h3 class="font-bold text-red-400 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                        Perdido
+                    </h3>
+                    <span id="badge-perdido" class="bg-slate-700 text-white text-xs px-2 py-1 rounded-full font-bold">0</span>
+                </div>
+                <div id="col-perdido" class="coluna-kanban p-3 flex flex-col gap-3 overflow-y-auto" data-status="perdido" ondragover="permitirDrop(event)" ondragleave="sairDrop(event)" ondrop="soltarCartao(event)"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL DE NOVO LEAD -->
+    <div id="modalNovoLead" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-lg p-6 relative">
+            <button onclick="fecharModalNovoLead()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl">&times;</button>
+            <h3 class="text-2xl font-bold text-orange-400 mb-4 border-b border-slate-700 pb-2 flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                Cadastrar Novo Lead
+            </h3>
+            
+            <form id="formNovoLead" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Nome *</label>
+                    <input type="text" id="lead_nome" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">E-mail *</label>
+                        <input type="email" id="lead_email" required class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">Telefone</label>
+                        <input type="text" id="lead_telefone" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">Empresa</label>
+                        <input type="text" id="lead_empresa" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">Origem</label>
+                        <input type="text" id="lead_origem" placeholder="Ex: Site, Instagram..." class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors">
+                    </div>
+                </div>
+                <button type="submit" class="pyside-button w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg mt-4 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Salvar Lead
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        let leadArrastadoId = null;
+        let todosLeads = [];
+
+        function arrastarCartao(event, id) {
+            leadArrastadoId = id;
+            event.dataTransfer.effectAllowed = 'move';
+            event.target.classList.add('dragging');
+        }
+
+        function permitirDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function sairDrop(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        async function soltarCartao(event) {
+            event.preventDefault();
+            const coluna = event.currentTarget;
+            coluna.classList.remove('drag-over');
+            
+            document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+
+            if (!leadArrastadoId) return;
+
+            const novoStatus = coluna.getAttribute('data-status');
+            
+            try {
+                const res = await fetch(`/api/leads/${leadArrastadoId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status: novoStatus })
+                });
+
+                if (res.ok) {
+                    carregarLeads(); 
+                } else {
+                    alert('Erro ao mover o lead.');
+                }
+            } catch (e) {
+                alert('Erro de rede.');
+            }
+            leadArrastadoId = null;
+        }
+
+        async function carregarLeads() {
+            try {
+                const res = await fetch('/api/leads', { headers: { 'Authorization': `Bearer ${token}` } });
+                
+                if (!res.ok) {
+                    const textoErro = await res.text();
+                    throw new Error(`Status ${res.status}: ${textoErro}`);
+                }
+                
+                todosLeads = await res.json();
+                
+                const colunasIds = ['novo', 'em_atendimento', 'convertido', 'perdido'];
+                colunasIds.forEach(id => {
+                    const col = document.getElementById(`col-${id}`);
+                    if (col) col.innerHTML = '';
+                    const badge = document.getElementById(`badge-${id}`);
+                    if (badge) badge.innerText = '0';
+                });
+
+                const contadores = { novo: 0, em_atendimento: 0, convertido: 0, perdido: 0 };
+
+                todosLeads.forEach(lead => {
+                    let status = (lead.status || 'novo').toLowerCase();
+                    if (!colunasIds.includes(status)) {
+                        status = 'novo'; 
+                    }
+
+                    contadores[status]++;
+                    const card = criarCartao(lead);
+                    
+                    const coluna = document.getElementById(`col-${status}`);
+                    if (coluna) coluna.appendChild(card);
+                });
+
+                Object.keys(contadores).forEach(status => {
+                    const badge = document.getElementById(`badge-${status}`);
+                    if (badge) badge.innerText = contadores[status];
+                });
+
+            } catch (error) {
+                alert('Erro ao carregar os leads.\nDetalhes: ' + error.message);
+            }
+        }
+
+        function criarCartao(lead) {
+            const div = document.createElement('div');
+            div.className = 'cartao-lead bg-slate-800 p-4 rounded-lg border border-slate-700 shadow-sm hover:border-slate-500 transition-colors relative';
+            div.draggable = true;
+            div.addEventListener('dragstart', (e) => arrastarCartao(e, lead.id));
+
+            const inicial = lead.nome ? lead.nome.charAt(0).toUpperCase() : '?';
+            const cores = ['bg-blue-600', 'bg-purple-600', 'bg-green-600', 'bg-orange-600', 'bg-pink-600'];
+            const corFundo = cores[lead.id % cores.length];
+
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 ${corFundo} rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0">
+                            ${inicial}
+                        </div>
+                        <div>
+                            <h4 class="text-white font-bold leading-tight line-clamp-1">${lead.nome}</h4>
+                            <p class="text-xs text-slate-400 line-clamp-1">${lead.empresa || 'Sem empresa'}</p>
+                        </div>
+                    </div>
+                    <button onclick="event.stopPropagation(); excluirLead(${lead.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1 bg-slate-900/50 rounded" title="Excluir Lead">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
+                <div class="text-xs text-slate-400 flex flex-col gap-1 mt-3">
+                    <div class="flex items-center gap-1"><svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> ${lead.email || 'N/A'}</div>
+                    <div class="flex items-center gap-1"><svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> ${lead.telefone || 'N/A'}</div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-slate-700 flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500 bg-slate-900 px-2 py-1 rounded">${lead.origem || 'Não informada'}</span>
+                </div>
+            `;
+            return div;
+        }
+
+        async function excluirLead(id) {
+            if (!confirm('Tem certeza que deseja excluir este lead? Ele será removido do banco de dados.')) return;
+            
+            try {
+                const res = await fetch(`/api/leads/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    alert('Lead excluído com sucesso!');
+                    carregarLeads();
+                } else {
+                    alert('Erro ao excluir o lead.');
+                }
+            } catch (error) {
+                alert('Erro de conexão com o servidor.');
+            }
+        }
+
+        function abrirModalNovoLead() {
+            document.getElementById('modalNovoLead').classList.remove('hidden');
+            document.getElementById('modalNovoLead').classList.add('flex');
+        }
+        function fecharModalNovoLead() {
+            document.getElementById('modalNovoLead').classList.add('hidden');
+            document.getElementById('modalNovoLead').classList.remove('flex');
+            document.getElementById('formNovoLead').reset();
+        }
+
+        document.getElementById('formNovoLead').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const dados = {
+                nome: document.getElementById('lead_nome').value,
+                email: document.getElementById('lead_email').value,
+                telefone: document.getElementById('lead_telefone').value,
+                empresa: document.getElementById('lead_empresa').value,
+                origem: document.getElementById('lead_origem').value,
+                status: 'novo'
+            };
+
+            try {
+                const res = await fetch('/api/leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(dados)
+                });
+                
+                if (res.ok) {
+                    fecharModalNovoLead();
+                    carregarLeads();
+                } else {
+                    const erro = await res.json();
+                    alert('Erro ao criar lead: ' + (erro.error || erro.detalhe));
+                }
+            } catch (error) {
+                alert('Erro de conexão.');
+            }
+        });
+
+        // --- EXPORTAÇÃO CSV ---
+        function exportarCSVLeads() {
+            if (todosLeads.length === 0) {
+                return alert('Não há leads para exportar.');
+            }
+
+            const cabecalhos = ['ID', 'Nome', 'E-mail', 'Telefone', 'Empresa', 'Origem', 'Status'];
+            const linhas = [];
+
+            todosLeads.forEach(l => {
+                const linha = [
+                    l.id,
+                    `"${(l.nome || '').replace(/"/g, '""')}"`,
+                    `"${(l.email || '').replace(/"/g, '""')}"`,
+                    `"${(l.telefone || '').replace(/"/g, '""')}"`,
+                    `"${(l.empresa || '').replace(/"/g, '""')}"`,
+                    `"${(l.origem || '').replace(/"/g, '""')}"`,
+                    l.status || 'novo'
+                ];
+                linhas.push(linha);
+            });
+
+            let csvContent = cabecalhos.join(';') + '\n';
+            linhas.forEach(linha => { csvContent += linha.join(';') + '\n'; });
+
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `leads_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarLeads);
+    </script>
+
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => {
+                const nav = header.querySelector('nav');
+                if(!nav) return;
+
+                const btn = document.createElement('button');
+                btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                btn.className = 'mobile-menu-btn p-2 rounded hover:bg-slate-800 text-slate-300 ml-auto';
+                
+                btn.onclick = () => {
+                    nav.classList.toggle('active');
+                };
+
+                nav.parentNode.insertBefore(btn, nav);
+            });
+        });
+    </script>
+
+</body>
+</html>

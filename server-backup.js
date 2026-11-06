@@ -1,0 +1,605 @@
+const express = require('express');
+const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+require('dotenv').config();
+const db = require('./db');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || 'minha-chave-secreta-super-segura-mudanca-em-producao';
+
+const pastaUpload = path.join(__dirname, 'public', 'kb');
+if (!fs.existsSync(pastaUpload)) { fs.mkdirSync(pastaUpload, { recursive: true }); }
+const storage = multer.diskStorage({ destination: (req, file, cb) => cb(null, pastaUpload), filename: (req, file, cb) => { const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); const ext = path.extname(file.originalname); const nomeLimpo = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9]/g, '_'); cb(null, `${nomeLimpo}-${uniqueSuffix}${ext}`); } });
+const upload = multer({ storage });
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
+
+function verificarToken(req, res, next) { const authHeader = req.headers['authorization']; const token = authHeader && authHeader.split(' ')[1]; if (!token) return res.status(401).json({ error: 'Token não fornecido.' }); jwt.verify(token, JWT_SECRET, (err, user) => { if (err) return res.status(401).json({ error: 'Token inválido.' }); req.user = user; next(); }); }
+
+app.get('/api/health', (req, res) => res.json({ status: 'ok', message: 'Servidor funcionando' }));
+app.post('/api/login', async (req, res) => {
+    const { email, senha } = req.body;
+    if (!email || !senha) return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
+    
+    try {
+        const result = await db.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+        if (result.rows.length === 0) return res.status(401).json({ error: 'Credenciais inválidas.' });
+        
+        const user = result.rows[0];
+        // Verifica a senha (funciona para texto puro ou hash bcrypt)
+        const senhaValida = (senha === user.senha) || (await bcrypt.compare(senha, user.senha).catch(() => false));
+        
+        if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas.' });
+        
+        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+        res.json({ token });
+    } catch (error) {
+        console.error("ERRO NO LOGIN:", error); // Isso vai mostrar o erro real no terminal
+        res.status(500).json({ error: 'Erro interno no servidor.' });
+    }
+});
+// ROTA DE LOGIN EXCLUSIVA DO CLIENTE
+app.post('/api/login-cliente', async (req, res) => {
+    const { email, senha } = req.body;
+    if (!email || !senha) return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
+    
+    try {
+        // Busca na tabela de clientes (que tem a coluna senha agora)
+        const result = await db.query('SELECT * FROM clientes WHERE email = $1', [email]);
+        if (result.rows.length === 0) return res.status(401).json({ error: 'Credenciais inválidas.' });
+        
+        const cliente = result.rows[0];
+        
+        // Verifica a senha. Se a coluna 'senha' não existir ou for nula, usa o CPF/CNPJ como fallback (ou apenas aceita)
+        const senhaValida = (senha === cliente.senha) || (await bcrypt.compare(senha, cliente.senha).catch(() => false));
+        
+        if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas.' });
+        
+        // Cria um token com o ID do cliente e uma flag para identificar que é cliente
+        const token = jwt.sign({ id: cliente.id, email: cliente.email, tipo: 'cliente' }, JWT_SECRET, { expiresIn: '8h' });
+        res.json({ token });
+    } catch (error) {
+        console.error("Erro no login do cliente:", error);
+        res.status(500).json({ error: 'Erro interno no servidor.' });
+    }
+});
+app.post('/api/leads', async (req, res) => { const { nome, email, mensagem, telefone, empresa, origem } = req.body; try { const result = await db.query('INSERT INTO leads (nome, email, mensagem, telefone, empresa, origem) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [nome, email, mensagem, telefone, empresa, origem]); res.status(201).json({ message: 'Lead salvo com sucesso!', lead: result.rows[0] }); } catch (error) { res.status(500).json({ error: 'Erro interno ao salvar lead' }); } });
+
+app.get('/api/mapeamento', verificarToken, async (req, res) => { try { const result = await db.query('SELECT * FROM mapeamentos_clientes ORDER BY data_criacao DESC'); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar mapeamentos' }); } });
+
+app.get('/api/leads', verificarToken, async (req, res) => { try { const leadsResult = await db.query('SELECT * FROM leads ORDER BY data_criacao DESC'); const tagsResult = await db.query('SELECT lt.lead_id, t.id, t.nome FROM lead_tags lt JOIN tags t ON t.id = lt.tag_id'); const tagsPorLead = {}; tagsResult.rows.forEach(row => { if (!tagsPorLead[row.lead_id]) tagsPorLead[row.lead_id] = []; tagsPorLead[row.lead_id].push({ id: row.id, nome: row.nome }); }); res.json(leadsResult.rows.map(lead => ({ ...lead, tags: tagsPorLead[lead.id] || [] }))); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar leads.' }); } });
+app.put('/api/leads/:id', verificarToken, async (req, res) => { const { status, cliente_id } = req.body; try { await db.query('UPDATE leads SET status = COALESCE($1, status), cliente_id = $2 WHERE id = $3', [status || null, cliente_id || null, req.params.id]); res.json({ message: 'Lead atualizado com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao atualizar lead.' }); } });
+app.delete('/api/leads/:id', verificarToken, async (req, res) => { try { await db.query('DELETE FROM leads WHERE id = $1', [req.params.id]); res.json({ message: 'Lead excluído com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao excluir lead.' }); } });
+
+app.get('/api/tags', verificarToken, async (req, res) => { try { const result = await db.query('SELECT * FROM tags ORDER BY nome ASC'); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar tags' }); } });
+app.post('/api/tags', verificarToken, async (req, res) => { const { nome } = req.body; if (!nome || nome.trim() === '') return res.status(400).json({ error: 'O nome da tag é obrigatório.' }); try { const result = await db.query('INSERT INTO tags (nome) VALUES ($1) ON CONFLICT (nome) DO NOTHING RETURNING *', [nome.trim()]); if (result.rows.length === 0) return res.status(409).json({ error: 'Esta tag já existe.' }); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro interno ao criar tag' }); } });
+app.post('/api/leads/:id/tags', verificarToken, async (req, res) => { const { id } = req.params; const { tag_id } = req.body; try { await db.query('INSERT INTO lead_tags (lead_id, tag_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, tag_id]); res.json({ message: 'Tag adicionada ao lead.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao adicionar tag' }); } });
+app.delete('/api/leads/:id/tags/:tag_id', verificarToken, async (req, res) => { const { id, tag_id } = req.params; try { await db.query('DELETE FROM lead_tags WHERE lead_id = $1 AND tag_id = $2', [id, tag_id]); res.json({ message: 'Tag removida do lead.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao remover tag' }); } });
+
+app.get('/api/tarefas', verificarToken, async (req, res) => { try { const result = await db.query('SELECT t.*, l.nome AS lead_nome FROM tarefas t LEFT JOIN leads l ON l.id = t.lead_id ORDER BY t.concluida ASC, t.data_vencimento ASC NULLS LAST, t.data_criacao DESC'); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar tarefas' }); } });
+app.post('/api/tarefas', verificarToken, async (req, res) => { const { lead_id, titulo, descricao, data_vencimento } = req.body; if (!titulo || titulo.trim() === '') return res.status(400).json({ error: 'O título da tarefa é obrigatório.' }); try { const result = await db.query('INSERT INTO tarefas (lead_id, titulo, descricao, data_vencimento) VALUES ($1, $2, $3, $4) RETURNING *', [lead_id || null, titulo, descricao || null, data_vencimento || null]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro interno ao criar tarefa' }); } });
+app.put('/api/tarefas/:id', verificarToken, async (req, res) => { try { await db.query('UPDATE tarefas SET concluida = $1 WHERE id = $2', [req.body.concluida, req.params.id]); res.json({ message: 'Tarefa atualizada com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao atualizar tarefa' }); } });
+app.delete('/api/tarefas/:id', verificarToken, async (req, res) => { try { await db.query('DELETE FROM tarefas WHERE id = $1', [req.params.id]); res.json({ message: 'Tarefa excluída com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao excluir tarefa' }); } });
+
+app.get('/api/campanhas', verificarToken, async (req, res) => { try { const result = await db.query('SELECT c.*, COALESCE((SELECT COUNT(*) FROM leads l WHERE l.campanha_id = c.id), 0) AS total_leads, cl.nome AS cliente_nome FROM campanhas c LEFT JOIN clientes cl ON cl.id = c.cliente_id ORDER BY c.id DESC'); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar campanhas' }); } });
+app.post('/api/campanhas', verificarToken, async (req, res) => { const { nome, descricao, data_inicio, data_fim, orcamento, cliente_id } = req.body; try { const result = await db.query('INSERT INTO campanhas (nome, descricao, data_inicio, data_fim, orcamento, cliente_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [nome, descricao, data_inicio, data_fim, orcamento, cliente_id || null]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro interno ao criar campanha' }); } });
+app.put('/api/campanhas/:id', verificarToken, async (req, res) => { const { nome, descricao, data_inicio, data_fim, orcamento, status, cliente_id } = req.body; try { await db.query('UPDATE campanhas SET nome = $1, descricao = $2, data_inicio = $3, data_fim = $4, orcamento = $5, status = $6, cliente_id = $7 WHERE id = $8', [nome, descricao, data_inicio, data_fim, orcamento, status, cliente_id || null, req.params.id]); res.json({ message: 'Campanha atualizada com sucesso' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao atualizar campanha' }); } });
+app.delete('/api/campanhas/:id', verificarToken, async (req, res) => { try { await db.query('DELETE FROM campanhas WHERE id = $1', [req.params.id]); res.json({ message: 'Campanha excluída com sucesso' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao excluir campanha' }); } });
+
+app.get('/api/clientes', verificarToken, async (req, res) => { try { const result = await db.query('SELECT c.*, COALESCE((SELECT COUNT(*) FROM leads l WHERE l.cliente_id = c.id), 0) AS total_leads, COALESCE((SELECT COUNT(*) FROM campanhas ca WHERE ca.cliente_id = c.id), 0) AS total_campanhas FROM clientes c ORDER BY c.id DESC'); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar clientes' }); } });
+app.get('/api/clientes/:id', verificarToken, async (req, res) => { try { const result = await db.query('SELECT * FROM clientes WHERE id = $1', [req.params.id]); if (result.rows.length === 0) return res.status(404).json({ error: 'Cliente não encontrado.' }); res.json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar cliente' }); } });
+app.get('/api/clientes/:id/leads', verificarToken, async (req, res) => { try { const result = await db.query('SELECT * FROM leads WHERE cliente_id = $1 ORDER BY data_criacao DESC', [req.params.id]); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar leads' }); } });
+app.get('/api/clientes/:id/campanhas', verificarToken, async (req, res) => { try { const result = await db.query('SELECT * FROM campanhas WHERE cliente_id = $1 ORDER BY data_criacao DESC', [req.params.id]); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar campanhas' }); } });
+app.get('/api/clientes/:id/tarefas', verificarToken, async (req, res) => { try { const result = await db.query('SELECT t.*, l.nome AS lead_nome FROM tarefas t JOIN leads l ON l.id = t.lead_id WHERE l.cliente_id = $1 ORDER BY t.concluida ASC, t.data_vencimento ASC NULLS LAST, t.data_criacao DESC', [req.params.id]); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar tarefas' }); } });
+app.post('/api/clientes', verificarToken, async (req, res) => { 
+    const { tipo, nome, razao_social, cpf, cnpj, email, telefone, celular, endereco, cidade, estado, cep, data_nascimento, observacoes, senha } = req.body; 
+    
+    if (!tipo || !nome || !email) return res.status(400).json({ error: 'Tipo, nome e e-mail são obrigatórios.' }); 
+    
+    try { 
+        // Se uma senha foi enviada, criptografa ela antes de salvar
+        let senhaCriptografada = null;
+        if (senha && senha.trim() !== '') {
+            senhaCriptografada = await bcrypt.hash(senha, 10);
+        }
+
+        const result = await db.query(
+            'INSERT INTO clientes (tipo, nome, razao_social, cpf, cnpj, email, telefone, celular, endereco, cidade, estado, cep, data_nascimento, observacoes, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *', 
+            [tipo, nome, razao_social || null, cpf || null, cnpj || null, email, telefone || null, celular || null, endereco || null, cidade || null, estado || null, cep || null, data_nascimento || null, observacoes || null, senhaCriptografada]
+        ); 
+        res.status(201).json({ message: 'Cliente salvo com sucesso!', cliente: result.rows[0] }); 
+    } catch (error) { 
+        if (error.code === '23505') return res.status(409).json({ error: 'CPF ou CNPJ já cadastrado.' }); 
+        res.status(500).json({ error: 'Erro interno ao salvar cliente' }); 
+    } 
+});app.put('/api/clientes/:id', verificarToken, async (req, res) => { const { tipo, nome, razao_social, cpf, cnpj, email, telefone, celular, endereco, cidade, estado, cep, data_nascimento, observacoes, status } = req.body; try { await db.query('UPDATE clientes SET tipo = $1, nome = $2, razao_social = $3, cpf = $4, cnpj = $5, email = $6, telefone = $7, celular = $8, endereco = $9, cidade = $10, estado = $11, cep = $12, data_nascimento = $13, observacoes = $14, status = $15 WHERE id = $16', [tipo, nome, razao_social || null, cpf || null, cnpj || null, email, telefone || null, celular || null, endereco || null, cidade || null, estado || null, cep || null, data_nascimento || null, observacoes || null, status, req.params.id]); res.json({ message: 'Cliente atualizado com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao atualizar cliente' }); } });
+app.delete('/api/clientes/:id', verificarToken, async (req, res) => { try { await db.query('DELETE FROM clientes WHERE id = $1', [req.params.id]); res.json({ message: 'Cliente excluído com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao excluir cliente' }); } });
+// === ROTA DE UPLOAD DE CRIATIVOS PELA AGÊNCIA ===
+const storageCriativos = multer.diskStorage({ 
+    destination: (req, file, cb) => { 
+        const dir = path.join(__dirname, 'public', 'uploads', 'criativos');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir); 
+    }, 
+    filename: (req, file, cb) => { 
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); 
+        const ext = path.extname(file.originalname);
+        cb(null, `${uniqueSuffix}${ext}`); 
+    } 
+});
+const uploadCriativos = multer({ storage: storageCriativos });
+
+app.post('/api/clientes/:id/criativos', verificarToken, uploadCriativos.single('arquivo'), async (req, res) => {
+    const { id } = req.params;
+    const { titulo } = req.body;
+    
+    if (!req.file) return res.status(400).json({ error: 'Arquivo é obrigatório.' });
+    if (!titulo) return res.status(400).json({ error: 'Título é obrigatório.' });
+
+    const url_arquivo = `/uploads/criativos/${req.file.filename}`;
+
+    try {
+        const result = await db.query(
+            'INSERT INTO criativos (cliente_id, titulo, url_arquivo, status) VALUES ($1, $2, $3, $4) RETURNING *',
+            [id, titulo, url_arquivo, 'pendente']
+        );
+        res.status(201).json({ message: 'Criativo enviado com sucesso!', criativo: result.rows[0] });
+    } catch (error) {
+        console.error("Erro ao salvar criativo:", error);
+        res.status(500).json({ error: 'Erro interno ao salvar criativo' });
+    }
+});
+app.get('/api/prospects', verificarToken, async (req, res) => { try { const result = await db.query('SELECT * FROM prospects ORDER BY data_criacao DESC'); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar prospects' }); } });
+app.post('/api/prospects', verificarToken, async (req, res) => { const { nome, email, telefone, empresa, cargo, origem, status, observacoes } = req.body; if (!nome) return res.status(400).json({ error: 'O nome é obrigatório.' }); try { const result = await db.query('INSERT INTO prospects (nome, email, telefone, empresa, cargo, origem, status, observacoes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [nome, email || null, telefone || null, empresa || null, cargo || null, origem || null, status || 'novo', observacoes || null]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro interno ao criar prospect' }); } });
+app.put('/api/prospects/:id', verificarToken, async (req, res) => { const { nome, email, telefone, empresa, cargo, origem, status, observacoes } = req.body; try { await db.query('UPDATE prospects SET nome = $1, email = $2, telefone = $3, empresa = $4, cargo = $5, origem = $6, status = $7, observacoes = $8 WHERE id = $9', [nome, email || null, telefone || null, empresa || null, cargo || null, origem || null, status, observacoes || null, req.params.id]); res.json({ message: 'Prospect atualizado com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao atualizar prospect' }); } });
+app.delete('/api/prospects/:id', verificarToken, async (req, res) => { try { await db.query('DELETE FROM prospects WHERE id = $1', [req.params.id]); res.json({ message: 'Prospect excluído com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao excluir prospect' }); } });
+
+app.post('/api/feedbacks', verificarToken, async (req, res) => { const { cliente_id, nota, comentario } = req.body; if (!cliente_id || !nota) return res.status(400).json({ error: 'Cliente e nota são obrigatórios.' }); try { const result = await db.query('INSERT INTO feedbacks (cliente_id, nota, comentario) VALUES ($1, $2, $3) RETURNING *', [cliente_id, nota, comentario || null]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro interno ao salvar feedback' }); } });
+app.get('/api/clientes/:id/feedbacks', verificarToken, async (req, res) => { try { const result = await db.query('SELECT * FROM feedbacks WHERE cliente_id = $1 ORDER BY data_criacao DESC', [req.params.id]); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar feedbacks' }); } });
+
+app.get('/api/acoes-sociais', verificarToken, async (req, res) => { try { const resultado = await db.query('SELECT a.*, cl.nome AS cliente_nome, ca.nome AS campanha_nome FROM acoes_sociais a LEFT JOIN clientes cl ON cl.id = a.cliente_id LEFT JOIN campanhas ca ON ca.id = a.campanha_id ORDER BY a.data_publicacao DESC NULLS LAST, a.data_criacao DESC'); res.json(resultado.rows); } catch (erro) { res.status(500).json({ error: 'Erro interno ao buscar ações sociais' }); } });
+app.post('/api/acoes-sociais', verificarToken, async (req, res) => { const { cliente_id, campanha_id, tipo, titulo, descricao, data_publicacao, status, link } = req.body; if (!cliente_id || !tipo || !titulo) return res.status(400).json({ error: 'Cliente, tipo e título são obrigatórios.' }); try { const resultado = await db.query('INSERT INTO acoes_sociais (cliente_id, campanha_id, tipo, titulo, descricao, data_publicacao, status, link) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [cliente_id, campanha_id || null, tipo, titulo, descricao || null, data_publicacao || null, status || 'planejado', link || null]); res.status(201).json(resultado.rows[0]); } catch (erro) { res.status(500).json({ error: 'Erro interno ao criar ação social' }); } });
+app.put('/api/acoes-sociais/:id', verificarToken, async (req, res) => { const { cliente_id, campanha_id, tipo, titulo, descricao, data_publicacao, status, link } = req.body; try { await db.query('UPDATE acoes_sociais SET cliente_id = $1, campanha_id = $2, tipo = $3, titulo = $4, descricao = $5, data_publicacao = $6, status = $7, link = $8 WHERE id = $9', [cliente_id, campanha_id || null, tipo, titulo, descricao || null, data_publicacao || null, status, link || null, req.params.id]); res.json({ message: 'Ação social atualizada com sucesso.' }); } catch (erro) { res.status(500).json({ error: 'Erro interno ao atualizar ação social' }); } });
+app.delete('/api/acoes-sociais/:id', verificarToken, async (req, res) => { try { await db.query('DELETE FROM acoes_sociais WHERE id = $1', [req.params.id]); res.json({ message: 'Ação social excluída com sucesso.' }); } catch (erro) { res.status(500).json({ error: 'Erro interno ao excluir ação social' }); } });
+
+app.get('/api/metricas', verificarToken, async (req, res) => { try { const funil = await db.query(`SELECT COALESCE(etapa_funil, 'novo') AS etapa, COUNT(*) AS total FROM leads GROUP BY etapa_funil ORDER BY total DESC`); const origem = await db.query(`SELECT COALESCE(origem, 'Não informado') AS origem, COUNT(*) AS total FROM leads GROUP BY origem ORDER BY total DESC`); const campanhas = await db.query(`SELECT c.nome, cl.nome AS cliente_nome, COUNT(l.id) AS total_leads, c.orcamento FROM campanhas c LEFT JOIN leads l ON l.campanha_id = c.id LEFT JOIN clientes cl ON cl.id = c.cliente_id GROUP BY c.id, c.nome, cl.nome, c.orcamento ORDER BY total_leads DESC`); const clientesResult = await db.query('SELECT COUNT(*) AS total FROM clientes'); const prospectsResult = await db.query('SELECT COUNT(*) AS total FROM prospects'); res.json({ funil: funil.rows, origem: origem.rows, campanhas: campanhas.rows, totalClientes: parseInt(clientesResult.rows[0].total), totalProspects: parseInt(prospectsResult.rows[0].total) }); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar métricas' }); } });
+app.get('/api/metricas/tarefas-por-cliente', verificarToken, async (req, res) => { try { const result = await db.query(`SELECT COALESCE(c.nome, 'Sem Cliente') AS cliente, COUNT(CASE WHEN t.concluida = false THEN 1 END) AS pendentes, COUNT(CASE WHEN t.concluida = true THEN 1 END) AS realizadas FROM tarefas t LEFT JOIN leads l ON l.id = t.lead_id LEFT JOIN clientes c ON c.id = l.cliente_id GROUP BY c.id, c.nome ORDER BY c.nome ASC`); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar tarefas por cliente' }); } });
+app.get('/api/metricas/redes-sociais', verificarToken, async (req, res) => { try { const resultado = await db.query(`SELECT cl.nome AS cliente, COUNT(CASE WHEN a.status = 'publicado' THEN 1 END) AS publicados, COUNT(CASE WHEN a.status = 'planejado' THEN 1 END) AS planejados, COUNT(CASE WHEN a.status = 'em_producao' THEN 1 END) AS em_producao, COUNT(a.id) AS total FROM clientes cl LEFT JOIN acoes_sociais a ON a.cliente_id = cl.id GROUP BY cl.id, cl.nome ORDER BY cl.nome ASC`); res.json(resultado.rows); } catch (erro) { res.status(500).json({ error: 'Erro interno ao buscar métricas de redes sociais' }); } });
+app.get('/api/metricas/campanhas-por-cliente', verificarToken, async (req, res) => { try { const resultado = await db.query(`SELECT cl.nome AS cliente, COUNT(DISTINCT c.id) AS total_campanhas, COUNT(l.id) AS total_leads FROM clientes cl LEFT JOIN campanhas c ON c.cliente_id = cl.id LEFT JOIN leads l ON l.campanha_id = c.id GROUP BY cl.id, cl.nome ORDER BY total_leads DESC, cl.nome ASC`); res.json(resultado.rows); } catch (erro) { res.status(500).json({ error: 'Erro interno ao buscar campanhas por cliente' }); } });
+
+app.get('/api/financeiro/dados', verificarToken, async (req, res) => { try { const campanhas = await db.query(`SELECT c.*, cl.nome AS cliente_nome FROM campanhas c LEFT JOIN clientes cl ON cl.id = c.cliente_id ORDER BY c.data_inicio DESC`); const receitas = await db.query(`SELECT r.*, cl.nome AS cliente_nome FROM receitas r LEFT JOIN clientes cl ON cl.id = r.cliente_id ORDER BY r.data DESC`); const despesas = await db.query(`SELECT d.*, cl.nome AS cliente_nome FROM despesas d LEFT JOIN clientes cl ON cl.id = d.cliente_id ORDER BY d.data DESC`); res.json({ campanhas: campanhas.rows, receitas: receitas.rows, despesas: despesas.rows }); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar financeiro.' }); } });
+app.post('/api/receitas', verificarToken, async (req, res) => { const { cliente_id, descricao, valor, data } = req.body; try { const result = await db.query('INSERT INTO receitas (cliente_id, descricao, valor, data) VALUES ($1, $2, $3, $4) RETURNING *', [cliente_id || null, descricao, valor, data]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro ao salvar receita' }); } });
+app.post('/api/despesas', verificarToken, async (req, res) => { const { cliente_id, descricao, valor, data, categoria } = req.body; try { const result = await db.query('INSERT INTO despesas (cliente_id, descricao, valor, data, categoria) VALUES ($1, $2, $3, $4, $5) RETURNING *', [cliente_id || null, descricao, valor, data, categoria]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro ao salvar despesa' }); } });
+
+app.get('/api/inbound', verificarToken, async (req, res) => { try { const result = await db.query(`SELECT i.*, c.nome AS cliente_nome FROM inbound_marketing i LEFT JOIN clientes c ON c.id = i.cliente_id ORDER BY i.data_criacao DESC`); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar inbound' }); } });
+app.post('/api/inbound', verificarToken, async (req, res) => { const { cliente_id, persona, etapa_funil, tipo_conteudo, titulo, descricao, palavras_chave, status, link } = req.body; try { const result = await db.query('INSERT INTO inbound_marketing (cliente_id, persona, etapa_funil, tipo_conteudo, titulo, descricao, palavras_chave, status, link) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [cliente_id, persona, etapa_funil, tipo_conteudo, titulo, descricao, palavras_chave, status, link]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro ao criar inbound' }); } });
+app.put('/api/inbound/:id', verificarToken, async (req, res) => { const { cliente_id, persona, etapa_funil, tipo_conteudo, titulo, descricao, palavras_chave, status, link } = req.body; try { await db.query('UPDATE inbound_marketing SET cliente_id = $1, persona = $2, etapa_funil = $3, tipo_conteudo = $4, titulo = $5, descricao = $6, palavras_chave = $7, status = $8, link = $9 WHERE id = $10', [cliente_id, persona, etapa_funil, tipo_conteudo, titulo, descricao, palavras_chave, status, link, req.params.id]); res.json({ message: 'Inbound atualizado com sucesso' }); } catch (error) { res.status(500).json({ error: 'Erro ao atualizar inbound' }); } });
+app.delete('/api/inbound/:id', verificarToken, async (req, res) => { try { await db.query('DELETE FROM inbound_marketing WHERE id = $1', [req.params.id]); res.json({ message: 'Inbound excluído com sucesso' }); } catch (error) { res.status(500).json({ error: 'Erro ao excluir inbound' }); } });
+
+app.get('/api/outbound', verificarToken, async (req, res) => { try { const result = await db.query(`SELECT o.*, c.nome AS cliente_nome, p.nome AS prospect_nome FROM outbound_marketing o LEFT JOIN clientes c ON c.id = o.cliente_id LEFT JOIN prospects p ON p.id = o.prospect_id ORDER BY o.data_criacao DESC`); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar outbound' }); } });
+app.post('/api/outbound', verificarToken, async (req, res) => { const { cliente_id, prospect_id, canal, mensagem, status, data_acao, observacoes } = req.body; try { const result = await db.query('INSERT INTO outbound_marketing (cliente_id, prospect_id, canal, mensagem, status, data_acao, observacoes) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [cliente_id, prospect_id, canal, mensagem, status, data_acao, observacoes]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro ao criar outbound' }); } });
+app.put('/api/outbound/:id', verificarToken, async (req, res) => { const { cliente_id, prospect_id, canal, mensagem, status, data_acao, observacoes } = req.body; try { await db.query('UPDATE outbound_marketing SET cliente_id = $1, prospect_id = $2, canal = $3, mensagem = $4, status = $5, data_acao = $6, observacoes = $7 WHERE id = $8', [cliente_id, prospect_id, canal, mensagem, status, data_acao, observacoes, req.params.id]); res.json({ message: 'Outbound atualizado com sucesso' }); } catch (error) { res.status(500).json({ error: 'Erro ao atualizar outbound' }); } });
+app.delete('/api/outbound/:id', verificarToken, async (req, res) => { try { await db.query('DELETE FROM outbound_marketing WHERE id = $1', [req.params.id]); res.json({ message: 'Outbound excluído com sucesso' }); } catch (error) { res.status(500).json({ error: 'Erro ao excluir outbound' }); } });
+
+app.get('/api/storytelling', verificarToken, async (req, res) => { try { const result = await db.query(`SELECT s.*, c.nome AS cliente_nome FROM storytelling s LEFT JOIN clientes c ON c.id = s.cliente_id ORDER BY s.data_criacao DESC`); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar histórias.' }); } });
+app.post('/api/storytelling', verificarToken, async (req, res) => { const { cliente_id, titulo, publico_alvo, dor_principal, solucao, transformacao } = req.body; if (!titulo || !cliente_id) return res.status(400).json({ error: 'Título e Cliente são obrigatórios.' }); try { const result = await db.query('INSERT INTO storytelling (cliente_id, titulo, publico_alvo, dor_principal, solucao, transformacao) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [cliente_id, titulo, publico_alvo || null, dor_principal || null, solucao || null, transformacao || null]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro interno ao criar história.' }); } });
+app.delete('/api/storytelling/:id', verificarToken, async (req, res) => { try { await db.query('DELETE FROM storytelling WHERE id = $1', [req.params.id]); res.json({ message: 'História excluída com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao excluir história.' }); } });
+
+app.get('/api/conhecimento', verificarToken, async (req, res) => { try { const result = await db.query('SELECT * FROM base_conhecimento ORDER BY data_criacao DESC'); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro interno ao buscar artigos.' }); } });
+app.post('/api/conhecimento', verificarToken, upload.single('arquivo'), async (req, res) => { const { titulo, categoria, conteudo } = req.body; if (!titulo || !conteudo) return res.status(400).json({ error: 'Título e conteúdo são obrigatórios.' }); let arquivo_url = null; if (req.file) arquivo_url = `/kb/${req.file.filename}`; try { const result = await db.query('INSERT INTO base_conhecimento (titulo, categoria, conteudo, autor, arquivo_url) VALUES ($1, $2, $3, $4, $5) RETURNING *', [titulo, categoria || 'Geral', conteudo, req.user.email, arquivo_url]); res.status(201).json(result.rows[0]); } catch (error) { res.status(500).json({ error: 'Erro interno ao criar artigo.' }); } });
+app.put('/api/conhecimento/:id', verificarToken, async (req, res) => { const { titulo, categoria, conteudo } = req.body; if (!titulo || !conteudo) return res.status(400).json({ error: 'Título e conteúdo são obrigatórios.' }); try { await db.query('UPDATE base_conhecimento SET titulo = $1, categoria = $2, conteudo = $3 WHERE id = $4', [titulo, categoria, conteudo, req.params.id]); res.json({ message: 'Artigo atualizado com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao atualizar artigo.' }); } });
+app.delete('/api/conhecimento/:id', verificarToken, async (req, res) => { try { const result = await db.query('SELECT arquivo_url FROM base_conhecimento WHERE id = $1', [req.params.id]); if (result.rows.length > 0 && result.rows[0].arquivo_url) { const caminhoArquivo = path.join(__dirname, 'public', result.rows[0].arquivo_url); if (fs.existsSync(caminhoArquivo)) fs.unlinkSync(caminhoArquivo); } await db.query('DELETE FROM base_conhecimento WHERE id = $1', [req.params.id]); res.json({ message: 'Artigo excluído com sucesso.' }); } catch (error) { res.status(500).json({ error: 'Erro interno ao excluir artigo.' }); } });
+
+app.get('/api/trafego-pago', verificarToken, async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT t.*, c.nome AS cliente_nome 
+            FROM trafego_pago t 
+            LEFT JOIN clientes c ON c.id = t.cliente_id 
+            ORDER BY t.data_criacao DESC
+        `);
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro interno ao buscar tráfego pago.' });
+    }
+});
+
+app.post('/api/trafego-pago', verificarToken, async (req, res) => {
+    const { cliente_id, plataforma, nome_campanha, objetivo, orcamento_diario, status, data_inicio, data_fim, investimento_total, impressoes, cliques, conversoes, observacoes } = req.body;
+    try {
+        const result = await db.query(
+            `INSERT INTO trafego_pago (cliente_id, plataforma, nome_campanha, objetivo, orcamento_diario, status, data_inicio, data_fim, investimento_total, impressoes, cliques, conversoes, observacoes, data_criacao) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP) 
+             RETURNING *`,
+            [cliente_id || null, plataforma || null, nome_campanha || null, objetivo || null, orcamento_diario || null, status || null, data_inicio || null, data_fim || null, investimento_total || null, impressoes || null, cliques || null, conversoes || null, observacoes || null]
+        );
+        res.status(201).json({ message: 'Tráfego pago salvo com sucesso!', trafego_pago: result.rows[0] });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro interno ao salvar tráfego pago' });
+    }
+});
+
+app.put('/api/trafego-pago/:id', verificarToken, async (req, res) => {
+    const { cliente_id, plataforma, nome_campanha, objetivo, orcamento_diario, status, data_inicio, data_fim, investimento_total, impressoes, cliques, conversoes, observacoes } = req.body;
+    try {
+        await db.query(
+            `UPDATE trafego_pago SET cliente_id = COALESCE($1, cliente_id), plataforma = COALESCE($2, plataforma), nome_campanha = COALESCE($3, nome_campanha), objetivo = COALESCE($4, objetivo), orcamento_diario = COALESCE($5, orcamento_diario), status = COALESCE($6, status), data_inicio = COALESCE($7, data_inicio), data_fim = COALESCE($8, data_fim), investimento_total = COALESCE($9, investimento_total), impressoes = COALESCE($10, impressoes), cliques = COALESCE($11, cliques), conversoes = COALESCE($12, conversoes), observacoes = COALESCE($13, observacoes) WHERE id = $14`,
+            [cliente_id || null, plataforma || null, nome_campanha || null, objetivo || null, orcamento_diario || null, status || null, data_inicio || null, data_fim || null, investimento_total || null, impressoes || null, cliques || null, conversoes || null, observacoes || null, req.params.id]
+        );
+        res.json({ message: 'Tráfego pago atualizado com sucesso.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro interno ao atualizar tráfego pago' });
+    }
+});
+
+app.delete('/api/trafego-pago/:id', verificarToken, async (req, res) => {
+    try {
+        await db.query('DELETE FROM trafego_pago WHERE id = $1', [req.params.id]);
+        res.json({ message: 'Tráfego pago excluído com sucesso.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro interno ao excluir tráfego pago' });
+    }
+});
+
+// --- ROTAS DE PLANEJAMENTO BSC ---
+app.post('/api/planejamento', verificarToken, async (req, res) => {
+  try {
+    const { cliente, nomeCampanha, dataInicio, dataFim, orcamentoTotal, metaFaturamento, metaROAS, metaCAC, persona, propostaValor, canais, metaNPS, entregaveis, ferramentas, responsavel, cronograma, treinamento, inovacao, posicionamentoMarca } = req.body;
+    const result = await db.query(
+      `INSERT INTO planejamentos_bsc (cliente_id, nome_campanha, data_inicio, data_fim, orcamento_total, meta_faturamento, meta_roas, meta_cac, persona_principal, proposta_valor, canais_aquisicao, meta_nps, entregaveis, ferramentas, responsavel, cronograma, treinamento, inovacao, posicionamento_marca) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) RETURNING *`,
+      [cliente || null, nomeCampanha, dataInicio, dataFim, orcamentoTotal || 0, metaFaturamento || 0, metaROAS || 0, metaCAC || 0, persona, propostaValor, canais, metaNPS, entregaveis, ferramentas, responsavel, cronograma, treinamento, inovacao, posicionamentoMarca]
+    );
+    res.status(201).json({ message: 'Planejamento salvo com sucesso!', planejamento: result.rows[0] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro interno ao salvar planejamento.' });
+  }
+});
+
+app.get('/api/planejamento', verificarToken, async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT p.*, c.nome AS cliente_nome 
+      FROM planejamentos_bsc p
+      LEFT JOIN clientes c ON c.id = p.cliente_id
+      ORDER BY p.id DESC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro interno ao buscar planejamentos.' });
+  }
+});
+
+app.delete('/api/planejamento/:id', verificarToken, async (req, res) => {
+  try {
+    await db.query('DELETE FROM planejamentos_bsc WHERE id = $1', [req.params.id]);
+    res.json({ message: 'Planejamento excluído com sucesso.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro interno ao excluir planejamento.' });
+  }
+});
+// --- FIM ROTAS PLANEJAMENTO ---
+// Rota para buscar mapeamento completo do cliente por e-mail
+app.get('/api/clientes/:email/mapeamento', verificarToken, async (req, res) => {
+    const { email } = req.params;
+    try {
+        const result = await db.query('SELECT * FROM mapeamentos_clientes WHERE email = $1', [email]);
+        if (result.rows.length === 0) return res.status(404).json({ error: 'Nenhum mapeamento encontrado para este e-mail.' });
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error("Erro ao buscar mapeamento:", error);
+        res.status(500).json({ error: 'Erro interno ao buscar mapeamento.' });
+    }
+});
+
+// ROTAS DO PORTAL DO CLIENTE (RESTAURADAS)
+app.get('/api/portal/tarefas', verificarToken, async (req, res) => {
+    try {
+        const result = await db.query('SELECT * FROM tarefas ORDER BY data_criacao DESC');
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao buscar tarefas' });
+    }
+});
+
+// ROTAS DA AGÊNCIA E APROVAÇÃO
+app.get('/api/admin/criativos', verificarToken, async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT c.*, cl.nome AS cliente_nome 
+            FROM criativos c
+            LEFT JOIN clientes cl ON cl.id = c.cliente_id
+            ORDER BY c.data_criacao DESC
+        `);
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao buscar criativos' });
+    }
+});
+
+app.post('/api/portal/criativos/:id/aprovar', verificarToken, async (req, res) => {
+    const { id } = req.params;
+    const { feedback_cliente } = req.body;
+    try {
+        await db.query(
+            "UPDATE criativos SET status = 'aprovado', feedback_cliente = $1 WHERE id = $2", 
+            [feedback_cliente || null, id]
+        );
+        res.json({ message: 'Criativo aprovado com sucesso!' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao aprovar' });
+    }
+});
+
+app.post('/api/portal/criativos/:id/recusar', verificarToken, async (req, res) => {
+    const { id } = req.params;
+    const { feedback_cliente } = req.body;
+    try {
+        await db.query(
+            "UPDATE criativos SET status = 'recusado', feedback_cliente = $1 WHERE id = $2", 
+            [feedback_cliente, id]
+        );
+        res.json({ message: 'Alteração solicitada com sucesso!' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao recusar' });
+    }
+});
+// ROTA DE LOGIN EXCLUSIVA DO CLIENTE
+app.post('/api/login-cliente', async (req, res) => {
+    const { email, senha } = req.body;
+    if (!email || !senha) return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
+    
+    try {
+        const result = await db.query('SELECT * FROM clientes WHERE email = $1', [email]);
+        if (result.rows.length === 0) return res.status(401).json({ error: 'Credenciais inválidas.' });
+        
+        const cliente = result.rows[0];
+        const senhaValida = (senha === cliente.senha) || (await bcrypt.compare(senha, cliente.senha).catch(() => false));
+        
+        if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas.' });
+        
+        const token = jwt.sign({ id: cliente.id, email: cliente.email, tipo: 'cliente' }, JWT_SECRET, { expiresIn: '8h' });
+        res.json({ token });
+    } catch (error) {
+        console.error("Erro no login do cliente:", error);
+        res.status(500).json({ error: 'Erro interno no servidor.' });
+    }
+});
+require('./rotas_metricas')(app, db, verificarToken);
+app.post('/api/mapeamento', async (req, res) => { 
+    const { nome_empresa, cnpj, segmento, site, telefone, nome_contato, objetivo_principal, meta_business, google_ads, google_analytics, site_hospedagem, manual_marca, observacoes_acessos, observacoes_gerais } = req.body; 
+    
+    try { 
+        const result = await db.query(`
+            INSERT INTO mapeamentos_clientes (
+                nome_empresa, cnpj, segmento, site, telefone, nome_contato, 
+                objetivo_principal, meta_business, google_ads, google_analytics, 
+                site_hospedagem, manual_marca, observacoes_acessos, observacoes_gerais
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`, 
+            [
+                nome_empresa, cnpj, segmento, site, telefone, nome_contato, 
+                objetivo_principal, meta_business, google_ads, google_analytics, 
+                site_hospedagem, manual_marca, observacoes_acessos, observacoes_gerais
+            ]
+        ); 
+        res.status(201).json({ message: 'Mapeamento salvo com sucesso!', mapeamento: result.rows[0] }); 
+    } catch (error) { 
+        console.error("Erro detalhado no banco:", error); 
+        res.status(500).json({ error: 'Erro interno ao salvar mapeamento' }); 
+    } 
+});
+app.post('/api/mapeamento', async (req, res) => { 
+    const { nome_empresa, cnpj, segmento, site, telefone, nome_contato, objetivo_principal, meta_business, google_ads, google_analytics, site_hospedagem, manual_marca, observacoes_acessos, observacoes_gerais } = req.body; 
+    
+    try { 
+        const result = await db.query(`
+            INSERT INTO mapeamentos_clientes (
+                nome_empresa, cnpj, segmento, site, telefone, nome_contato, 
+                objetivo_principal, meta_business, google_ads, google_analytics, 
+                site_hospedagem, manual_marca, observacoes_acessos, observacoes_gerais
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`, 
+            [
+                nome_empresa, cnpj, segmento, site, telefone, nome_contato, 
+                objetivo_principal, meta_business, google_ads, google_analytics, 
+                site_hospedagem, manual_marca, observacoes_acessos, observacoes_gerais
+            ]
+        ); 
+        res.status(201).json({ message: 'Mapeamento salvo com sucesso!', mapeamento: result.rows[0] }); 
+    } catch (error) { 
+        console.error("Erro detalhado no banco:", error); 
+        res.status(500).json({ error: 'Erro interno ao salvar mapeamento' }); 
+    } 
+});
+require('./rotas_mapeamento')(app, db, verificarToken);
+require('./rotas_relatorio')(app, db, verificarToken);
+require('./rotas_propostas')(app, db, verificarToken);
+require('./rotas_dashboard')(app, db, verificarToken);
+// ROTA DO DASHBOARD EXECUTIVO
+app.get('/api/dashboard', verificarToken, async (req, res) => {
+    try {
+        const clientesRes = await db.query('SELECT COUNT(*) AS total FROM clientes');
+        const criativosPendentesRes = await db.query("SELECT COUNT(*) AS total FROM criativos WHERE status = 'pendente'");
+        const campanhasRes = await db.query('SELECT COUNT(*) AS total FROM campanhas');
+        
+        const faturamentoRes = await db.query(`
+            SELECT COALESCE(SUM(valor), 0) AS total 
+            FROM receitas 
+            WHERE EXTRACT(MONTH FROM data) = EXTRACT(MONTH FROM CURRENT_DATE)
+            AND EXTRACT(YEAR FROM data) = EXTRACT(YEAR FROM CURRENT_DATE)
+        `);
+
+        res.json({
+            totalClientes: parseInt(clientesRes.rows[0].total) || 0,
+            criativosPendentes: parseInt(criativosPendentesRes.rows[0].total) || 0,
+            totalCampanhas: parseInt(campanhasRes.rows[0].total) || 0,
+            faturamentoMes: parseFloat(faturamentoRes.rows[0].total) || 0
+        });
+    } catch (error) {
+        console.error("Erro ao buscar dados do dashboard:", error);
+        res.status(500).json({ error: 'Erro ao carregar dashboard' });
+    }
+});
+// ROTAS DO BRIEFING
+app.get('/api/portal/briefing', verificarToken, async (req, res) => {
+    try {
+        const isCliente = req.user.tipo === 'cliente';
+        const clienteId = isCliente ? req.user.id : req.query.cliente_id;
+        if (!clienteId) return res.status(400).json({ error: 'Cliente não identificado.' });
+
+        const result = await db.query('SELECT * FROM briefings WHERE cliente_id = $1', [clienteId]);
+        res.json(result.rows[0] || {});
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao buscar briefing' });
+    }
+});
+// ROTA PARA BUSCAR O BRIEFING
+app.get('/api/portal/briefing', verificarToken, async (req, res) => {
+    try {
+        const isCliente = req.user.tipo === 'cliente';
+        const clienteId = isCliente ? req.user.id : req.query.cliente_id;
+        
+        if (!clienteId) return res.status(400).json({ error: 'Cliente não identificado.' });
+
+        const result = await db.query('SELECT * FROM briefings WHERE cliente_id = $1', [clienteId]);
+        res.json(result.rows[0] || {});
+    } catch (error) {
+        console.error("❌ ERRO AO BUSCAR BRIEFING:", error.message);
+        res.status(500).json({ error: 'Erro ao buscar briefing' });
+    }
+});
+
+// ROTA PARA SALVAR O BRIEFING
+
+// ROTA PARA BUSCAR O BRIEFING
+app.get('/api/portal/briefing', verificarToken, async (req, res) => {
+    try {
+        const isCliente = req.user.tipo === 'cliente';
+        const clienteId = isCliente ? req.user.id : req.query.cliente_id;
+        
+        if (!clienteId) return res.status(400).json({ error: 'Cliente não identificado.' });
+
+        const result = await db.query('SELECT * FROM briefings WHERE cliente_id = $1', [clienteId]);
+        res.json(result.rows[0] || {});
+    } catch (error) {
+        console.error("❌ ERRO AO BUSCAR BRIEFING:", error.message);
+        res.status(500).json({ error: 'Erro ao buscar briefing' });
+    }
+});
+// ROTA PARA SALVAR O BRIEFING
+app.post('/api/portal/briefing', verificarToken, async (req, res) => {
+    try {
+        // Se for cliente, usa o ID dele. Se for admin, pega o ID do primeiro cliente do banco para testar.
+        let clienteId = req.user.tipo === 'cliente' ? req.user.id : req.query.cliente_id;
+        
+        if (!clienteId && req.user.tipo !== 'cliente') {
+            const cli = await db.query('SELECT id FROM clientes LIMIT 1');
+            if (cli.rows.length > 0) clienteId = cli.rows[0].id;
+        }
+
+        if (!clienteId) return res.status(400).json({ error: 'Cliente não identificado.' });
+
+        const { empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site } = req.body;
+
+        const existe = await db.query('SELECT id FROM briefings WHERE cliente_id = $1', [clienteId]);
+        
+        if (existe.rows.length > 0) {
+            await db.query(`
+                UPDATE briefings SET 
+                    empresa=$1, segmento=$2, publico_alvo=$3, concorrentes=$4, 
+                    diferenciais=$5, identidade_visual=$6, redes_sociais=$7, site=$8, status='respondido'
+                WHERE cliente_id=$9
+            `, [empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site, clienteId]);
+        } else {
+            await db.query(`
+                INSERT INTO briefings (cliente_id, empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site, status) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'respondido')
+            `, [clienteId, empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site]);
+        }
+
+        res.status(201).json({ message: 'Briefing salvo com sucesso!' });
+    } catch (error) {
+        console.error("❌ ERRO NO BANCO (BRIEFING):", error.message);
+        res.status(500).json({ error: 'Erro interno ao salvar briefing' });
+    }
+});
+// ROTA PARA SALVAR O BRIEFING
+app.post('/api/portal/briefing', verificarToken, async (req, res) => {
+    try {
+        let clienteId = req.user.tipo === 'cliente' ? req.user.id : req.query.cliente_id;
+        
+        // Se for Admin e não passou ID na URL, pega o ID do primeiro cliente do banco para testar
+        if (!clienteId && req.user.tipo !== 'cliente') {
+            const cli = await db.query('SELECT id FROM clientes LIMIT 1');
+            if (cli.rows.length > 0) clienteId = cli.rows[0].id;
+        }
+
+        if (!clienteId) return res.status(400).json({ error: 'Cliente não identificado.' });
+
+        const { empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site } = req.body;
+
+        const existe = await db.query('SELECT id FROM briefings WHERE cliente_id = $1', [clienteId]);
+        
+        if (existe.rows.length > 0) {
+            await db.query(`
+                UPDATE briefings SET 
+                    empresa=$1, segmento=$2, publico_alvo=$3, concorrentes=$4, 
+                    diferenciais=$5, identidade_visual=$6, redes_sociais=$7, site=$8, status='respondido'
+                WHERE cliente_id=$9
+            `, [empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site, clienteId]);
+        } else {
+            await db.query(`
+                INSERT INTO briefings (cliente_id, empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site, status) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'respondido')
+            `, [clienteId, empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site]);
+        }
+
+        res.status(201).json({ message: 'Briefing salvo com sucesso!' });
+    } catch (error) {
+        console.error("❌ ERRO NO BANCO (BRIEFING):", error.message);
+        res.status(500).json({ error: 'Erro interno ao salvar briefing' });
+    }
+});
+// ROTA PARA SALVAR O BRIEFING
+app.post('/api/portal/briefing', verificarToken, async (req, res) => {
+    try {
+        const isCliente = req.user.tipo === 'cliente';
+        const clienteId = isCliente ? req.user.id : req.query.cliente_id;
+        
+        if (!clienteId) return res.status(400).json({ error: 'Cliente não identificado.' });
+
+        const { empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site } = req.body;
+
+        const existe = await db.query('SELECT id FROM briefings WHERE cliente_id = $1', [clienteId]);
+        
+        if (existe.rows.length > 0) {
+            await db.query(`
+                UPDATE briefings SET 
+                    empresa=$1, segmento=$2, publico_alvo=$3, concorrentes=$4, 
+                    diferenciais=$5, identidade_visual=$6, redes_sociais=$7, site=$8, status='respondido'
+                WHERE cliente_id=$9
+            `, [empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site, clienteId]);
+        } else {
+            await db.query(`
+                INSERT INTO briefings (cliente_id, empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site, status) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'respondido')
+            `, [clienteId, empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site]);
+        }
+
+        res.status(201).json({ message: 'Briefing salvo com sucesso!' });
+    } catch (error) {
+        console.error("❌ ERRO NO BANCO (BRIEFING):", error.message);
+        res.status(500).json({ error: 'Erro interno ao salvar briefing' });
+    }
+});
+require('./rotas_portal')(app, db, verificarToken);
+app.listen(PORT, () => { console.log(`Servidor rodando em http://localhost:${PORT}`); console.log(`Health check: http://localhost:${PORT}/api/health`); });
