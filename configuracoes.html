@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased min-h-screen">
+
+    <!-- Header simples -->
+    <header class="bg-slate-900 border-b border-slate-800 p-4">
+        <div class="max-w-5xl mx-auto flex justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-lg font-bold">Configurações do Sistema</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/admin.html" class="text-sm px-3 py-2 rounded hover:bg-slate-800 transition-colors text-slate-300">← Dashboard</a>
+                <button id="btnSair" class="text-sm bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-4 md:p-8">
+
+        <!-- Banner de aviso -->
+        <div class="bg-amber-500/10 border border-amber-500/40 text-amber-300 p-4 rounded-lg mb-8 text-sm">
+            <p class="font-bold mb-1">🔐 Área restrita</p>
+            <p>Alterações aqui afetam <strong>todo o sistema</strong>. A senha de app do Gmail é armazenada criptografada no banco (AES-256-GCM). Nunca compartilhe este acesso.</p>
+        </div>
+
+        <!-- Card: E-mail -->
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-6">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                <span class="text-2xl">📧</span>
+                <div>
+                    <h2 class="text-xl font-bold">E-mail (SMTP Gmail)</h2>
+                    <p class="text-slate-400 text-sm">Credenciais usadas para enviar e-mails automáticos e notificações.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">E-mail de envio (remetente) *</label>
+                    <input type="email" id="email_user" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="seuemail@gmail.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Senha de App do Gmail *</label>
+                    <div class="relative">
+                        <input type="password" id="email_senha" class="w-full p-3 pr-12 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="••••••••">
+                        <button type="button" id="toggleSenha" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">👁️</button>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">16 caracteres, sem espaços. Gere em <a href="https://myaccount.google.com/apppasswords" target="_blank" class="text-orange-400 hover:underline">myaccount.google.com/apppasswords</a></p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">E-mail da agência (notificações)</label>
+                    <input type="email" id="email_agencia" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="notificacoes@agencia.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Nome exibido no "De:"</label>
+                    <input type="text" id="email_remetente_nome" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="Reverse Marketing">
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-800">
+                <button id="btnTestarEmail" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2 text-sm">
+                    <span>🧪</span> Testar e-mail
+                </button>
+                <span class="text-xs text-slate-500 ml-3">Envia um e-mail de teste usando as credenciais <strong>salvas no banco</strong>.</span>
+            </div>
+        </div>
+
+        <!-- Card: Sistema -->
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-6">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                <span class="text-2xl">🌐</span>
+                <div>
+                    <h2 class="text-xl font-bold">Sistema</h2>
+                    <p class="text-slate-400 text-sm">Endereço base usado nos links de e-mail (portal, propostas, etc.).</p>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2 text-slate-300">Base URL</label>
+                <input type="text" id="base_url" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="http://localhost:3001">
+                <p class="text-xs text-slate-500 mt-1">
+                    Em produção, use o domínio real (ex: <code class="bg-slate-800 px-1 rounded">https://reversemkt.com.br</code>). Sem barra no final.
+                </p>
+            </div>
+        </div>
+
+        <!-- Card: Segurança -->
+        <div class="bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-lg mb-6">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-2xl">🔒</span>
+                <div>
+                    <h2 class="text-xl font-bold">Segurança</h2>
+                    <p class="text-slate-400 text-sm">Itens controlados fora da tela, via arquivo <code class="bg-slate-800 px-1 rounded">.env</code>.</p>
+                </div>
+            </div>
+            <ul class="text-sm text-slate-400 space-y-2 ml-2">
+                <li>• <strong class="text-slate-200">JWT_SECRET</strong> — controlado apenas pelo arquivo <code class="bg-slate-800 px-1 rounded">.env</code> (não editável pela tela)</li>
+                <li>• <strong class="text-slate-200">MASTER_KEY</strong> — chave de criptografia dos campos sensíveis, no <code class="bg-slate-800 px-1 rounded">.env</code></li>
+                <li>• Se perder a <strong>MASTER_KEY</strong>, as senhas criptografadas no banco ficam irrecuperáveis. Faça backup.</li>
+            </ul>
+        </div>
+
+        <!-- Botão Salvar fixo -->
+        <div class="sticky bottom-4 bg-slate-900/95 backdrop-blur border border-slate-700 p-4 rounded-lg shadow-2xl flex justify-between items-center">
+            <span class="text-sm text-slate-400">As alterações entram em vigor imediatamente após salvar.</span>
+            <button id="btnSalvar" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2">
+                <span>💾</span> Salvar alterações
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login.html';
+
+        document.getElementById('btnSair').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('permissoes');
+            window.location.href = '/login.html';
+        });
+
+        // Toggle mostrar/ocultar senha
+        document.getElementById('toggleSenha').addEventListener('click', () => {
+            const input = document.getElementById('email_senha');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        });
+
+        // Carrega configs
+        async function carregar() {
+            try {
+                const r = await fetch('/api/configuracoes', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!r.ok) throw new Error('Falha ao carregar');
+                const itens = await r.json();
+                itens.forEach(it => {
+                    const el = document.getElementById(it.chave);
+                    if (el) el.value = it.valor || '';
+                });
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Erro ao carregar', text: err.message, background: '#0f172a', color: '#fff' });
+            }
+        }
+
+        // Salvar
+        document.getElementById('btnSalvar').addEventListener('click', async () => {
+            const campos = ['email_user', 'email_senha', 'email_agencia', 'email_remetente_nome', 'base_url'];
+            const dados = {};
+            campos.forEach(c => {
+                const el = document.getElementById(c);
+                if (el) dados[c] = el.value;
+            });
+
+            // Se a senha ainda está mascarada, não envia (não sobrescreve)
+            if (dados.email_senha === '••••••••') delete dados.email_senha;
+
+            // Limpa espaços da senha (Gmail exibe com espaços, salvamos sem)
+            if (dados.email_senha) dados.email_senha = dados.email_senha.replace(/\s+/g, '');
+
+            try {
+                const r = await fetch('/api/configuracoes', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(dados)
+                });
+                const resp = await r.json();
+                if (!r.ok) throw new Error(resp.error || 'Falha ao salvar');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Salvo!',
+                    text: resp.mensagem,
+                    background: '#0f172a', color: '#fff',
+                    timer: 2000, showConfirmButton: false
+                });
+                // Recarrega para pegar a senha mascarada
+                carregar();
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Erro', text: err.message, background: '#0f172a', color: '#fff' });
+            }
+        });
+
+        // Testar e-mail
+        document.getElementById('btnTestarEmail').addEventListener('click', async () => {
+            const emailUser = document.getElementById('email_user').value;
+            const { value: destino } = await Swal.fire({
+                title: 'Enviar e-mail de teste',
+                input: 'email',
+                inputValue: emailUser,
+                inputLabel: 'Destinatário',
+                showCancelButton: true,
+                confirmButtonText: 'Enviar',
+                cancelButtonText: 'Cancelar',
+                background: '#0f172a', color: '#fff',
+                confirmButtonColor: '#f97316'
+            });
+            if (!destino) return;
+
+            Swal.fire({ title: 'Enviando...', background: '#0f172a', color: '#fff', didOpen: () => Swal.showLoading() });
+            try {
+                const r = await fetch('/api/configuracoes/testar-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ email_destino: destino })
+                });
+                const resp = await r.json();
+                if (!r.ok) throw new Error(resp.error || 'Falha no envio');
+                Swal.fire({ icon: 'success', title: 'Enviado!', text: resp.mensagem, background: '#0f172a', color: '#fff' });
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Falha', text: err.message, background: '#0f172a', color: '#fff' });
+            }
+        });
+
+        carregar();
+    </script>
+
+</body>
+</html>

@@ -1,8 +1,11 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { limitadorLogin } = require('./rateLimitLogin'); // <--- IMPORTADO AQUI
 
 module.exports = function(app, db, JWT_SECRET) {
-    app.post('/api/login-cliente', async (req, res) => {
+    
+    // ROTA DE LOGIN DO CLIENTE COM RATE LIMIT
+    app.post('/api/login-cliente', limitadorLogin, async (req, res) => {
         const { email, senha } = req.body;
         try {
             const result = await db.query('SELECT * FROM clientes WHERE email = $1', [email]);
@@ -25,7 +28,7 @@ module.exports = function(app, db, JWT_SECRET) {
         }
     });
 
-    // ROTA DO PERFIL (Que estava causando o "Carregando...")
+    // ROTA DO PERFIL
     app.get('/api/portal/perfil', (req, res) => {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];

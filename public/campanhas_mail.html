@@ -53,6 +53,10 @@
             .mobile-menu-btn { display: none !important; }
         }
     </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/ux.js"></script>
 </head>
 <body class="bg-slate-950 text-white font-sans antialiased">
 
@@ -230,7 +234,7 @@
             try {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 if (payload.tipo === 'cliente') {
-                    const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html', 'branding.html', 'permissoes.html', 'campanhas_mail.html', 'configuracoes_email.html'];
+                    const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'branding.html', 'permissoes.html', 'campanhas_mail.html', 'configuracoes_email.html'];
                     
                     const urlAtual = window.location.pathname.split('/').pop();
                     

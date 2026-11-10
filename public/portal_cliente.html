@@ -11,17 +11,13 @@
         .pyside-button { transition: all 0.2s ease; border-radius: 0.375rem; font-weight: 500; }
         .pyside-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2); }
     </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/ux.js"></script>
 </head>
 <body class="bg-slate-950 text-white font-sans antialiased">
-            
-    <!-- VERIFICAÇÃO DE SEGURANÇA: SE NÃO TIVER TOKEN, REDIRECIONA PARA O LOGIN -->
-    <script>
-        if (!localStorage.getItem('token')) {
-            window.location.href = '/login.html';
-        }
-    </script>
-
-    <!-- MENU ADMIN -->
+        
     <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -30,6 +26,7 @@
             </div>
             <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
                 <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+
                 <div class="relative group">
                     <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
@@ -39,17 +36,21 @@
                         <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
                     </div>
                 </div>
+
                 <div class="relative group">
                     <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
-                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                    <div class="absolute left-0 top-full mt-1 w-56 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
                         <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
                         <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
                         <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
                         <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
                         <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
                         <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                        <a href="/atividades.html" class="px-4 py-2 hover:bg-slate-700 text-white">📅 Atividades</a>
+                        <a href="/timeline_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">🕒 Timeline</a>
                     </div>
                 </div>
+
                 <div class="relative group">
                     <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
@@ -63,15 +64,17 @@
                         <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
                     </div>
                 </div>
+
                 <div class="relative group">
                     <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
                         <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
-                        <a href="/relatorios.html" class="px-4 py-2 hover:bg-slate-700 text-white">Relatórios</a>
                         <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
                         <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                        <a href="/configuracoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Configurações</a>
                     </div>
                 </div>
+
                 <div class="relative group">
                     <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
@@ -81,13 +84,14 @@
                         <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
                     </div>
                 </div>
+
                 <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
                 <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
             </nav>
         </div>
     </header>
 
-    <!-- MENU CLIENTE -->
+        
     <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -101,43 +105,75 @@
         </div>
     </header>
 
-    <script>
-        (function() {
-            const token = localStorage.getItem('token');
-            let isCliente = false;
-            if (token) {
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    if (payload.tipo === 'cliente') isCliente = true;
-                } catch(e) {}
-            }
-            if (isCliente) {
-                document.getElementById('menu-admin').style.display = 'none';
-                document.getElementById('menu-cliente').classList.remove('hidden');
-                const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
-                const nav = document.getElementById('nav-cliente');
-                const btnSair = nav.querySelector('.btn-sair');
-                const addLink = (href, texto) => {
-                    const a = document.createElement('a'); a.href = href; a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors'; a.innerText = texto; nav.insertBefore(a, btnSair);
-                };
-                if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
-                if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
-                if (permissoes.pode_ver_metricas) addLink('/metricas.html', 'Resultados');
-                if (permissoes.pode_ver_branding) addLink('/lista_brandings.html', 'Minha Marca');
-                if (permissoes.pode_ver_campanhas) addLink('/campanhas.html', 'Campanhas');
-                if (permissoes.pode_ver_propostas) addLink('/propostas.html', 'Propostas');
-                if (permissoes.pode_ver_tarefas) addLink('/tarefas.html', 'Minhas Tarefas');
-            } else {
-                document.getElementById('menu-cliente').style.display = 'none';
-                document.getElementById('menu-admin').classList.remove('hidden');
-            }
-            document.querySelectorAll('.btn-sair').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    localStorage.removeItem('token'); localStorage.removeItem('permissoes'); window.location.href = '/login.html';
+        <script>
+            (function() {
+                const token = localStorage.getItem('token');
+                let isCliente = false;
+
+                if (token) {
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        if (payload.tipo === 'cliente') isCliente = true;
+                    } catch(e) {}
+                }
+
+                if (isCliente) {
+                    const menuAdminEl = document.getElementById('menu-admin');
+                    if (menuAdminEl) menuAdminEl.style.display = 'none';
+
+                    const menuClienteEl = document.getElementById('menu-cliente');
+                    if (menuClienteEl) menuClienteEl.classList.remove('hidden');
+
+                    const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                    const nav = document.getElementById('nav-cliente');
+                    const btnSair = nav.querySelector('.btn-sair');
+
+                    const addLink = (href, texto) => {
+                        const a = document.createElement('a');
+                        a.href = href;
+                        a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors';
+                        a.innerText = texto;
+                        nav.insertBefore(a, btnSair);
+                    };
+
+                    if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                    if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                    if (permissoes.pode_ver_metricas)   addLink('/metricas.html', 'Resultados');
+                    if (permissoes.pode_ver_branding)   addLink('/lista_brandings.html', 'Minha Marca');
+                    if (permissoes.pode_ver_campanhas)  addLink('/campanhas.html', 'Campanhas');
+                    if (permissoes.pode_ver_propostas)  addLink('/propostas.html', 'Propostas');
+                    if (permissoes.pode_ver_tarefas)    addLink('/tarefas.html', 'Minhas Tarefas');
+
+                } else {
+                    const menuClienteEl = document.getElementById('menu-cliente');
+                    if (menuClienteEl) menuClienteEl.style.display = 'none';
+
+                    const menuAdminEl = document.getElementById('menu-admin');
+                    if (menuAdminEl) menuAdminEl.classList.remove('hidden');
+                }
+
+                document.querySelectorAll('.btn-sair').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('permissoes');
+                        window.location.href = '/login.html';
+                    });
                 });
-            });
-        })();
+            })();
+        </script>
+    
+            
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/login.html';
+        }
     </script>
+
+    
+
+    
+
+    
 
     <main class="max-w-7xl mx-auto p-4 md:p-8">
         
@@ -231,12 +267,18 @@
 
         <!-- Tarefas -->
         <div id="conteudo-tarefas" class="bg-slate-900 rounded-lg border border-slate-800 overflow-hidden shadow-lg">
-            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
-                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                <div>
-                    <h2 class="text-xl font-bold">Acompanhamento de Tarefas</h2>
-                    <p class="text-sm text-slate-400 mt-1">Veja o andamento dos serviços contratados em tempo real.</p>
+            <div class="p-6 border-b border-slate-800 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    <div>
+                        <h2 class="text-xl font-bold">Acompanhamento de Tarefas</h2>
+                        <p class="text-sm text-slate-400 mt-1">Veja o andamento dos serviços contratados em tempo real.</p>
+                    </div>
                 </div>
+                <button id="btnSolicitarTarefa" onclick="abrirModalNovaTarefa()" class="pyside-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Solicitar Tarefa
+                </button>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-slate-400">
@@ -414,8 +456,16 @@
                 tarefas.forEach(tarefa => { 
                     const tr = document.createElement('tr'); 
                     tr.className = 'border-b border-slate-800 hover:bg-slate-800/30 transition-colors'; 
+                    
+                    let tagSolicitante = '';
+                    if (tarefa.criado_por === 'admin') {
+                        tagSolicitante = `<span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400">Solicitado pela Agência</span>`;
+                    } else {
+                        tagSolicitante = `<span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-400">Solicitado por Você</span>`;
+                    }
+
                     tr.innerHTML = `
-                        <td class="p-4 text-white font-medium">${tarefa.titulo}</td>
+                        <td class="p-4 text-white font-medium flex items-center">${tarefa.titulo} ${tagSolicitante}</td>
                         <td class="p-4">${tarefa.descricao || '-'}</td>
                         <td class="p-4">${tarefa.data_vencimento ? new Date(tarefa.data_vencimento).toLocaleDateString('pt-BR') : '-'}</td>
                         <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${tarefa.concluida ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}">${tarefa.concluida ? 'Concluída' : 'Em Andamento'}</span></td>
@@ -426,6 +476,63 @@
             } catch (error) { 
                 console.error("Erro ao carregar tarefas:", error);
                 document.getElementById('tabelaTarefas').innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Erro ao carregar as tarefas.</td></tr>'; 
+            }
+        }
+
+        async function abrirModalNovaTarefa() {
+            const { value: formValues } = await Swal.fire({
+                title: 'Solicitar Nova Tarefa',
+                html: `
+                    <div class="text-left mt-4">
+                        <label class="block text-sm mb-1 text-slate-300">Título da Tarefa *</label>
+                        <input id="swal-titulo" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white mb-4 focus:outline-none focus:border-orange-500" placeholder="Ex: Criar arte para Black Friday">
+                        
+                        <label class="block text-sm mb-1 text-slate-300">Descrição</label>
+                        <textarea id="swal-descricao" rows="3" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white mb-4 focus:outline-none focus:border-orange-500" placeholder="Descreva os detalhes do que precisa..."></textarea>
+                        
+                        <label class="block text-sm mb-1 text-slate-300">Prazo Desejado</label>
+                        <input type="date" id="swal-data" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-orange-500" style="color-scheme: dark;">
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Solicitar',
+                cancelButtonText: 'Cancelar',
+                background: '#0f172a',
+                color: '#fff',
+                confirmButtonColor: '#f97316',
+                cancelButtonColor: '#334155',
+                preConfirm: () => {
+                    const titulo = document.getElementById('swal-titulo').value;
+                    const descricao = document.getElementById('swal-descricao').value;
+                    const data = document.getElementById('swal-data').value;
+                    if (!titulo) {
+                        Swal.showValidationMessage('O título é obrigatório');
+                        return false;
+                    }
+                    return { titulo, descricao, data_vencimento: data || null };
+                }
+            });
+
+            if (formValues) {
+                try {
+                    Swal.fire({ title: 'Enviando...', background: '#0f172a', color: '#fff', didOpen: () => Swal.showLoading() });
+                    const response = await fetch('/api/portal/tarefas', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify(formValues)
+                    });
+                    
+                    if (response.ok) {
+                        Swal.fire({ icon: 'success', title: 'Tarefa criada!', text: 'A agência já foi notificada.', background: '#0f172a', color: '#fff', timer: 2000, showConfirmButton: false });
+                        carregarTarefas(); // Atualiza a lista na tela
+                    } else {
+                        const err = await response.json();
+                        throw new Error(err.error || 'Erro ao criar tarefa');
+                    }
+                } catch (error) {
+                    Swal.fire({ icon: 'error', title: 'Erro', text: error.message, background: '#0f172a', color: '#fff' });
+                }
             }
         }
 
@@ -838,22 +945,103 @@
         });
     </script>
 
+    <!-- SCRIPT DO SINO -->
     <script>
         (function() {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                if (payload.tipo === 'cliente') {
-                    const paginasAdmin = ['financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html', 'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html', 'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html', 'storytelling.html', 'base_conhecimento.html', 'produtos.html', 'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html', 'branding.html', 'permissoes.html'];
-                    const urlAtual = window.location.pathname.split('/').pop();
-                    if (paginasAdmin.includes(urlAtual)) {
-                        alert('Acesso negado. Esta área é restrita.');
-                        window.location.href = '/portal_cliente.html';
+            function carregarNotificacoes() {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                fetch('/api/notificacoes', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(res => res.json())
+                .then(notificacoes => {
+                    const badge = document.getElementById('badge-sino');
+                    const lista = document.getElementById('lista-notificacoes');
+                    if (!badge || !lista) return;
+
+                    if (notificacoes.length > 0) {
+                        badge.innerText = notificacoes.length;
+                        badge.classList.remove('hidden');
+                        badge.classList.add('flex');
+                        
+                        lista.innerHTML = notificacoes.map(n => `
+                            <div class="p-4 hover:bg-slate-700 cursor-pointer transition-colors" onclick="marcarComoLida(${n.id}, '${n.link || '#'}')">
+                                <p class="text-sm font-bold text-white">${n.titulo}</p>
+                                <p class="text-xs text-slate-400 mt-1">${n.mensagem}</p>
+                            </div>
+                        `).join('');
+                    } else {
+                        badge.classList.add('hidden');
+                        badge.classList.remove('flex');
+                        lista.innerHTML = '<div class="p-4 text-slate-400 text-sm text-center">Nenhuma notificação nova.</div>';
                     }
+                }).catch(() => {});
+            }
+
+            window.marcarComoLida = function(id, link) {
+                const token = localStorage.getItem('token');
+                fetch(`/api/notificacoes/${id}/ler`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).then(() => {
+                    carregarNotificacoes();
+                    if (link && link !== '#') window.location.href = link;
+                });
+            };
+
+            const btnSino = document.getElementById('btn-sino');
+            if (btnSino) {
+                btnSino.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('dropdown-sino').classList.toggle('hidden');
+                });
+            }
+
+            // Fecha o dropdown se clicar fora
+            document.addEventListener('click', (e) => {
+                const dropdown = document.getElementById('dropdown-sino');
+                const container = document.getElementById('sino-container');
+                if (dropdown && container && !container.contains(e.target)) {
+                    dropdown.classList.add('hidden');
                 }
-            } catch(e) {}
+            });
+
+            // Polling: busca novas notificações a cada 60 segundos
+            if (localStorage.getItem('token')) {
+                carregarNotificacoes();
+                setInterval(carregarNotificacoes, 60000);
+            }
         })();
     </script>
-</body>
+
+    
+
+        <script>
+            (function() {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') {
+                        const paginasAdmin = [
+                            'financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html',
+                            'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html',
+                            'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html',
+                            'storytelling.html', 'base_conhecimento.html', 'produtos.html',
+                            'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html',
+                            'branding.html', 'permissoes.html', 'configuracoes.html',
+                            'atividades.html', 'timeline_cliente.html'
+                        ];
+                        const urlAtual = window.location.pathname.split('/').pop();
+                        if (paginasAdmin.includes(urlAtual)) {
+                            alert('Acesso negado. Esta área é restrita.');
+                            window.location.href = '/portal_cliente.html';
+                        }
+                    }
+                } catch(e) {}
+            })();
+        </script>
+    </body>
 </html>

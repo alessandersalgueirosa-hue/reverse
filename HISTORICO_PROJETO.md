@@ -308,3 +308,783 @@ Esta sessão foi focada na estabilização do banco de dados (após reset do Doc
 2.  **Exportação CSV:** Adicionar os botões de exportar planilha nas telas de Financeiro e Prospects.
 3.  **Integração de Pagamentos:** Mercado Pago (Checkout Pro) e configuração de Webhooks (necessário domínio em produção).
 4.  **Deploy em Produção:** Configuração do Nginx e certificado SSL (Certbot) no servidor Ubuntu.
+
+Copie o conteúdo abaixo sem a barra de código e cole direto no arquivo SESSAO_2026-11-06.md (na raiz do projeto, ao lado do HISTORICO_PROJETO.md). É markdown puro, pronto para abrir no VS Code com preview (Ctrl+Shift+V).
+📋 Sessão de Desenvolvimento — 06/11/2026
+
+Contexto: Implementação da feature Assinatura Digital de Propostas (planejada como parte da lista de melhorias do sistema).
+
+Duração estimada: ~6h de trabalho colaborativo (você executando + eu escrevendo código)
+✅ O QUE FOI IMPLEMENTADO HOJE
+🎯 Feature Principal: Assinatura Digital de Propostas
+
+Sistema completo de aceite digital de propostas comerciais com validade jurídica (MP 2.200-2/2001). O cliente recebe um link único por e-mail/WhatsApp, vê a proposta em uma tela pública, e pode Aceitar ou Recusar com registro de IP, timestamp, navegador e hash SHA-256 (comprovação de integridade).
+
+Fluxo funcionando:
+
+    Admin gera proposta no propostas.html → backend gera token_aceite (64 caracteres)
+
+    Admin copia o link /assinar/{token} (botão 📋 Link) ou envia por WhatsApp (botão 📱 WhatsApp)
+
+    Cliente abre o link → tela assinar_proposta.html renderiza a proposta
+
+    Cliente clica Aceitar → backend registra IP + data/hora + navegador + hash SHA-256
+
+    Cliente clica Recusar → modal pede motivo (mínimo 10 caracteres), backend registra
+
+    Admin vê o status atualizado na tabela (badge colorido)
+
+    Se aceita → botão ✍️ PDF Assinado disponível (PDF com página de comprovante no final)
+
+    Ambas as ações disparam e-mail de notificação para reverse.mkt.dgt@gmail.com
+
+📁 ARQUIVOS CRIADOS/MODIFICADOS HOJE
+🆕 Criados (do zero)
+Arquivo	Função
+public/assinar_proposta.html	Tela pública de assinatura (dark + laranja, responsiva, autocontida)
+✏️ Modificados (substituídos por versão nova)
+Arquivo	Mudanças
+rotas_propostas.js	+ helpers de sanitização (parseValidade, parseValorMonetario) · + extração do PDF em helper renderizarPropostaPDF · + 4 rotas novas (pública de busca, aceitar, recusar, PDF assinado) · + geração de token_aceite no POST
+server.js	+ app.set('trust proxy', 1) (IP real atrás do Nginx) · + rota GET /assinar/:token (serve o HTML)
+public/propostas.html	+ coluna Status com badges coloridos · + botões "📋 Link", "📱 WhatsApp", "✍️ PDF Assinado" na tabela · + validação type="number" na validade · + popup "copiar link?" após gerar PDF · + modal SweetAlert2 com motivo da recusa
+mailer.js	+ conversão \n → <br> (corrige e-mails com quebras de linha) · + BASE_URL dinâmico (fallback 3001) · + estilo melhorado nos e-mails da agência · + detecção de HTML vs texto puro
+🗄️ Banco de dados (colunas adicionadas em propostas)
+sql
+
+token_aceite VARCHAR(64) UNIQUE
+status_aceite VARCHAR(20) DEFAULT 'pendente'
+aceite_em TIMESTAMP
+aceite_ip VARCHAR(45)
+aceite_user_agent TEXT
+aceite_hash_pdf VARCHAR(64)
+recusa_motivo TEXT
+recusa_em TIMESTAMP
+
+🔧 PROBLEMAS RESOLVIDOS HOJE
+Problema	Causa	Solução
+Erro 28P01 — password authentication failed	Transitório — Postgres do container reiniciando pool de conexões	Reiniciar o servidor resolveu. Não era senha errada (confirmado com teste isolado do node -e)
+Erro 22P02 — invalid input syntax for type integer: "30 Dias"	Frontend enviava validade: "30 Dias" (texto), banco esperava INTEGER	Backend agora sanitiza com parseValidade() e parseValorMonetario(). Frontend usa type="number"
+E-mails da agência espremidos em 1 linha	\n do rotas_propostas.js não virava <br> no HTML	mailer.js detecta texto puro e converte automaticamente
+Link do portal no e-mail de boas-vindas apontava para :3000	Hardcoded	Agora usa process.env.BASE_URL com fallback :3001
+🧪 TESTES REALIZADOS HOJE
+
+    ✅ Geração de proposta com token_aceite (log no terminal: 📝 Proposta #X criada | Token: ...)
+
+    ✅ Proposta sendo salva no banco com status_aceite = 'pendente'
+
+    ✅ Frontend propostas.html renderizando coluna Status e botões novos
+
+    ✅ Conexão PostgreSQL funcionando (✅ Conectado ao PostgreSQL com sucesso!)
+
+    ✅ Nodemailer configurado (✅ Transportador do Nodemailer configurado.)
+
+    ✅ Servidor rodando na porta 3001
+
+⏳ Testes que ainda não foram executados (fazer amanhã)
+
+    □
+
+    Abrir o link /assinar/{token} no navegador (aba anônima) e ver a tela renderizada
+    □
+
+    Testar Aceitar → verificar status_aceite = 'aceita' no banco
+    □
+
+    Testar Recusar com motivo (validar que exige mínimo 10 chars)
+    □
+
+    Verificar se e-mail de notificação chega em reverse.mkt.dgt@gmail.com
+    □
+
+    Baixar o PDF assinado e conferir a página de comprovante (IP, data, hash)
+
+⚠️ Ação prioritária para amanhã: rodar esses 5 testes antes de qualquer nova implementação. Se algum falhar, corrigir antes de seguir.
+📌 O QUE ESTÁ PENDENTE / PRÓXIMOS PASSOS
+🔴 Curto prazo (fazer amanhã, por ordem de prioridade)
+1. Finalizar testes da assinatura digital (15 min)
+
+Executar os 5 testes pendentes listados acima.
+2. Completar o CSV de Prospects (30 min)
+
+Ficou pendente no início da sessão. Todas as outras telas (Leads, Clientes, Financeiro) já têm "Exportar CSV", mas Prospects não. Precisa:
+
+    Adicionar botão "Exportar CSV" em prospects.html
+
+    Decidir entre exportação frontend (Blob) ou backend (rota dedicada)
+
+    Manter o padrão dos outros (; como separador, BOM UTF-8, escapar aspas)
+
+3. Central de Configurações (4-6h — esforço médio)
+
+Motivo: risco de segurança real — a senha de app do Gmail está hardcoded no mailer.js, e o JWT_SECRET cai em 'sua_chave_secreta_aqui' se não houver .env.
+
+Escopo aprovado (aguardando confirmação final):
+
+    Nova tabela configuracoes (chave/valor/tipo/descrição)
+
+    Criptografia AES-256-GCM para campos sensíveis (senha Gmail, JWT secret) com chave mestra em .env
+
+    Cache em memória (configCache.js) para não consultar banco em toda requisição
+
+    Backend rotas_configuracoes.js com GET, PUT, POST /testar-email
+
+    Frontend configuracoes.html com cards por seção
+
+    Refatorar mailer.js e server.js para ler do cache (com fallback para não quebrar)
+
+    Script de migração migrar_configuracoes.js
+
+Antes de começar, preciso:
+
+    Saber se existe .env no projeto (e o que tem dentro)
+
+    Confirmar se o usuário quer rotação de JWT_SECRET pela tela
+
+🟡 Médio prazo (próximas 2-3 semanas)
+4. Notificações In-App (1 dia)
+
+Sino no topo com badge de pendências. Tabela notificacoes + rota + polling de 60s no frontend. Mostra ao cliente "3 criativos pendentes de aprovação" sem ele precisar procurar.
+5. Relatórios Automáticos Mensais (1 dia)
+
+No dia 1º de cada mês, cliente recebe PDF com resultados do mês anterior. Usa pdfkit (já funciona) + cron job + mailer.js.
+6. Deploy em Produção (1 dia)
+
+    Nginx como reverse proxy
+
+    Certbot / Let's Encrypt para HTTPS
+
+    PM2 com pm2 startup (auto-restart no boot)
+
+    Firewall UFW
+
+    Backup automático via pg_dump + cron diário
+
+🟢 Longo prazo (quando estabilizar)
+7. Integração Meta Ads + Google Ads (1-2 semanas)
+
+Gráficos do portal deixam de ser manuais e passam a puxar investimento/cliques/conversões reais via APIs.
+8. Assinatura via Clicksign/D4Sign (upgrade da feature de hoje)
+
+Para contratos de alto valor (> R$ 50k), oferecer opção de assinatura com certificado digital ICP-Brasil. Hoje temos "prova razoável"; isso elevaria para "prova forte".
+9. IA na Base de Conhecimento (chatbot de suporte)
+
+Chat "Pergunte à Reverse" usando RAG com a base importada.
+10. IA para geração de copy de posts
+
+Botão "Sugerir legenda" no calendário editorial, baseado no Branding do cliente.
+🖥️ AMBIENTE ATUAL (referência para amanhã)
+Item	Valor
+Porta do servidor local	3001
+Porta do container Docker (app)	3000 (não editar via localhost:3000 — pode conflitar)
+Porta do PostgreSQL	5432 (container projeto_novo-db-1)
+Database	marketing_db
+User do banco	admin
+Password do banco	admin123
+Login admin	admin@reverse.com / admin123
+E-mail usado pelo sistema	reverse.mkt.dgt@gmail.com (senha de app hardcoded no mailer.js — mover para config amanhã)
+Conexão testada	node -e "const { Pool } = require('pg'); ..." funciona com credenciais acima
+🚨 Comandos essenciais
+
+Iniciar o servidor:
+powershell
+
+cd E:\Projeto_Novo
+node server.js
+
+Saída esperada:
+text
+
+✅ Transportador do Nodemailer configurado.
+✅ Servidor rodando perfeitamente na porta 3001
+✅ Conectado ao PostgreSQL com sucesso!
+
+Verificar o banco:
+powershell
+
+docker exec -it projeto_novo-db-1 psql -U admin -d marketing_db -c "SELECT id, cliente_nome, status_aceite, aceite_em, recusa_motivo FROM propostas ORDER BY id DESC LIMIT 5;"
+
+Ver containers rodando:
+powershell
+
+docker ps --format "table {{.Names}}\t{{.Ports}}\t{{.Status}}"
+
+⚠️ PENDÊNCIAS TÉCNICAS / DÍVIDAS CONHECIDAS
+
+    Senha de app do Gmail está hardcoded em mailer.js (linha pass: 'mzqk pttc kprn vozg'). Prioridade: alta. Será resolvido pela Central de Configurações.
+
+    JWT_SECRET tem fallback fraco ('sua_chave_secreta_aqui') se .env não existir. Qualquer um pode forjar tokens. Prioridade: alta. Também resolvido pela Central de Configurações.
+
+    BASE_URL hardcoded em vários lugares como http://localhost:3001. Quando for para produção (domínio real), vai quebrar os links de e-mail. Prioridade: média. Mover para config.
+
+    Não há backup automático. Hoje é manual (botão no dashboard). Se o container morrer, perde tudo desde o último backup. Prioridade: alta (fazer junto com deploy).
+
+    Não há rate limiting no login. Alguém pode tentar 10 mil senhas por minuto. Prioridade: média. Adicionar express-rate-limit no /api/login.
+
+    Projeto roda em HTTP local. Em produção, obrigatório HTTPS (Certbot). O trust proxy já está configurado para quando isso acontecer.
+
+📝 ANOTAÇÕES SOBRE A SESSÃO DE HOJE
+Descobertas técnicas úteis
+
+    O erro 28P01 que apareceu no começo não era senha errada — era transitório. O teste isolado node -e "..." provou que as credenciais estavam corretas. Aprendizado: sempre isolar a conexão direto no driver antes de mexer no db.js ou docker-compose.
+
+    Postgres com trust no localhost dentro do container aceita conexão sem senha via socket Unix. Isso significa que docker exec ... psql -U admin ... não testa a senha real. Para testar de verdade, precisa conectar via TCP de fora do container (via node -e do host).
+
+    O container projeto_novo-app-1 rodando na porta 3000 é uma cópia da aplicação dentro do Docker. Coexiste com o node server.js local (porta 3001). Cuidado: alterações no código local não refletem no container — precisa docker-compose restart app se quiser testar via Docker.
+
+Dicas de manutenção (herdadas do histórico + confirmadas hoje)
+
+    Sempre Ctrl+C + node server.js após editar qualquer .js
+
+    Sempre Ctrl+Shift+R no navegador após editar HTML/CSS (cache do navegador)
+
+    Se aparecer erro estranho de conexão, rodar o teste isolado antes de assumir problema no código
+
+    Não editar arquivos com +200 linhas em uma única tentativa — usar scripts ou substituir inteiro
+
+🎯 SUGESTÃO DE ORDEM PARA AMANHÃ
+
+    09h — Testes rápidos (30 min)
+
+        Reiniciar servidor
+
+        Abrir link de assinatura pendente
+
+        Testar Aceitar e Recusar
+
+        Conferir e-mails na caixa da agência
+
+    09h30 — Fechar CSV de Prospects (30 min)
+
+        Rápido e tira uma pendência antiga do caminho
+
+    10h — Central de Configurações (4-6h)
+
+        Backend primeiro (migrar_configuracoes.js + configCache.js + rotas_configuracoes.js)
+
+        Depois refatorar mailer.js e server.js
+
+        Por último o frontend configuracoes.html
+
+    Final do dia — Validar tudo e atualizar este arquivo com o progresso.
+
+🗂️ LINKS ÚTEIS
+
+    MP 2.200-2/2001 (validade jurídica da assinatura eletrônica): http://www.planalto.gov.br/ccivil_03/mpv/antigas_2001/2200-2.htm
+
+    Senha de app do Gmail (para gerar nova, se precisar): https://myaccount.google.com/apppasswords
+
+    Documentação PDFKit (para evoluir os PDFs): https://pdfkit.org/
+
+    Mercado Pago Checkout Pro (para a integração futura): https://www.mercadopago.com.br/developers/pt/docs/checkout-pro/landing
+
+Documento gerado em 06/11/2026 ao final da sessão. Use este arquivo amanhã para retomar o contexto sem perder informação.
+## 📅 Sessão de Desenvolvimento: 07/11/2026
+Esta sessão foi focada na finalização da **Central de Configurações**, resolução de dívidas técnicas de segurança (senhas hardcoded) e finalização do CSV de Prospects.
+
+### 1. 📥 Exportação CSV
+*   **Prospects:** O botão "Exportar CSV" foi corrigido. Agora ele respeita os filtros de busca e status ativos na tela, inclui a coluna de "Observações" e trata caracteres especiais (`;`, `"`, quebras de linha) para não quebrar no Excel.
+
+### 2. ⚙️ Central de Configurações (Segurança)
+*   **Nova Tela:** Criado o `configuracoes.html` para o Admin gerenciar credenciais sem mexer no código.
+*   **Criptografia:** Criado o sistema `cripto.js` com AES-256-GCM. A senha de app do Gmail não fica mais hardcoded; ela está criptografada na tabela `configuracoes` do banco.
+*   **Master Key:** O `.env` foi criado (via `setup_env.js`) e contém a `MASTER_KEY` (para descriptografar a senha) e o `JWT_SECRET` forte (que antes era um fallback fraco).
+*   **Cache:** Criado o `configCache.js` para carregar as configurações na memória do servidor, evitando consultas ao banco a cada e-mail enviado.
+*   **Mailer Refatorado:** O `mailer.js` agora lê as credenciais do banco e recria o transportador automaticamente se a senha mudar.
+*   **API Protegida:** A rota `rotas_configuracoes.js` foi criada e protegida com `apenasAdmin` (clientes logados recebem 403 Forbidden se tentarem acessar).
+
+### ⚠️ Avisos Importantes para o Futuro
+1.  **Backup do `.env`:** Se o arquivo `.env` for perdido, a `MASTER_KEY` some e a senha do Gmail no banco fica irrecuperável. Faça backup desse arquivo.
+2.  **JWT_SECRET:** Foi trocado por um valor forte. Todos os usuários antigos precisaram relogar.
+3.  **Nova Senha do Gmail:** Se precisar trocar a senha, use a tela de Configurações. O sistema exige exatamente 16 caracteres sem espaços.
+
+### 📌 Próximos Passos (Backlog)
+1.  **Notificações In-App:** Sino com badge de pendências.
+2.  **Relatórios Automáticos Mensais:** PDF no dia 1º de cada mês.
+3.  **Deploy em Produção:** Configurar Nginx, HTTPS e PM2 na VPS.
+4.  **Integração de Pagamentos:** Mercado Pago (Checkout Pro).
+# 📅 Sessão de Desenvolvimento: 07/11/2026
+
+Esta sessão foi focada na finalização da **Central de Configurações**, criação do **Fluxo Bidirecional de Tarefas** (Cliente ↔ Agência), correção do **CSV de Prospects** e ajuste nas **Permissões de Acesso** do Portal do Cliente.
+
+---
+
+## ✅ O que foi implementado hoje
+
+### 1. 📥 Exportação CSV (Prospects)
+- O botão "Exportar CSV" da tela de prospects foi reescrito.
+- Agora ele **respeita os filtros** (busca e status) da tela.
+- Adicionada a coluna `Observações` e ajuste no escape de caracteres (`;`, `"`, quebras de linha) para não corromper a planilha no Excel.
+- Incluído BOM UTF-8 para os acentos aparecerem corretamente.
+
+### 2. ⚙️ Central de Configurações (Segurança)
+- **Fim das senhas hardcoded:** A senha de app do Gmail não fica mais exposta no código.
+- **Banco de Dados:** Criada a tabela `configuracoes` no Postgres.
+- **Criptografia:** Criado o `cripto.js` (AES-256-GCM) para salvar a senha do Gmail criptografada no banco.
+- **Cache:** Criado o `configCache.js` para não bater no banco a cada e-mail enviado.
+- **Novo Mailer:** O `mailer.js` agora lê as credenciais do banco e as atualiza em tempo real.
+- **Tela de Configurações:** Criada a `configuracoes.html` (com teste de envio de e-mail e configuração do Base URL).
+- **Rotas Protegidas:** Criado `rotas_configuracoes.js` (bloqueia acesso de clientes).
+- **Variáveis de Ambiente:** Criado o `.env` com `JWT_SECRET` forte (invalida tokens antigos) e `MASTER_KEY` (para criptografia). 
+- ⚠️ **Aviso:** O arquivo `.env` precisa de backup. Se perder a `MASTER_KEY`, a senha no banco fica irrecuperável.
+
+### 3. 🔄 Fluxo Bidirecional de Tarefas
+- **Banco de Dados:** Adicionada a coluna `criado_por` na tabela `tarefas` (valores: 'admin' ou 'cliente').
+- **Visão do Cliente (`portal_cliente.html`):**
+  - Adicionado botão "Solicitar Tarefa".
+  - Ao criar, a tarefa é vinculada automaticamente ao ID do cliente e a agência recebe um e-mail de notificação.
+  - Adicionada "tag" visual: *Solicitado pela Agência* (azul) ou *Solicitado por Você* (laranja).
+- **Visão da Agência (`tarefas.html`):**
+  - O Admin cria tarefas e vincula ao cliente. O sistema insere a tag *Solicitado pelo Cliente* quando a origem é o portal.
+  - Tela e rotas corrigidas para não conflitar com as rotas do portal.
+
+### 4. 🔓 Correção de Permissões do Cliente
+- **Problema:** O cliente Alessander tinha a permissão "Propostas" ativa no banco, mas era bloqueado por um script de segurança antigo hardcoded dentro dos HTMLs.
+- **Solução:** Criado e executado o script `corrigir_permissoes.js`, que varreu a pasta `public` e removeu os bloqueios indevidos das telas: `propostas.html`, `campanhas.html`, `metricas.html`, `calendario_editorial.html`, `lista_brandings.html` e `tarefas.html`.
+- As telas de Admin (Leads, Clientes, Configurações, etc.) continuam bloqueadas com sucesso.
+
+---
+
+## 🛠️ Como o ambiente ficou (Referência)
+
+- **Porta do Servidor:** 3001.
+- **Novas credenciais (JWT):** O `JWT_SECRET` mudou. Todos precisam logar novamente.
+- **Arquivos novos na raiz:** `.env`, `cripto.js`, `configCache.js`, `rotas_configuracoes.js`, `criar_tabela_configuracoes.js`, `setup_env.js`, `corrigir_permissoes.js`.
+- **Tabelas novas/alteradas:** `configuracoes` (nova) e `tarefas` (coluna `criado_por` adicionada).
+
+---
+
+## 📌 Próximos Passos (Backlog para amanhã/Próximas semanas)
+
+1. **Notificações In-App:** Criar o "sino" de notificações no topo da tela (Admin e Cliente) para avisar de novas tarefas/criativos sem precisar olhar o e-mail.
+2. **Relatórios Automáticos:** Criar um cron job para gerar e enviar PDFs de relatórios mensais no dia 1º de cada mês.
+3. **Integração de Pagamentos:** Mercado Pago (Checkout Pro) - aguardando domínio.
+4. **Deploy em Produção:** Configurar Nginx, HTTPS (Certbot) e PM2 no servidor Ubuntu.
+5. **Segurança Extra:** Adicionar `express-rate-limit` para evitar ataques de força bruta no login.
+6. **Integração de APIs:** Puxar dados reais do Meta Ads e Google Ads para os gráficos do Portal.
+Sessão de Deploy — Resumo Completo
+
+Data: 08/11/2026
+Status: ✅ Sistema rodando no servidor!
+Próximo passo: Restaurar/validar dados do banco e configurar HTTPS/Nginx.
+🎯 O que conquistamos hoje
+✅ Sistema no ar no servidor Ubuntu
+
+O sistema está rodando em produção local (na rede interna), acessível via:
+
+http://192.168.15.46:3001
+
+Login testado:
+
+    E-mail: admin@reverse.com
+
+    Senha: admin123
+
+🖥️ Ambiente Atual (Servidor Ubuntu)
+Item	Valor
+IP do servidor	192.168.15.46
+Usuário SSH	alessander
+Senha SSH	(definida por você)
+Hostname	srvslglocal
+Pasta do projeto	/mnt/Projeto_Novo (NTFS externo)
+Node.js no host	v26.13.0
+Docker	v29.9.2
+Docker Compose	v5.5.1
+Git	v2.53.0
+Porta da aplicação	3001
+Porta do banco (PostgreSQL)	5432
+🐳 Containers Docker Rodando
+1. projeto_novo-db-1 (PostgreSQL)
+
+    Imagem: postgres:15-alpine
+
+    Porta: 5432:5432
+
+    Status: ✅ Up
+
+    Comando de criação:
+
+bash
+
+sudo docker run -d \
+  --name projeto_novo-db-1 \
+  -p 5432:5432 \
+  -e POSTGRES_USER=admin \
+  -e POSTGRES_PASSWORD=admin123 \
+  -e POSTGRES_DB=marketing_db \
+  postgres:15-alpine
+
+2. projeto_novo-app-1 (Node.js)
+
+    Imagem: node:20-alpine
+
+    Porta: 3001:3001
+
+    Status: ✅ Up
+
+    Comando de criação:
+
+bash
+
+sudo docker run -d \
+  --name projeto_novo-app-1 \
+  -p 3001:3001 \
+  --link projeto_novo-db-1:db \
+  -v /mnt/Projeto_Novo:/app \
+  -w /app \
+  -e DB_HOST=db \
+  -e DB_PORT=5432 \
+  -e DB_USER=admin \
+  -e DB_PASSWORD=admin123 \
+  -e DB_NAME=marketing_db \
+  -e PORT=3001 \
+  node:20-alpine sh -c "node server.js"
+
+⚠️ Problemas Encontrados e Soluções
+1. permission denied no .env e docker-compose.yml
+
+    Causa: A pasta /mnt/Projeto_Novo está em NTFS/Samba (HD externo). O Docker não consegue ler arquivos com permissão root desse tipo de sistema de arquivos.
+
+    Solução: Rodar containers manualmente com docker run (sem depender do docker-compose.yml).
+
+2. chown não alterava o dono dos arquivos
+
+    Causa: NTFS/Samba ignora chown do Linux.
+
+    Solução: Não é necessário. Os containers funcionam com docker run + volumes.
+
+3. Cannot find module 'dotenv'
+
+    Causa: npm install rodou em container temporário com volume anônimo, e o node server.js rodou em outro container sem esse volume.
+
+    Solução: Rodar npm install e node server.js no mesmo container ou garantir o volume compartilhado.
+
+4. ❌ Erro na conexão com PostgreSQL (no servidor)
+
+    Causa: db.js estava com host: 'localhost' hardcoded. Dentro do container, localhost aponta para o próprio container, não para o banco.
+
+    Solução: db.js foi reescrito para usar process.env:
+
+javascript
+
+const { Pool } = require('pg');
+
+const pool = new Pool({
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT) || 5432,
+    user: process.env.DB_USER || 'admin',
+    password: process.env.DB_PASSWORD || 'admin123',
+    database: process.env.DB_NAME || 'marketing_db',
+});
+
+pool.query('SELECT NOW()')
+    .then(() => console.log('✅ Conectado ao PostgreSQL com sucesso!'))
+    .catch(err => console.error('❌ Erro na conexão com PostgreSQL:', err.message));
+
+module.exports = pool;
+
+5. ❌ Erro detalhado: (vazio) ao rodar scripts
+
+    Causa: Scripts como criar_admin.js e reconstruir_sistema_completo.js engolem o erro real (só imprimem error.message).
+
+    Solução: Criar tabelas diretamente via psql (comando manual grande executado no Passo 1 do último bloco).
+
+6. Banco vazio (Did not find any relations)
+
+    Causa: O backup não foi restaurado (você mencionou que não fez backup).
+
+    Solução (parcial): Criar todas as tabelas manualmente via psql (já feito).
+
+🗄️ Estrutura do Banco (criada manualmente)
+
+Todas as tabelas foram criadas via psql. As tabelas existentes agora são:
+Tabela	Descrição
+usuarios	Usuários admin (login da agência)
+clientes	Clientes da agência (login do portal)
+leads	Leads do Kanban
+prospects	Prospects do comercial
+propostas	Propostas comerciais (com assinatura digital)
+tarefas	Tarefas (agência + cliente)
+criativos	Peças para aprovação
+posts	Calendário editorial
+campanhas	Campanhas de marketing
+receitas	Lançamentos de receita
+despesas	Lançamentos de despesa
+briefings	Briefings do cliente
+branding	Brand Books
+permissoes_clientes	Controle de acesso do cliente
+configuracoes	Configurações centralizadas (chave/valor)
+notificacoes	Notificações in-app (sino)
+comentarios	Chat de tarefas/criativos/posts
+produtos	Produtos da agência
+conhecimento	Base de conhecimento (artigos)
+
+Usuário admin criado:
+
+    Email: admin@reverse.com
+
+    Senha: admin123
+
+    Tipo: admin
+
+🚨 Pendências Técnicas Importantes
+1. O backup do banco NÃO foi restaurado
+
+    O banco está com as tabelas vazias (exceto admin).
+
+    Próximo passo: Popular os dados manualmente (clientes, leads, campanhas, etc.) ou rodar os scripts de popular banco com cuidado.
+
+2. O .env no servidor está com problema
+
+    O server.js procura o .env na pasta /mnt/Projeto_Novo (NTFS, sem permissão).
+
+    Impacto: JWT_SECRET, MASTER_KEY, BASE_URL não estão configurados no servidor.
+
+    Solução: Criar .env na pasta ~/.env do usuário alessander (disco Linux, ext4) e montar via volume:
+
+bash
+
+sudo docker run ... -v ~/.env:/app/.env:ro ...
+
+3. Cache de configurações falhando
+
+    O log mostra ⚠️ Falha ao carregar cache de configurações: relation "configuracoes" does not exist.
+
+    Mas agora a tabela existe! Reiniciar o container deve resolver:
+
+bash
+
+sudo docker restart projeto_novo-app-1
+sudo docker logs projeto_novo-app-1
+
+4. Firewall do servidor
+
+    Verificar se a porta 3001 está liberada no firewall do Ubuntu:
+
+bash
+
+sudo ufw status
+sudo ufw allow 3001/tcp
+sudo ufw reload
+
+5. HTTPS / Nginx / Certbot
+
+    O sistema está rodando em HTTP puro na porta 3001.
+
+    Próximo passo: Configurar Nginx como reverse proxy + Certbot para SSL.
+
+    Requisito: Ter o domínio apontado para o IP 192.168.15.46 (ou IP público, se houver).
+
+📋 Checklist para a próxima sessão (amanhã)
+Prioridade Alta (sistema quebrado sem isso)
+
+    □
+
+    Reiniciar o container do app para ele reconhecer a tabela configuracoes
+    □
+
+    Criar o .env no servidor (disco Linux) e montar no container
+    □
+
+    Popular o banco com dados essenciais (cliente teste, tarefas, campanhas)
+    □
+
+    Testar login do cliente (não só do admin)
+    □
+
+    Testar as telas principais no navegador: leads, clientes, propostas, financeiro, criativos, tarefas
+
+Prioridade Média
+
+    □
+
+    Configurar PM2 ou restart automático dos containers (para subir sozinhos após reboot)
+    □
+
+    Configurar Nginx como reverse proxy (porta 80 → 3001)
+    □
+
+    Configurar Certbot para HTTPS
+    □
+
+    Fazer backup do banco do servidor e salvar no seu PC
+
+Prioridade Baixa
+
+    □
+
+    Revisar os scripts criar_admin.js e reconstruir_sistema_completo.js para mostrar os erros reais (não engolir o error.message)
+    □
+
+    Remover arquivos antigos/duplicados do /mnt/Projeto_Novo (backups, server - Copia.js, db - Copia.js, etc.)
+    □
+
+    Mover o projeto do /mnt (NTFS) para o disco Linux (ext4), quando houver espaço
+
+🚀 Comandos Úteis (para amanhã)
+Ver se os containers estão rodando
+bash
+
+sudo docker ps
+
+Reiniciar o app (para reconhecer novas tabelas)
+bash
+
+sudo docker restart projeto_novo-app-1
+
+Ver os logs do app em tempo real
+bash
+
+sudo docker logs -f projeto_novo-app-1
+
+Parar o app
+bash
+
+sudo docker stop projeto_novo-app-1
+
+Recriar o app (se precisar trocar variáveis)
+bash
+
+sudo docker stop projeto_novo-app-1
+sudo docker rm projeto_novo-app-1
+sudo docker run -d \
+  --name projeto_novo-app-1 \
+  -p 3001:3001 \
+  --link projeto_novo-db-1:db \
+  -v /mnt/Projeto_Novo:/app \
+  -w /app \
+  -e DB_HOST=db \
+  -e DB_PORT=5432 \
+  -e DB_USER=admin \
+  -e DB_PASSWORD=admin123 \
+  -e DB_NAME=marketing_db \
+  -e PORT=3001 \
+  node:20-alpine sh -c "node server.js"
+
+Acessar o banco via terminal
+bash
+
+sudo docker exec -it projeto_novo-db-1 psql -U admin -d marketing_db
+
+Ver tabelas
+bash
+
+sudo docker exec -it projeto_novo-db-1 psql -U admin -d marketing_db -c "\dt"
+
+Fazer backup do banco do servidor (e baixar para o PC)
+bash
+
+# No servidor
+sudo docker exec projeto_novo-db-1 pg_dump -U admin marketing_db > /tmp/backup_servidor.sql
+
+# No PC (Windows/PowerShell)
+scp alessander@192.168.15.46:/tmp/backup_servidor.sql E:\Backups\banco\backup_servidor_2026-11-08.sql
+
+📌 Dicas para o futuro
+
+    Sempre que alterar db.js, server.js ou qualquer .js, reinicie o container do app:
+    bash
+
+    sudo docker restart projeto_novo-app-1
+
+    Sempre que alterar HTML/CSS, o navegador pode guardar cache. Force recarregar com Ctrl + Shift + R.
+
+    Se docker-compose up der permission denied, use docker run direto. A pasta NTFS do /mnt não aceita bem o docker-compose.
+
+    Para mudar algo no .env, crie em ~/.env (Linux) e monte com -v ~/.env:/app/.env:ro. Não edite o .env da pasta /mnt.
+
+    Se mover o projeto para o disco Linux (quando tiver espaço), aí sim o docker-compose up -d vai funcionar normalmente, e o gerenciamento será muito mais fácil.
+
+Documento gerado em 08/11/2026.
+Sistema: Reverse Marketing
+# 📅 Sessão de Desenvolvimento: 08/11/2026 (Parte 2 - Noite)
+## Módulo: CRM Avançado — Fase 1 (Timeline + Atividades/Follow-ups)
+
+Esta sessão foi focada na implementação da fundação do CRM Avançado, integrando todas as ações do sistema a uma linha do tempo unificada e criando o módulo de gestão de atividades e follow-ups.
+
+### ✅ O que foi entregue e implementado
+
+#### 1. Banco de Dados
+- **Nova Tabela `atividades`**: Criada via script (`criar_tabela_atividades.js`) para gerenciar follow-ups (ligações, reuniões, e-mails, WhatsApp, visitas, tarefas e lembretes).
+  - Colunas: `id`, `cliente_id` (FK), `lead_id` (FK), `tipo`, `titulo`, `descricao`, `data_hora`, `status` (pendente/concluida/cancelada), `prioridade`, `concluida_em`, `criado_por`, `criado_em`.
+  - Inclui regra de negócio (CHECK) garantindo que a atividade esteja ligada a um Cliente OU a um Lead.
+
+#### 2. Backend (Rotas)
+- **`rotas_atividades.js`** criado e integrado ao `server.js`:
+  - CRUD completo de Atividades (`GET`, `POST`, `PUT`, `PATCH /concluir`, `DELETE`).
+  - Rota `/api/atividades/hoje` para alimentar o dashboard (retorna atividades do dia e atrasadas).
+  - **Rota `/api/timeline/:cliente_id`**: O "motor" do CRM. Agrega em tempo real (via UNION e queries paralelas) o histórico de:
+    - Atividades e Tarefas.
+    - Criativos, Posts (Calendário) e Propostas (incluindo aceites/recusas).
+    - Lançamentos Financeiros (Receitas/Despesas).
+    - Briefings, Brandings, Comentários e Mapeamentos.
+  - Os dados são ordenados cronologicamente (mais recente primeiro) e possuem `try/catch` individuais para não quebrar a timeline caso uma tabela esteja vazia.
+
+#### 3. Frontend (Novas Telas e Integrações)
+- **`public/atividades.html`**: Tela de gestão (dark mode) com tabela, filtros de busca, criação/edição via modal, conclusão rápida e exclusão.
+- **`public/timeline_cliente.html`**: Interface visual em formato de "linha do tempo vertical", com filtros interativos por tipo de evento. Exibe a agregação de dados que o backend monta.
+- **`public/admin.html`**: 
+  - Adicionados 2 novos cards dinâmicos ("Atividades de Hoje" e "Atividades Atrasadas") com atualização automática a cada 60s.
+  - Corrigido um problema de duplicação de menus e scripts causados por execuções anteriores dos scripts de injeção de menu.
+
+#### 4. Navegação e Segurança
+- **`adicionar_menu_atividades.js`**: Script criado e executado para injetar os links "📅 Atividades" e "🕒 Timeline" no menu "Operação" do Admin (em todas as telas).
+- **Segurança**: As rotas e telas de Atividades e Timeline foram adicionadas à lista de bloqueio para usuários do tipo `cliente`. (Clientes continuam com acesso restrito ao portal).
+
+### 🛠️ Correções Técnicas e Ajustes
+- **CORS no `server.js`**: Adicionado o método `PATCH` no `Access-Control-Allow-Methods`, necessário para a rota de conclusão de atividades.
+- **Correção de Encoding**: Vários caracteres corrompidos nos menus (ex: `PermissÃµes` -> `Permissões`) foram corrigidos durante a re-injeção.
+- **Ícones e Layout**: Refinamento dos cards no dashboard e alinhamento visual das telas novas com o padrão da agência.
+
+### 📌 Status do Ambiente
+- Servidor local rodando na porta `3001`.
+- PostgreSQL conectado com sucesso.
+- Banco populado com dados de teste (Alessander - ID 1) contendo Atividades, Tarefas, Branding, Briefing e Financeiro, o que já permite ver a Timeline funcionando com 11+ eventos mistos.
+
+### 🚀 Próximos Passos (Retomar amanhã)
+1. **Início da Fase 2 do CRM**. Opções para o próximo módulo:
+   - *Notificações In-App* (Sino no topo do sistema com badge de pendências).
+   - *Timeline do Lead* (Reaproveitar o motor da timeline para o funil comercial).
+   - *Automações* (Ex: "Se lead parado há 7 dias -> gerar atividade").
+   - *Dashboard CRM* (Taxa de conversão, tempo médio no funil, forecast).
+2. **Deploy e Infra**: Lembrar de rodar a migration `criar_tabela_atividades.js` e atualizar os arquivos no servidor Ubuntu quando formos subir as novidades de hoje.
+
+---
+*Documento gerado em 08/11/2026 ao final da sessão.*
+# 📅 Sessão de Desenvolvimento: 10/11/2026
+## Módulo: CRM Avançado — Fase 2 (Timeline do Lead)
+
+Esta sessão foi focada em estender o motor da Timeline (criado na Fase 1) para os Leads do funil comercial. O objetivo era permitir que o vendedor veja todo o histórico de interações, tarefas e propostas de um lead em uma única linha do tempo, auxiliando na negociação antes da conversão em cliente.
+
+### ✅ O que foi entregue e implementado
+
+#### 1. Backend (Rotas)
+- **Nova Rota `/api/timeline/lead/:lead_id`**: Criada no arquivo `rotas_atividades.js`.
+  - Ela agrega os seguintes eventos exclusivos do lead: Criação do Lead (data e origem), Atividades/Follow-ups, Tarefas, Comentários (chat) e Propostas vinculadas ao nome do Lead.
+  - **Ajuste Crítico de Rota (Express):** A rota específica `/api/timeline/lead/:lead_id` foi posicionada **ANTES** da rota genérica `/api/timeline/:cliente_id`. Isso evita que o Express interprete a palavra "lead" como o ID de um cliente.
+  - A resposta do backend agora inclui um campo `is_lead: true/false` para o frontend saber com qual entidade está lidando.
+
+#### 2. Frontend (Integração no Kanban)
+- **`public/leads.html`**: A tela do Kanban foi atualizada. Agora, cada card de lead possui um botão **"🕒 Histórico"** no rodapé (ao lado da origem).
+- O botão redireciona para a tela da timeline passando o parâmetro via URL: `/timeline_cliente.html?lead_id=X`.
+
+#### 3. Frontend (Aproveitamento da Tela Existente)
+- **`public/timeline_cliente.html`**: A tela já existente foi adaptada para ler os parâmetros da URL (`?lead_id=` ou `?cliente_id=`). 
+- O layout, as cores das bolinhas na linha do tempo e os filtros de tags continuam funcionando perfeitamente para ambos os casos (Lead e Cliente).
+
+---
+
+### 🛠️ Como Testar (Retomada Amanhã)
+1. Acesse `http://localhost:3001/leads.html`.
+2. Clique no botão **"🕒 Histórico"** em qualquer card de lead.
+3. A tela deve abrir mostrando o nome do lead no topo e, na linha do tempo, o evento de "🎯 Lead capturado" (além de tarefas ou atividades vinculadas a ele).
+
+---
+
+### 📌 Próximos Passos (Fase 3 do CRM)
+Com as fundações do CRM prontas (Atividades + Timeline de Clientes + Timeline de Leads), os próximos caminhos recomendados são:
+1. **Notificações In-App (Sino)**: Criar a interface do sino com badge no topo das telas, lendo a tabela `notificacoes` e fazendo polling.
+2. **Dashboard CRM**: Criar gráficos de conversão (Taxa de conversão de Leads em Clientes, Tempo médio no funil).
+3. **Automações**: Criar regras no backend (ex: "Se o lead ficar X dias no status 'Novo' sem atividade, gerar uma notificação para o admin").
+
+---
+*Documento gerado em 10/11/2026 ao final da sessão.*

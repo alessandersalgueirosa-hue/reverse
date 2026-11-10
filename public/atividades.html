@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atividades | Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        laranja: '#f97316',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f172a; }
+        .card { background-color: #1e293b; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+        .badge-ligacao  { background:#3b82f6; color:#fff; }
+        .badge-reuniao  { background:#8b5cf6; color:#fff; }
+        .badge-email    { background:#06b6d4; color:#fff; }
+        .badge-whatsapp { background:#22c55e; color:#fff; }
+        .badge-visita   { background:#eab308; color:#000; }
+        .badge-tarefa   { background:#f97316; color:#fff; }
+        .badge-lembrete { background:#ef4444; color:#fff; }
+        .badge-baixa    { background:#475569; color:#fff; }
+        .badge-media    { background:#eab308; color:#000; }
+        .badge-alta     { background:#ef4444; color:#fff; }
+        .badge-pendente { background:#eab308; color:#000; }
+        .badge-concluida{ background:#22c55e; color:#fff; }
+        .badge-cancelada{ background:#64748b; color:#fff; }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen">
+        
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-56 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                        <a href="/atividades.html" class="px-4 py-2 hover:bg-slate-700 text-white">📅 Atividades</a>
+                        <a href="/timeline_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">🕒 Timeline</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                        <a href="/configuracoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Configurações</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+        
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+        <script>
+            (function() {
+                const token = localStorage.getItem('token');
+                let isCliente = false;
+
+                if (token) {
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        if (payload.tipo === 'cliente') isCliente = true;
+                    } catch(e) {}
+                }
+
+                if (isCliente) {
+                    const menuAdminEl = document.getElementById('menu-admin');
+                    if (menuAdminEl) menuAdminEl.style.display = 'none';
+
+                    const menuClienteEl = document.getElementById('menu-cliente');
+                    if (menuClienteEl) menuClienteEl.classList.remove('hidden');
+
+                    const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                    const nav = document.getElementById('nav-cliente');
+                    const btnSair = nav.querySelector('.btn-sair');
+
+                    const addLink = (href, texto) => {
+                        const a = document.createElement('a');
+                        a.href = href;
+                        a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors';
+                        a.innerText = texto;
+                        nav.insertBefore(a, btnSair);
+                    };
+
+                    if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                    if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                    if (permissoes.pode_ver_metricas)   addLink('/metricas.html', 'Resultados');
+                    if (permissoes.pode_ver_branding)   addLink('/lista_brandings.html', 'Minha Marca');
+                    if (permissoes.pode_ver_campanhas)  addLink('/campanhas.html', 'Campanhas');
+                    if (permissoes.pode_ver_propostas)  addLink('/propostas.html', 'Propostas');
+                    if (permissoes.pode_ver_tarefas)    addLink('/tarefas.html', 'Minhas Tarefas');
+
+                } else {
+                    const menuClienteEl = document.getElementById('menu-cliente');
+                    if (menuClienteEl) menuClienteEl.style.display = 'none';
+
+                    const menuAdminEl = document.getElementById('menu-admin');
+                    if (menuAdminEl) menuAdminEl.classList.remove('hidden');
+                }
+
+                document.querySelectorAll('.btn-sair').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('permissoes');
+                        window.location.href = '/login.html';
+                    });
+                });
+            })();
+        </script>
+    
+
+<!-- Cabeçalho -->
+
+
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- Cards de resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="card rounded-xl p-4 border-l-4 border-yellow-500">
+            <div class="text-xs text-slate-400 uppercase">Hoje</div>
+            <div id="countHoje" class="text-2xl font-bold text-yellow-400">0</div>
+        </div>
+        <div class="card rounded-xl p-4 border-l-4 border-red-500">
+            <div class="text-xs text-slate-400 uppercase">Atrasadas</div>
+            <div id="countAtrasadas" class="text-2xl font-bold text-red-400">0</div>
+        </div>
+        <div class="card rounded-xl p-4 border-l-4 border-green-500">
+            <div class="text-xs text-slate-400 uppercase">Concluídas</div>
+            <div id="countConcluidas" class="text-2xl font-bold text-green-400">0</div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card rounded-xl p-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <input id="filtroBusca" type="text" placeholder="Buscar por título..." class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white w-full">
+            <select id="filtroTipo" class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white w-full">
+                <option value="">Todos os tipos</option>
+                <option value="ligacao">Ligação</option>
+                <option value="reuniao">Reunião</option>
+                <option value="email">E-mail</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="visita">Visita</option>
+                <option value="tarefa">Tarefa</option>
+                <option value="lembrete">Lembrete</option>
+            </select>
+            <select id="filtroStatus" class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white w-full">
+                <option value="">Todos os status</option>
+                <option value="pendente">Pendente</option>
+                <option value="concluida">Concluída</option>
+                <option value="cancelada">Cancelada</option>
+            </select>
+            <input id="filtroDe" type="date" class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white w-full">
+            <input id="filtroAte" type="date" class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white w-full">
+        </div>
+        <div class="flex justify-end mt-3">
+            <button onclick="carregar()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg text-sm font-semibold">🔄 Aplicar Filtros</button>
+        </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="card rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-800 text-slate-400 uppercase text-xs">
+                    <tr>
+                        <th class="px-3 py-3 text-left">Data/Hora</th>
+                        <th class="px-3 py-3 text-left">Título</th>
+                        <th class="px-3 py-3 text-left">Tipo</th>
+                        <th class="px-3 py-3 text-left">Cliente/Lead</th>
+                        <th class="px-3 py-3 text-left">Prioridade</th>
+                        <th class="px-3 py-3 text-left">Status</th>
+                        <th class="px-3 py-3 text-right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody" class="divide-y divide-slate-700">
+                    <tr><td colspan="7" class="px-3 py-6 text-center text-slate-500">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<!-- Modal Nova/Editar -->
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4">
+    <div class="card rounded-2xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between">
+            <h2 id="modalTitulo" class="text-lg font-bold">Nova Atividade</h2>
+            <button onclick="fecharModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+        </div>
+
+        <input type="hidden" id="fId">
+
+        <div>
+            <label class="block text-xs text-slate-400 mb-1">Título *</label>
+            <input id="fTitulo" type="text" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" placeholder="Ex: Ligar para alinhar campanha">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">Tipo *</label>
+                <select id="fTipo" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white">
+                    <option value="ligacao">Ligação</option>
+                    <option value="reuniao">Reunião</option>
+                    <option value="email">E-mail</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="visita">Visita</option>
+                    <option value="tarefa">Tarefa</option>
+                    <option value="lembrete">Lembrete</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">Prioridade</label>
+                <select id="fPrioridade" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white">
+                    <option value="baixa">Baixa</option>
+                    <option value="media" selected>Média</option>
+                    <option value="alta">Alta</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs text-slate-400 mb-1">Cliente *</label>
+            <select id="fCliente" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white">
+                <option value="">Carregando clientes...</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-xs text-slate-400 mb-1">Data e Hora *</label>
+            <input id="fDataHora" type="datetime-local" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white">
+        </div>
+
+        <div>
+            <label class="block text-xs text-slate-400 mb-1">Descrição</label>
+            <textarea id="fDescricao" rows="3" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" placeholder="Detalhes..."></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+            <button onclick="fecharModal()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg">Cancelar</button>
+            <button onclick="salvar()" class="bg-laranja hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// =====================================================
+// Config
+// =====================================================
+const API = ''; // mesma origem
+const token = localStorage.getItem('token');
+
+if (!token) {
+    window.location.href = '/login.html';
+}
+
+const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + token
+};
+
+// =====================================================
+// Helpers
+// =====================================================
+function fmtDataHora(s) {
+    if (!s) return '-';
+    const d = new Date(s);
+    return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+}
+
+function badgeTipo(t) {
+    const map = {
+        ligacao:'Ligação', reuniao:'Reunião', email:'E-mail',
+        whatsapp:'WhatsApp', visita:'Visita', tarefa:'Tarefa', lembrete:'Lembrete'
+    };
+    return `<span class="badge badge-${t}">${map[t] || t}</span>`;
+}
+
+function badgePrioridade(p) {
+    const map = { baixa:'Baixa', media:'Média', alta:'Alta' };
+    return `<span class="badge badge-${p}">${map[p] || p}</span>`;
+}
+
+function badgeStatus(s) {
+    const map = { pendente:'Pendente', concluida:'Concluída', cancelada:'Cancelada' };
+    return `<span class="badge badge-${s}">${map[s] || s}</span>`;
+}
+
+function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('permissoes');
+    window.location.href = '/login.html';
+}
+
+// =====================================================
+// Carregar clientes no select
+// =====================================================
+async function carregarClientes() {
+    try {
+        const r = await fetch('/api/clientes', { headers });
+        const clientes = await r.json();
+        const sel = document.getElementById('fCliente');
+        sel.innerHTML = '<option value="">Selecione um cliente</option>';
+        clientes.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.nome;
+            sel.appendChild(opt);
+        });
+    } catch (e) {
+        console.error('Erro ao carregar clientes:', e);
+    }
+}
+
+// =====================================================
+// Carregar atividades + cards
+// =====================================================
+async function carregar() {
+    try {
+        // Filtros
+        const params = new URLSearchParams();
+        const busca = document.getElementById('filtroBusca').value.trim();
+        const tipo = document.getElementById('filtroTipo').value;
+        const status = document.getElementById('filtroStatus').value;
+        const de = document.getElementById('filtroDe').value;
+        const ate = document.getElementById('filtroAte').value;
+
+        if (tipo) params.append('tipo', tipo);
+        if (status) params.append('status', status);
+        if (de) params.append('de', de + 'T00:00:00');
+        if (ate) params.append('ate', ate + 'T23:59:59');
+
+        const r = await fetch('/api/atividades?' + params.toString(), { headers });
+        let lista = await r.json();
+
+        // Filtro de busca no frontend (título + descrição)
+        if (busca) {
+            const b = busca.toLowerCase();
+            lista = lista.filter(a =>
+                (a.titulo && a.titulo.toLowerCase().includes(b)) ||
+                (a.descricao && a.descricao.toLowerCase().includes(b))
+            );
+        }
+
+        // Render tabela
+        const tbody = document.getElementById('tbody');
+        if (lista.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="px-3 py-6 text-center text-slate-500">Nenhuma atividade encontrada.</td></tr>';
+        } else {
+            tbody.innerHTML = lista.map(a => `
+                <tr class="hover:bg-slate-800">
+                    <td class="px-3 py-3 whitespace-nowrap">${fmtDataHora(a.data_hora)}</td>
+                    <td class="px-3 py-3">
+                        <div class="font-medium">${escapeHtml(a.titulo)}</div>
+                        ${a.descricao ? `<div class="text-xs text-slate-400 truncate max-w-xs">${escapeHtml(a.descricao)}</div>` : ''}
+                    </td>
+                    <td class="px-3 py-3">${badgeTipo(a.tipo)}</td>
+                    <td class="px-3 py-3">${escapeHtml(a.cliente_nome || a.lead_nome || '-')}</td>
+                    <td class="px-3 py-3">${badgePrioridade(a.prioridade)}</td>
+                    <td class="px-3 py-3">${badgeStatus(a.status)}</td>
+                    <td class="px-3 py-3 text-right whitespace-nowrap">
+                        ${a.status === 'pendente' ? `<button onclick="concluir(${a.id})" class="text-green-400 hover:text-green-300 mr-2" title="Concluir">✓</button>` : ''}
+                        <button onclick="editar(${a.id})" class="text-blue-400 hover:text-blue-300 mr-2" title="Editar">✏️</button>
+                        <button onclick="excluir(${a.id})" class="text-red-400 hover:text-red-300" title="Excluir">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Atualizar cards (usa rota /hoje)
+        await atualizarCards();
+
+    } catch (e) {
+        console.error('Erro ao carregar atividades:', e);
+        Swal.fire('Erro', 'Não foi possível carregar as atividades.', 'error');
+    }
+}
+
+async function atualizarCards() {
+    try {
+        const r = await fetch('/api/atividades/hoje', { headers });
+        const { hoje, atrasadas } = await r.json();
+        document.getElementById('countHoje').textContent = hoje.length;
+        document.getElementById('countAtrasadas').textContent = atrasadas.length;
+
+        // Concluídas (contagem rápida via listagem completa)
+        const r2 = await fetch('/api/atividades?status=concluida', { headers });
+        const concluidas = await r2.json();
+        document.getElementById('countConcluidas').textContent = concluidas.length;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+// =====================================================
+// Modal
+// =====================================================
+function abrirModalNova() {
+    document.getElementById('modalTitulo').textContent = 'Nova Atividade';
+    document.getElementById('fId').value = '';
+    document.getElementById('fTitulo').value = '';
+    document.getElementById('fTipo').value = 'ligacao';
+    document.getElementById('fPrioridade').value = 'media';
+    document.getElementById('fCliente').value = '';
+    document.getElementById('fDescricao').value = '';
+
+    // Data padrão: agora + 1h
+    const d = new Date(Date.now() + 60*60*1000);
+    d.setMinutes(0,0,0);
+    const pad = n => String(n).padStart(2,'0');
+    document.getElementById('fDataHora').value =
+        `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modal').classList.add('flex');
+}
+
+function fecharModal() {
+    document.getElementById('modal').classList.add('hidden');
+    document.getElementById('modal').classList.remove('flex');
+}
+
+async function editar(id) {
+    try {
+        const r = await fetch('/api/atividades/' + id, { headers });
+        const a = await r.json();
+        document.getElementById('modalTitulo').textContent = 'Editar Atividade';
+        document.getElementById('fId').value = a.id;
+        document.getElementById('fTitulo').value = a.titulo || '';
+        document.getElementById('fTipo').value = a.tipo;
+        document.getElementById('fPrioridade').value = a.prioridade;
+        document.getElementById('fCliente').value = a.cliente_id || '';
+        document.getElementById('fDescricao').value = a.descricao || '';
+        if (a.data_hora) {
+            const d = new Date(a.data_hora);
+            const pad = n => String(n).padStart(2,'0');
+            document.getElementById('fDataHora').value =
+                `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+        document.getElementById('modal').classList.remove('hidden');
+        document.getElementById('modal').classList.add('flex');
+    } catch (e) {
+        Swal.fire('Erro', 'Não foi possível carregar.', 'error');
+    }
+}
+
+async function salvar() {
+    const id = document.getElementById('fId').value;
+    const titulo = document.getElementById('fTitulo').value.trim();
+    const tipo = document.getElementById('fTipo').value;
+    const prioridade = document.getElementById('fPrioridade').value;
+    const cliente_id = document.getElementById('fCliente').value;
+    const data_hora = document.getElementById('fDataHora').value;
+    const descricao = document.getElementById('fDescricao').value.trim();
+
+    if (!titulo) return Swal.fire('Atenção', 'Informe o título.', 'warning');
+    if (!cliente_id) return Swal.fire('Atenção', 'Selecione o cliente.', 'warning');
+    if (!data_hora) return Swal.fire('Atenção', 'Informe data e hora.', 'warning');
+
+    const body = {
+        cliente_id: parseInt(cliente_id),
+        tipo, titulo,
+        descricao: descricao || null,
+        data_hora: data_hora + ':00',
+        prioridade
+    };
+
+    try {
+        const url = id ? '/api/atividades/' + id : '/api/atividades';
+        const method = id ? 'PUT' : 'POST';
+        const r = await fetch(url, { method, headers, body: JSON.stringify(body) });
+        if (!r.ok) {
+            const err = await r.json();
+            throw new Error(err.erro || err.detalhe || 'Erro desconhecido');
+        }
+        fecharModal();
+        Swal.fire({
+            icon: 'success',
+            title: id ? 'Atualizada!' : 'Criada!',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+        carregar();
+    } catch (e) {
+        Swal.fire('Erro', e.message, 'error');
+    }
+}
+
+async function concluir(id) {
+    try {
+        const r = await fetch('/api/atividades/' + id + '/concluir', { method: 'PATCH', headers });
+        if (!r.ok) throw new Error('Falha ao concluir');
+        Swal.fire({ icon:'success', title:'Concluída!', toast:true, position:'top-end', showConfirmButton:false, timer:1500 });
+        carregar();
+    } catch (e) {
+        Swal.fire('Erro', e.message, 'error');
+    }
+}
+
+async function excluir(id) {
+    const c = await Swal.fire({
+        title: 'Excluir atividade?',
+        text: 'Esta ação não pode ser desfeita.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar'
+    });
+    if (!c.isConfirmed) return;
+    try {
+        const r = await fetch('/api/atividades/' + id, { method: 'DELETE', headers });
+        if (!r.ok) throw new Error('Falha ao excluir');
+        Swal.fire({ icon:'success', title:'Excluída!', toast:true, position:'top-end', showConfirmButton:false, timer:1500 });
+        carregar();
+    } catch (e) {
+        Swal.fire('Erro', e.message, 'error');
+    }
+}
+
+// =====================================================
+// Init
+// =====================================================
+(async function init() {
+    await carregarClientes();
+    await carregar();
+})();
+</script>
+
+
+        <script>
+            (function() {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') {
+                        const paginasAdmin = [
+                            'financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html',
+                            'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html',
+                            'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html',
+                            'storytelling.html', 'base_conhecimento.html', 'produtos.html',
+                            'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html',
+                            'branding.html', 'permissoes.html', 'configuracoes.html',
+                            'atividades.html', 'timeline_cliente.html'
+                        ];
+                        const urlAtual = window.location.pathname.split('/').pop();
+                        if (paginasAdmin.includes(urlAtual)) {
+                            alert('Acesso negado. Esta área é restrita.');
+                            window.location.href = '/portal_cliente.html';
+                        }
+                    }
+                } catch(e) {}
+            })();
+        </script>
+    </body>
+</html>

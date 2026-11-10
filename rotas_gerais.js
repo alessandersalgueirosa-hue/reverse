@@ -84,11 +84,14 @@ module.exports = function(app, db, verificarToken) {
     // ==========================================
     app.get('/api/campanhas', verificarToken, middlewares.verificarPermissao('pode_ver_campanhas'), async (req, res) => { 
         try { 
+            const u = req.user || req.usuario || req.cliente || {};
+            const isCliente = u.tipo === 'cliente';
+            
             let query;
             let values = [];
-            if (req.user.tipo === 'cliente') {
+            if (isCliente) {
                 query = `SELECT c.*, cl.nome AS cliente_nome FROM campanhas c LEFT JOIN clientes cl ON cl.id = c.cliente_id WHERE c.cliente_id = $1 ORDER BY c.id DESC`;
-                values = [req.user.id];
+                values = [u.id || u.cliente_id];
             } else {
                 query = `SELECT c.*, cl.nome AS cliente_nome FROM campanhas c LEFT JOIN clientes cl ON cl.id = c.cliente_id ORDER BY c.id DESC`;
             }
@@ -120,11 +123,13 @@ module.exports = function(app, db, verificarToken) {
     // ==========================================
     app.get('/api/trafego-pago', verificarToken, async (req, res) => {
         try {
+            const u = req.user || req.usuario || req.cliente || {};
+            const isCliente = u.tipo === 'cliente';
             let query;
             let values = [];
-            if (req.user.tipo === 'cliente') {
+            if (isCliente) {
                 query = `SELECT t.*, c.nome AS cliente_nome FROM trafego_pago t LEFT JOIN clientes c ON c.id = t.cliente_id WHERE t.cliente_id = $1 ORDER BY t.id DESC`;
-                values = [req.user.id];
+                values = [u.id || u.cliente_id];
             } else {
                 query = `SELECT t.*, c.nome AS cliente_nome FROM trafego_pago t LEFT JOIN clientes c ON c.id = t.cliente_id ORDER BY t.id DESC`;
             }
@@ -226,17 +231,95 @@ module.exports = function(app, db, verificarToken) {
     });
 
     // ==========================================
-    // MÉTRICAS
+    // ROTA EXCLUSIVA PARA O DASHBOARD DE MÉTRICAS DO SISTEMA
+    // ==========================================
+    app.get('/api/metricas_sistema', verificarToken, async (req, res) => {
+        console.log("🚨 [MÉTRICAS SISTEMA] Rota acessada!");
+        try {
+            const clientes = await db.query('SELECT COUNT(*) AS total FROM clientes');
+            const prospects = await db.query('SELECT COUNT(*) AS total FROM prospects');
+            const leads = await db.query('SELECT COUNT(*) AS total FROM leads');
+            const campanhas = await db.query('SELECT COUNT(*) AS total FROM campanhas');
+            const tarefasPendentes = await db.query('SELECT COUNT(*) AS total FROM tarefas WHERE concluida = false');
+            
+            const funil = await db.query(`
+                SELECT COALESCE(status, 'Novo') AS etapa, COUNT(*) AS total 
+                FROM leads 
+                GROUP BY COALESCE(status, 'Novo') 
+                ORDER BY total DESC
+            `);
+
+            const origem = await db.query(`
+                SELECT COALESCE(origem, 'Não informado') AS origem, COUNT(*) AS total 
+                FROM leads 
+                GROUP BY COALESCE(origem, 'Não informado') 
+                ORDER BY total DESC
+            `);
+
+            const statusLeads = await db.query(`
+                SELECT COALESCE(status, 'Novo') AS status, COUNT(*) AS total 
+                FROM leads 
+                GROUP BY COALESCE(status, 'Novo')
+            `);
+
+            let pendentes = 0;
+            let atendidos = 0;
+            statusLeads.rows.forEach(row => {
+                if (row.status.toLowerCase() === 'novo' || row.status.toLowerCase() === 'pendente') {
+                    pendentes += parseInt(row.total);
+                } else {
+                    atendidos += parseInt(row.total);
+                }
+            });
+
+            const payload = {
+                totalLeads: parseInt(leads.rows[0].total) || 0,
+                pendentes: pendentes,
+                atendidos: atendidos,
+                totalClientes: parseInt(clientes.rows[0].total) || 0,
+                totalProspects: parseInt(prospects.rows[0].total) || 0,
+                tarefasPendentes: parseInt(tarefasPendentes.rows[0].total) || 0,
+                totalCampanhas: parseInt(campanhas.rows[0].total) || 0,
+                funil: funil.rows,
+                baseContatos: origem.rows
+            };
+
+            console.log("📊 [MÉTRICAS SISTEMA] Enviando dados para o frontend:", JSON.stringify(payload, null, 2));
+
+            res.json(payload);
+        } catch (error) {
+            console.error("❌ [MÉTRICAS SISTEMA] Erro na rota:", error.message);
+            res.status(500).json({ error: 'Erro ao buscar métricas do sistema', detalhe: error.message });
+        }
+    });
+
+    // ==========================================
+    // MÉTRICAS GERAIS (MANTIDA PARA COMPATIBILIDADE)
     // ==========================================
     app.get('/api/metricas', verificarToken, middlewares.verificarPermissao('pode_ver_metricas'), async (req, res) => { 
         try { 
-            const funil = await db.query(`SELECT COALESCE(etapa_funil, 'novo') AS etapa, COUNT(*) AS total FROM leads GROUP BY etapa_funil ORDER BY total DESC`); 
-            const origem = await db.query(`SELECT COALESCE(origem, 'Não informado') AS origem, COUNT(*) AS total FROM leads GROUP BY origem ORDER BY total DESC`); 
-            const campanhas = await db.query(`SELECT c.nome, cl.nome AS cliente_nome, COUNT(l.id) AS total_leads, c.orcamento FROM campanhas c LEFT JOIN leads l ON l.campanha_id = c.id LEFT JOIN clientes cl ON cl.id = c.cliente_id GROUP BY c.id, c.nome, cl.nome, c.orcamento ORDER BY total_leads DESC`); 
+            const u = req.user || req.usuario || req.cliente || {};
+            const isAdmin = u.tipo === 'admin' || u.role === 'admin' || !u.id; 
+
+            const filtroLeads = isAdmin ? '' : `WHERE cliente_id = ${u.id}`;
+            const filtroCampanhas = isAdmin ? '' : `WHERE c.cliente_id = ${u.id}`;
+
+            const funil = await db.query(`SELECT COALESCE(status, 'novo') AS etapa, COUNT(*) AS total FROM leads ${filtroLeads} GROUP BY COALESCE(status, 'novo') ORDER BY total DESC`); 
+            const origem = await db.query(`SELECT COALESCE(origem, 'Não informado') AS origem, COUNT(*) AS total FROM leads ${filtroLeads} GROUP BY origem ORDER BY total DESC`); 
+            const campanhas = await db.query(`SELECT c.nome, cl.nome AS cliente_nome, COUNT(l.id) AS total_leads, c.orcamento FROM campanhas c LEFT JOIN leads l ON l.campanha_id = c.id LEFT JOIN clientes cl ON cl.id = c.cliente_id ${filtroCampanhas} GROUP BY c.id, c.nome, cl.nome, c.orcamento ORDER BY total_leads DESC`); 
             const clientesResult = await db.query('SELECT COUNT(*) AS total FROM clientes'); 
             const prospectsResult = await db.query('SELECT COUNT(*) AS total FROM prospects'); 
-            res.json({ funil: funil.rows, origem: origem.rows, campanhas: campanhas.rows, totalClientes: parseInt(clientesResult.rows[0].total), totalProspects: parseInt(prospectsResult.rows[0].total) }); 
-        } catch (error) { res.status(500).json({ error: 'Erro' }); } 
+            
+            res.json({ 
+                funil: funil.rows, 
+                origem: origem.rows, 
+                campanhas: campanhas.rows, 
+                totalClientes: parseInt(clientesResult.rows[0].total), 
+                totalProspects: parseInt(prospectsResult.rows[0].total) 
+            }); 
+        } catch (error) { 
+            res.status(500).json({ error: 'Erro ao buscar métricas' }); 
+        } 
     });
 
     // ==========================================
@@ -423,6 +506,16 @@ module.exports = function(app, db, verificarToken) {
             }
 
             const result = await db.query(`INSERT INTO criativos (cliente_id, titulo, url_arquivo, status) VALUES ($1, $2, $3, 'pendente') RETURNING *`, [cliente_id, titulo, urlFinal]);
+
+            // === GATILHO DE NOTIFICAÇÃO PARA O CRIATIVO ===
+            if (cliente_id) {
+                db.query(
+                    "INSERT INTO notificacoes (cliente_id, titulo, mensagem, link) VALUES ($1, $2, $3, $4)",
+                    [cliente_id, 'Novo Criativo Disponível', 'Uma nova peça está aguardando sua aprovação no portal.', '/portal_cliente.html']
+                ).catch(err => console.error("Erro ao notificar criativo:", err.message));
+            }
+            // ===============================================
+
             res.status(201).json(result.rows[0]);
         } catch (error) { 
             console.error("Erro ao criar criativo:", error.message);
@@ -482,6 +575,16 @@ module.exports = function(app, db, verificarToken) {
             const query = `INSERT INTO posts (cliente_id, plataforma, titulo, conteudo, data_publicacao, status, url_midia) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
             const values = [cliente_id, plataforma || 'Instagram', titulo, conteudo || null, data_publicacao || null, status, url_midia || null];
             const result = await db.query(query, values);
+
+            // === GATILHO DE NOTIFICAÇÃO PARA O POST ===
+            if (cliente_id) {
+                db.query(
+                    "INSERT INTO notificacoes (cliente_id, titulo, mensagem, link) VALUES ($1, $2, $3, $4)",
+                    [cliente_id, 'Novo Post Disponível', 'Um novo post foi agendado e precisa da sua aprovação.', '/portal_cliente.html']
+                ).catch(err => console.error("Erro ao notificar post:", err.message));
+            }
+            // ===========================================
+
             res.status(201).json(result.rows[0]); 
         } catch (error) { 
             console.error("Erro ao criar post:", error.message);
@@ -551,5 +654,25 @@ module.exports = function(app, db, verificarToken) {
                 });
             });
         } catch (error) { res.status(500).json({ error: 'Erro' }); }
+    });
+
+    // ==========================================
+    // NOVA ROTA: ALERTAS DO DASHBOARD
+    // ==========================================
+    app.get('/api/dashboard/alertas', verificarToken, async (req, res) => {
+        try {
+            const criativos = await db.query("SELECT COUNT(*) AS total FROM criativos WHERE status = 'pendente'");
+            const postsRecusados = await db.query("SELECT COUNT(*) AS total FROM posts WHERE status = 'recusado'");
+            const propostasAceitas = await db.query("SELECT COUNT(*) AS total FROM propostas WHERE status_aceite = 'aceita'");
+
+            res.json({
+                criativosPendentes: parseInt(criativos.rows[0].total) || 0,
+                postsRecusados: parseInt(postsRecusados.rows[0].total) || 0,
+                propostasAceitas: parseInt(propostasAceitas.rows[0].total) || 0
+            });
+        } catch (error) {
+            console.error("Erro ao buscar alertas:", error.message);
+            res.status(500).json({ error: 'Erro ao buscar alertas' });
+        }
     });
 };

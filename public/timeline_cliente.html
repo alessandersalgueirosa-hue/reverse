@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline do Cliente | Reverse Marketing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { laranja: '#f97316' } } }
+        }
+    </script>
+    <style>
+        body { background-color: #0f172a; }
+        .card { background-color: #1e293b; }
+
+        /* Linha do tempo vertical */
+        .timeline { position: relative; padding-left: 40px; }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #f97316, #475569);
+        }
+        .evento { position: relative; margin-bottom: 24px; }
+        .evento::before {
+            content: '';
+            position: absolute;
+            left: -31px; top: 8px;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: #475569;
+            border: 3px solid #0f172a;
+        }
+        .evento[data-tipo="atividade"]::before  { background: #3b82f6; }
+        .evento[data-tipo="tarefa"]::before     { background: #f97316; }
+        .evento[data-tipo="criativo"]::before   { background: #a855f7; }
+        .evento[data-tipo="post"]::before       { background: #06b6d4; }
+        .evento[data-tipo="proposta"]::before   { background: #22c55e; }
+        .evento[data-tipo="financeiro"]::before { background: #eab308; }
+        .evento[data-tipo="briefing"]::before,
+        .evento[data-tipo="branding"]::before,
+        .evento[data-tipo="mapeamento"]::before { background: #ec4899; }
+        .evento[data-tipo="comentario"]::before { background: #64748b; }
+
+        .evento-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #334155;
+            transition: all 0.15s;
+        }
+        .evento-card:hover { border-color: #f97316; transform: translateX(2px); }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .tag-atividade  { background:#1e40af; color:#fff; }
+        .tag-tarefa     { background:#c2410c; color:#fff; }
+        .tag-criativo   { background:#6b21a8; color:#fff; }
+        .tag-post       { background:#0e7490; color:#fff; }
+        .tag-proposta   { background:#166534; color:#fff; }
+        .tag-financeiro { background:#854d0e; color:#fff; }
+        .tag-briefing   { background:#9d174d; color:#fff; }
+        .tag-branding   { background:#9d174d; color:#fff; }
+        .tag-mapeamento { background:#9d174d; color:#fff; }
+        .tag-comentario { background:#334155; color:#fff; }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen">
+        
+    <header id="menu-admin" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Reverse Marketing</h1>
+            </div>
+            <nav class="flex flex-wrap items-center gap-1 text-sm text-slate-300">
+                <a href="/admin.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Dashboard</a>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Comercial <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/leads.html" class="px-4 py-2 hover:bg-slate-700 text-white">Leads</a>
+                        <a href="/prospects.html" class="px-4 py-2 hover:bg-slate-700 text-white">Prospects</a>
+                        <a href="/clientes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Clientes</a>
+                        <a href="/permissoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Permissões</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Operação <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-56 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/mapeamento_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">Mapeamento</a>
+                        <a href="/branding.html" class="px-4 py-2 hover:bg-slate-700 text-white">Branding</a>
+                        <a href="/lista_brandings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Brand Books</a>
+                        <a href="/planejamento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Planejamento</a>
+                        <a href="/campanhas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Campanhas</a>
+                        <a href="/tarefas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tarefas</a>
+                        <a href="/atividades.html" class="px-4 py-2 hover:bg-slate-700 text-white">📅 Atividades</a>
+                        <a href="/timeline_cliente.html" class="px-4 py-2 hover:bg-slate-700 text-white">🕒 Timeline</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Execução <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/inbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Inbound</a>
+                        <a href="/outbound.html" class="px-4 py-2 hover:bg-slate-700 text-white">Outbound</a>
+                        <a href="/trafego_pago.html" class="px-4 py-2 hover:bg-slate-700 text-white">Tráfego Pago</a>
+                        <a href="/redes_sociais.html" class="px-4 py-2 hover:bg-slate-700 text-white">Redes Sociais</a>
+                        <a href="/storytelling.html" class="px-4 py-2 hover:bg-slate-700 text-white">Storytelling</a>
+                        <a href="/criativos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Criativos</a>
+                        <a href="/calendario_editorial.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calendário Editorial</a>
+                        <a href="/briefings.html" class="px-4 py-2 hover:bg-slate-700 text-white">Briefings</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Gestão <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/financeiro.html" class="px-4 py-2 hover:bg-slate-700 text-white">Financeiro</a>
+                        <a href="/propostas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Propostas</a>
+                        <a href="/produtos.html" class="px-4 py-2 hover:bg-slate-700 text-white">Produtos</a>
+                        <a href="/configuracoes.html" class="px-4 py-2 hover:bg-slate-700 text-white">Configurações</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">Inteligência <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute left-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col overflow-hidden">
+                        <a href="/metricas_sistema.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas do Sistema</a>
+                        <a href="/metricas.html" class="px-4 py-2 hover:bg-slate-700 text-white">Métricas de Tráfego</a>
+                        <a href="/calculadora-trafego.html" class="px-4 py-2 hover:bg-slate-700 text-white">Calculadora</a>
+                        <a href="/base_conhecimento.html" class="px-4 py-2 hover:bg-slate-700 text-white">Conhecimento</a>
+                    </div>
+                </div>
+
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors">Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+        
+    <header id="menu-cliente" class="bg-slate-900 border-b border-slate-800 p-4 relative z-50 hidden">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Reverse Marketing" class="h-8 w-auto object-contain">
+                <h1 class="text-xl font-bold">Área do Cliente</h1>
+            </div>
+            <nav id="nav-cliente" class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <a href="/portal_cliente.html" class="px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors font-bold text-orange-500">Meu Portal</a>
+                <button class="btn-sair bg-slate-800 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded transition-colors ml-2">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+        <script>
+            (function() {
+                const token = localStorage.getItem('token');
+                let isCliente = false;
+
+                if (token) {
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        if (payload.tipo === 'cliente') isCliente = true;
+                    } catch(e) {}
+                }
+
+                if (isCliente) {
+                    const menuAdminEl = document.getElementById('menu-admin');
+                    if (menuAdminEl) menuAdminEl.style.display = 'none';
+
+                    const menuClienteEl = document.getElementById('menu-cliente');
+                    if (menuClienteEl) menuClienteEl.classList.remove('hidden');
+
+                    const permissoes = JSON.parse(localStorage.getItem('permissoes') || '{}');
+                    const nav = document.getElementById('nav-cliente');
+                    const btnSair = nav.querySelector('.btn-sair');
+
+                    const addLink = (href, texto) => {
+                        const a = document.createElement('a');
+                        a.href = href;
+                        a.className = 'px-3 py-2 rounded hover:bg-slate-800 hover:text-white transition-colors';
+                        a.innerText = texto;
+                        nav.insertBefore(a, btnSair);
+                    };
+
+                    if (permissoes.pode_ver_calendario) addLink('/calendario_editorial.html', 'Calendário');
+                    if (permissoes.pode_ver_financeiro) addLink('/financeiro.html', 'Financeiro');
+                    if (permissoes.pode_ver_metricas)   addLink('/metricas.html', 'Resultados');
+                    if (permissoes.pode_ver_branding)   addLink('/lista_brandings.html', 'Minha Marca');
+                    if (permissoes.pode_ver_campanhas)  addLink('/campanhas.html', 'Campanhas');
+                    if (permissoes.pode_ver_propostas)  addLink('/propostas.html', 'Propostas');
+                    if (permissoes.pode_ver_tarefas)    addLink('/tarefas.html', 'Minhas Tarefas');
+
+                } else {
+                    const menuClienteEl = document.getElementById('menu-cliente');
+                    if (menuClienteEl) menuClienteEl.style.display = 'none';
+
+                    const menuAdminEl = document.getElementById('menu-admin');
+                    if (menuAdminEl) menuAdminEl.classList.remove('hidden');
+                }
+
+                document.querySelectorAll('.btn-sair').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('permissoes');
+                        window.location.href = '/login.html';
+                    });
+                });
+            })();
+        </script>
+    
+
+<!-- Cabeçalho -->
+
+
+<main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- Seletor de cliente -->
+    <div class="card rounded-xl p-4">
+        <label class="block text-xs text-slate-400 mb-2 uppercase">Selecione o cliente</label>
+        <div class="flex flex-wrap gap-3">
+            <select id="selCliente" class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white flex-1 min-w-[240px]">
+                <option value="">Carregando...</option>
+            </select>
+            <button onclick="carregarTimeline()" class="bg-laranja hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold">
+                🔍 Ver Timeline
+            </button>
+        </div>
+    </div>
+
+    <!-- Info do cliente + filtros -->
+    <div id="painelCliente" class="hidden">
+        <div class="card rounded-xl p-4 flex flex-wrap justify-between items-center gap-3">
+            <div>
+                <div class="text-xs text-slate-400 uppercase">Cliente</div>
+                <div id="nomeCliente" class="text-lg font-bold text-laranja"></div>
+                <div id="emailCliente" class="text-sm text-slate-400"></div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <div class="text-xs text-slate-400 uppercase">Total de Eventos</div>
+                    <div id="totalEventos" class="text-2xl font-bold text-laranja">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros de tipo de evento -->
+        <div class="card rounded-xl p-4 mt-4">
+            <div class="text-xs text-slate-400 mb-2 uppercase">Filtrar por tipo</div>
+            <div id="filtrosTipo" class="flex flex-wrap gap-2">
+                <!-- Preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline -->
+    <div id="containerTimeline" class="hidden">
+        <div id="timeline" class="timeline"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="card rounded-xl p-8 text-center text-slate-500 hidden">
+        <div class="text-5xl mb-3">📭</div>
+        <div>Nenhum evento encontrado para este cliente ainda.</div>
+        <div class="text-sm mt-2">As atividades, tarefas, criativos, propostas e demais interações aparecerão aqui.</div>
+    </div>
+
+</main>
+
+<script>
+// =====================================================
+// Config
+// =====================================================
+const token = localStorage.getItem('token');
+if (!token) window.location.href = '/login.html';
+const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+
+let dadosTimeline = null;
+let filtroAtivo = ''; // tipo de evento selecionado (vazio = todos)
+
+// =====================================================
+// Helpers
+// =====================================================
+function fmtDataHora(s) {
+    if (!s) return '-';
+    const d = new Date(s);
+    return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+}
+
+function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('permissoes');
+    window.location.href = '/login.html';
+}
+
+function iconeTipo(tipo) {
+    const map = {
+        atividade: '📅', tarefa: '✅', criativo: '🎨', post: '📱',
+        proposta: '📄', financeiro: '💰', briefing: '📝', branding: '🎨',
+        mapeamento: '🗺️', comentario: '💬'
+    };
+    return map[tipo] || '•';
+}
+
+// =====================================================
+// Carregar clientes
+// =====================================================
+async function carregarClientes() {
+    try {
+        const r = await fetch('/api/clientes', { headers });
+        const clientes = await r.json();
+        const sel = document.getElementById('selCliente');
+        sel.innerHTML = '<option value="">— Selecione —</option>';
+        clientes.forEach(c => {
+            const o = document.createElement('option');
+            o.value = c.id;
+            o.textContent = c.nome;
+            sel.appendChild(o);
+        });
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+// =====================================================
+// Carregar timeline
+// =====================================================
+async function carregarTimeline() {
+    const id = document.getElementById('selCliente').value;
+    if (!id) {
+        Swal.fire('Atenção', 'Selecione um cliente.', 'warning');
+        return;
+    }
+
+    try {
+        const r = await fetch('/api/timeline/' + id, { headers });
+        if (!r.ok) throw new Error('Falha ao carregar timeline');
+        dadosTimeline = await r.json();
+
+        // Painel cliente
+        document.getElementById('painelCliente').classList.remove('hidden');
+        document.getElementById('nomeCliente').textContent = dadosTimeline.cliente.nome;
+        document.getElementById('emailCliente').textContent = dadosTimeline.cliente.email || '';
+        document.getElementById('totalEventos').textContent = dadosTimeline.total;
+
+        // Filtros por tipo
+        renderFiltros();
+
+        // Timeline
+        renderTimeline();
+
+    } catch(e) {
+        console.error(e);
+        Swal.fire('Erro', e.message, 'error');
+    }
+}
+
+// =====================================================
+// Filtros de tipo
+// =====================================================
+function renderFiltros() {
+    const tipos = {};
+    dadosTimeline.eventos.forEach(e => {
+        tipos[e.tipo] = (tipos[e.tipo] || 0) + 1;
+    });
+
+    const container = document.getElementById('filtrosTipo');
+    container.innerHTML = '';
+
+    // Botão "Todos"
+    const btnTodos = document.createElement('button');
+    btnTodos.className = filtroAtivo === '' ? 'tag tag-atividade' : 'tag tag-comentario';
+    btnTodos.textContent = `Todos (${dadosTimeline.total})`;
+    btnTodos.onclick = () => { filtroAtivo = ''; renderFiltros(); renderTimeline(); };
+    container.appendChild(btnTodos);
+
+    Object.keys(tipos).sort().forEach(t => {
+        const btn = document.createElement('button');
+        btn.className = filtroAtivo === t ? `tag tag-${t}` : 'tag tag-comentario';
+        btn.textContent = `${iconeTipo(t)} ${t} (${tipos[t]})`;
+        btn.onclick = () => { filtroAtivo = t; renderFiltros(); renderTimeline(); };
+        container.appendChild(btn);
+    });
+}
+
+// =====================================================
+// Render timeline
+// =====================================================
+function renderTimeline() {
+    const container = document.getElementById('timeline');
+    const empty = document.getElementById('emptyState');
+    const wrap = document.getElementById('containerTimeline');
+
+    const eventos = filtroAtivo
+        ? dadosTimeline.eventos.filter(e => e.tipo === filtroAtivo)
+        : dadosTimeline.eventos;
+
+    if (eventos.length === 0) {
+        wrap.classList.add('hidden');
+        empty.classList.remove('hidden');
+        return;
+    }
+
+    empty.classList.add('hidden');
+    wrap.classList.remove('hidden');
+
+    container.innerHTML = eventos.map(e => `
+        <div class="evento" data-tipo="${e.tipo}">
+            <div class="evento-card">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="tag tag-${e.tipo}">${iconeTipo(e.tipo)} ${e.tipo}</span>
+                        ${e.subtipo ? `<span class="text-xs text-slate-400">${escapeHtml(e.subtipo)}</span>` : ''}
+                    </div>
+                    <div class="text-xs text-slate-400">${fmtDataHora(e.data)}</div>
+                </div>
+                <div class="font-semibold text-white">${escapeHtml(e.titulo)}</div>
+                ${e.descricao ? `<div class="text-sm text-slate-300 mt-1 whitespace-pre-line">${escapeHtml(e.descricao)}</div>` : ''}
+                ${e.status ? `<div class="text-xs text-slate-500 mt-2">Status: <span class="text-slate-300">${escapeHtml(e.status)}</span></div>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+// =====================================================
+// Init
+// =====================================================
+(async function init() {
+    await carregarClientes();
+})();
+</script>
+
+
+        <script>
+            (function() {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.tipo === 'cliente') {
+                        const paginasAdmin = [
+                            'financeiro.html', 'clientes.html', 'leads.html', 'prospects.html', 'campanhas.html',
+                            'mapeamento_cliente.html', 'planejamento.html', 'trafego_pago.html',
+                            'metricas_sistema.html', 'calculadora-trafego.html', 'redes_sociais.html',
+                            'storytelling.html', 'base_conhecimento.html', 'produtos.html',
+                            'inbound.html', 'outbound.html', 'criativos.html', 'propostas.html',
+                            'branding.html', 'permissoes.html', 'configuracoes.html',
+                            'atividades.html', 'timeline_cliente.html'
+                        ];
+                        const urlAtual = window.location.pathname.split('/').pop();
+                        if (paginasAdmin.includes(urlAtual)) {
+                            alert('Acesso negado. Esta área é restrita.');
+                            window.location.href = '/portal_cliente.html';
+                        }
+                    }
+                } catch(e) {}
+            })();
+        </script>
+    </body>
+</html>

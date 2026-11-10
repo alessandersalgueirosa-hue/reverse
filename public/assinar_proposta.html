@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assinar Proposta — Reverse Marketing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#f97316',
+            dark: '#1e293b',
+            grayish: '#64748b',
+            success: '#16a34a',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="bg-slate-800 border-b border-slate-700 py-4 px-6">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center font-bold text-white">R</div>
+        <div>
+          <h1 class="font-bold text-lg">Reverse Marketing</h1>
+          <p class="text-xs text-slate-400">Proposta Comercial Digital</p>
+        </div>
+      </div>
+      <span id="badgeStatus" class="hidden text-xs px-3 py-1 rounded-full font-bold"></span>
+    </div>
+  </header>
+
+  <!-- CONTAINER PRINCIPAL -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-8">
+
+    <!-- LOADING -->
+    <div id="loading" class="text-center py-20">
+      <div class="inline-block w-10 h-10 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
+      <p class="mt-4 text-slate-400">Carregando proposta...</p>
+    </div>
+
+    <!-- ERRO -->
+    <div id="erro" class="hidden bg-red-900/30 border border-red-700 rounded-lg p-6 text-center">
+      <p class="text-4xl mb-2">⚠️</p>
+      <h2 class="text-xl font-bold text-red-300" id="erroTitulo">Proposta não encontrada</h2>
+      <p class="text-slate-400 mt-2" id="erroMensagem">Verifique o link recebido ou entre em contato com a agência.</p>
+    </div>
+
+    <!-- CONTEÚDO DA PROPOSTA -->
+    <div id="conteudo" class="hidden space-y-6">
+
+      <!-- CARD: RESUMO -->
+      <div class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
+        <div class="bg-brand px-6 py-8">
+          <p class="text-sm text-orange-100 uppercase tracking-widest mb-2">Proposta Comercial</p>
+          <h2 class="text-2xl md:text-3xl font-bold text-white">Preparada para</h2>
+          <p class="text-3xl md:text-4xl font-extrabold text-white mt-1" id="clienteNome">—</p>
+          <p class="text-sm text-orange-100 mt-2" id="clienteEmail"></p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
+          <div>
+            <p class="text-xs text-slate-400 uppercase">Proposta</p>
+            <p class="font-bold text-lg" id="propostaId">#—</p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 uppercase">Data</p>
+            <p class="font-bold text-lg" id="propostaData">—</p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 uppercase">Validade</p>
+            <p class="font-bold text-lg" id="propostaValidade">—</p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 uppercase">Investimento</p>
+            <p class="font-bold text-lg text-success" id="propostaValor">—</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVIÇOS -->
+      <div class="bg-slate-800 rounded-xl border border-slate-700 p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-1 h-6 bg-brand rounded"></div>
+          <h3 class="text-xl font-bold">Escopo dos Serviços</h3>
+        </div>
+        <div id="listaServicos" class="space-y-4"></div>
+      </div>
+
+      <!-- CONDIÇÕES -->
+      <div class="bg-slate-800 rounded-xl border border-slate-700 p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-1 h-6 bg-brand rounded"></div>
+          <h3 class="text-xl font-bold">Condições Comerciais</h3>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs text-slate-400 uppercase">Condições de Pagamento</p>
+            <p class="font-medium" id="propostaPagamento">—</p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 uppercase">Observações</p>
+            <p class="font-medium whitespace-pre-wrap" id="propostaObservacoes">—</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCO DE AÇÕES (aparece só se pendente) -->
+      <div id="acoes" class="hidden bg-slate-800 rounded-xl border-2 border-brand p-6">
+        <h3 class="text-xl font-bold mb-2">Esta é a sua proposta!</h3>
+        <p class="text-slate-400 text-sm mb-6">
+          Ao clicar em <strong class="text-success">Aceitar</strong>, você concorda com os termos desta proposta.
+          O aceite será registrado com data, hora e endereço IP para fins de comprovação.
+        </p>
+
+        <div class="flex flex-col md:flex-row gap-3">
+          <button onclick="aceitar()" id="btnAceitar"
+            class="flex-1 bg-success hover:bg-green-700 text-white py-4 px-6 rounded-lg font-bold text-lg transition">
+            ✅ Aceitar Proposta
+          </button>
+          <button onclick="mostrarRecusa()" id="btnRecusar"
+            class="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 px-6 rounded-lg font-bold text-lg transition">
+            ❌ Recusar
+          </button>
+        </div>
+
+        <!-- FORM DE RECUSA (escondido até clicar em recusar) -->
+        <div id="boxRecusa" class="hidden mt-6 pt-6 border-t border-slate-700">
+          <label class="block text-sm font-medium mb-2">
+            Antes de recusar, conte o que motivou a decisão (mínimo 10 caracteres):
+          </label>
+          <textarea id="motivo" rows="4"
+            class="w-full bg-slate-900 rounded-lg p-3 text-white border border-slate-700 focus:border-brand focus:outline-none"
+            placeholder="Ex: O valor está acima do nosso orçamento atual, ou precisamos de ajustes no escopo..."></textarea>
+          <div class="flex gap-3 mt-3">
+            <button onclick="recusar()" id="btnConfirmarRecusa"
+              class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition">
+              Confirmar Recusa
+            </button>
+            <button onclick="esconderRecusa()"
+              class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg transition">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCO DE RESULTADO (aparece se já aceita/recusada) -->
+      <div id="resultado" class="hidden rounded-xl p-8 text-center border-2"></div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-800 border-t border-slate-700 py-4 px-6 text-center text-xs text-slate-500">
+    Reverse Marketing | Estratégia e Resultados · Este documento tem validade conforme MP 2.200-2/2001
+  </footer>
+
+<script>
+  // ============================================================
+  // EXTRAÇÃO DO TOKEN DA URL (/assinar/{token})
+  // ============================================================
+  const partesUrl = window.location.pathname.split('/').filter(Boolean);
+  const token = partesUrl[partesUrl.length - 1];
+
+  let propostaAtual = null;
+  let processando = false; // trava anti-duplo-clique
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+  function formatarMoeda(valor) {
+    return 'R$ ' + parseFloat(valor || 0).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function formatarData(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function mostrarErro(titulo, mensagem) {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('conteudo').classList.add('hidden');
+    document.getElementById('erro').classList.remove('hidden');
+    document.getElementById('erroTitulo').textContent = titulo;
+    document.getElementById('erroMensagem').textContent = mensagem;
+  }
+
+  function mostrarBadge(texto, cor) {
+    const badge = document.getElementById('badgeStatus');
+    badge.textContent = texto;
+    badge.className = `text-xs px-3 py-1 rounded-full font-bold bg-${cor}-900 text-${cor}-300`;
+    badge.classList.remove('hidden');
+  }
+
+  function bloquearBotoes() {
+    document.getElementById('btnAceitar').disabled = true;
+    document.getElementById('btnRecusar').disabled = true;
+    document.getElementById('btnAceitar').classList.add('opacity-50', 'cursor-not-allowed');
+    document.getElementById('btnRecusar').classList.add('opacity-50', 'cursor-not-allowed');
+  }
+
+  // ============================================================
+  // CARREGAR PROPOSTA
+  // ============================================================
+  async function carregar() {
+    if (!token || token.length < 10) {
+      return mostrarErro('Link inválido', 'Este link não contém um token válido. Peça um novo link à agência.');
+    }
+
+    try {
+      const resposta = await fetch(`/api/proposta-publica/${token}`);
+
+      if (resposta.status === 404) {
+        return mostrarErro('Proposta não encontrada', 'Verifique o link recebido. A proposta pode ter sido removida.');
+      }
+
+      if (!resposta.ok) {
+        throw new Error('Erro ao carregar proposta');
+      }
+
+      propostaAtual = await resposta.json();
+      renderizarProposta(propostaAtual);
+
+    } catch (erro) {
+      console.error('Erro ao carregar:', erro);
+      mostrarErro('Erro de conexão', 'Não foi possível carregar a proposta. Tente novamente em instantes.');
+    }
+  }
+
+  // ============================================================
+  // RENDERIZAR
+  // ============================================================
+  function renderizarProposta(p) {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('conteudo').classList.remove('hidden');
+
+    // Dados do cliente
+    document.getElementById('clienteNome').textContent = p.cliente_nome || '—';
+    document.getElementById('clienteEmail').textContent = p.cliente_email || '';
+
+    // Dados da proposta
+    document.getElementById('propostaId').textContent = '#' + p.id;
+    document.getElementById('propostaData').textContent = formatarData(p.data_criacao);
+    document.getElementById('propostaValidade').textContent = (p.validade || 15) + ' dias';
+    document.getElementById('propostaValor').textContent = formatarMoeda(p.valor_total);
+
+    document.getElementById('propostaPagamento').textContent = p.condicoes_pagamento || 'A combinar';
+    document.getElementById('propostaObservacoes').textContent = p.observacoes || 'Sem observações adicionais.';
+
+    // Serviços
+    const lista = document.getElementById('listaServicos');
+    lista.innerHTML = '';
+    const servicos = Array.isArray(p.servicos) ? p.servicos : [];
+
+    if (servicos.length === 0) {
+      lista.innerHTML = '<p class="text-slate-400">Nenhum serviço detalhado nesta proposta.</p>';
+    } else {
+      servicos.forEach((s, i) => {
+        const div = document.createElement('div');
+        div.className = 'flex gap-4 pb-4 border-b border-slate-700 last:border-0 last:pb-0';
+        div.innerHTML = `
+          <div class="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white font-bold shrink-0">
+            ${i + 1}
+          </div>
+          <div>
+            <h4 class="font-bold text-lg">${escaparHtml(s.nome || 'Serviço')}</h4>
+            <p class="text-slate-400 text-sm mt-1">${escaparHtml(s.descricao || '')}</p>
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    // Estado da proposta
+    const status = p.status_aceite || 'pendente';
+
+    if (status === 'pendente') {
+      mostrarBadge('⏳ Aguardando sua decisão', 'yellow');
+      document.getElementById('acoes').classList.remove('hidden');
+    } else if (status === 'aceita') {
+      mostrarBadge('✅ Proposta aceita', 'green');
+      mostrarResultado(
+        'success',
+        '✅ Proposta Aceita',
+        `Você aceitou esta proposta em <strong>${formatarData(p.aceite_em)}</strong>.`,
+        'A agência já foi notificada. Em caso de dúvidas, entre em contato pelo WhatsApp.'
+      );
+    } else if (status === 'recusada') {
+      mostrarBadge('❌ Proposta recusada', 'red');
+      mostrarResultado(
+        'error',
+        '❌ Proposta Recusada',
+        `Você recusou esta proposta em <strong>${formatarData(p.recusa_em)}</strong>.`,
+        p.recusa_motivo ? `Motivo registrado: "${escaparHtml(p.recusa_motivo)}"` : ''
+      );
+    }
+  }
+
+  function mostrarResultado(tipo, titulo, mensagem, extra) {
+    const div = document.getElementById('resultado');
+    const cor = tipo === 'success' ? 'green' : 'red';
+    div.className = `rounded-xl p-8 text-center border-2 border-${cor}-700 bg-${cor}-900/20`;
+    div.innerHTML = `
+      <h3 class="text-2xl font-bold text-${cor}-300 mb-3">${titulo}</h3>
+      <p class="text-slate-300">${mensagem}</p>
+      ${extra ? `<p class="text-slate-400 text-sm mt-3">${extra}</p>` : ''}
+    `;
+    div.classList.remove('hidden');
+  }
+
+  function escaparHtml(texto) {
+    const div = document.createElement('div');
+    div.textContent = texto;
+    return div.innerHTML;
+  }
+
+  // ============================================================
+  // AÇÕES — ACEITAR / RECUSAR
+  // ============================================================
+  async function aceitar() {
+    if (processando) return;
+
+    if (!confirm('Confirmar o aceite desta proposta?\n\nAo aceitar, você concorda com os termos apresentados.')) {
+      return;
+    }
+
+    processando = true;
+    bloquearBotoes();
+
+    try {
+      const resposta = await fetch(`/api/proposta-publica/${token}/aceitar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        alert(dados.error || 'Erro ao aceitar proposta.');
+        processando = false;
+        return;
+      }
+
+      // Recarrega para mostrar o estado "aceita"
+      window.location.reload();
+
+    } catch (erro) {
+      console.error('Erro ao aceitar:', erro);
+      alert('Erro de conexão. Tente novamente.');
+      processando = false;
+    }
+  }
+
+  function mostrarRecusa() {
+    document.getElementById('boxRecusa').classList.remove('hidden');
+    document.getElementById('motivo').focus();
+    document.getElementById('btnRecusar').classList.add('hidden');
+  }
+
+  function esconderRecusa() {
+    document.getElementById('boxRecusa').classList.add('hidden');
+    document.getElementById('btnRecusar').classList.remove('hidden');
+  }
+
+  async function recusar() {
+    if (processando) return;
+
+    const motivo = document.getElementById('motivo').value.trim();
+
+    if (motivo.length < 10) {
+      alert('Por favor, descreva o motivo da recusa com pelo menos 10 caracteres.');
+      document.getElementById('motivo').focus();
+      return;
+    }
+
+    if (!confirm('Confirmar a recusa desta proposta?')) return;
+
+    processando = true;
+    document.getElementById('btnConfirmarRecusa').disabled = true;
+    document.getElementById('btnConfirmarRecusa').classList.add('opacity-50', 'cursor-not-allowed');
+
+    try {
+      const resposta = await fetch(`/api/proposta-publica/${token}/recusar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ motivo })
+      });
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        alert(dados.error || 'Erro ao registrar recusa.');
+        processando = false;
+        document.getElementById('btnConfirmarRecusa').disabled = false;
+        document.getElementById('btnConfirmarRecusa').classList.remove('opacity-50', 'cursor-not-allowed');
+        return;
+      }
+
+      // Recarrega para mostrar o estado "recusada"
+      window.location.reload();
+
+    } catch (erro) {
+      console.error('Erro ao recusar:', erro);
+      alert('Erro de conexão. Tente novamente.');
+      processando = false;
+    }
+  }
+
+  // ============================================================
+  // START
+  // ============================================================
+  carregar();
+</script>
+</body>
+</html>

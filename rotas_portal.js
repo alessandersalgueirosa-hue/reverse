@@ -6,15 +6,86 @@ const mailer = require('./mailer');
 module.exports = function(app, db, verificarToken) {
     
     // ==========================================
-    // TAREFAS
+    // TAREFAS (ADMIN) - ROTAS CORRIGIDAS
+    // ==========================================
+    app.get('/api/admin/tarefas/dados', verificarToken, async (req, res) => {
+        try {
+            const clientes = await db.query('SELECT id, nome FROM clientes ORDER BY nome');
+            const leads = await db.query('SELECT id, nome FROM leads ORDER BY nome');
+            res.json({ clientes: clientes.rows, leads: leads.rows });
+        } catch (error) {
+            console.error("Erro ao buscar dados de tarefas:", error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    app.get('/api/admin/tarefas', verificarToken, async (req, res) => {
+        try {
+            const result = await db.query(`
+                SELECT t.*, c.nome as cliente_nome, l.nome as lead_nome 
+                FROM tarefas t 
+                LEFT JOIN clientes c ON c.id = t.cliente_id 
+                LEFT JOIN leads l ON l.id = t.lead_id 
+                ORDER BY t.data_criacao DESC
+            `);
+            res.json(result.rows);
+        } catch (error) {
+            console.error("Erro ao buscar tarefas:", error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    app.post('/api/admin/tarefas', verificarToken, async (req, res) => {
+        try {
+            const { titulo, descricao, cliente_id, lead_id, data_vencimento } = req.body;
+            const result = await db.query(
+                `INSERT INTO tarefas (titulo, descricao, cliente_id, lead_id, data_vencimento, concluida, criado_por) 
+                 VALUES ($1, $2, $3, $4, $5, false, 'admin') RETURNING *`,
+                [titulo, descricao || null, cliente_id || null, lead_id || null, data_vencimento || null]
+            );
+            res.status(201).json(result.rows[0]);
+        } catch (error) {
+            console.error("Erro ao criar tarefa (Admin):", error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    app.put('/api/admin/tarefas/:id', verificarToken, async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { concluida } = req.body;
+            await db.query('UPDATE tarefas SET concluida = $1 WHERE id = $2', [concluida, id]);
+            res.json({ success: true });
+        } catch (error) {
+            console.error("Erro ao atualizar tarefa:", error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    app.delete('/api/admin/tarefas/:id', verificarToken, async (req, res) => {
+        try {
+            const { id } = req.params;
+            await db.query('DELETE FROM tarefas WHERE id = $1', [id]);
+            res.json({ success: true });
+        } catch (error) {
+            console.error("Erro ao excluir tarefa:", error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    // ==========================================
+    // TAREFAS (PORTAL DO CLIENTE)
     // ==========================================
     app.get('/api/portal/tarefas', verificarToken, async (req, res) => {
         try {
-            const isCliente = req.user.tipo === 'cliente';
+            const u = req.user || req.usuario || req.cliente || {};
+            const isCliente = u.tipo !== 'admin' && u.role !== 'admin';
+            const clienteId = u.id || u.cliente_id || u.sub;
+
             const query = isCliente 
                 ? 'SELECT * FROM tarefas WHERE cliente_id = $1 ORDER BY data_criacao DESC' 
                 : 'SELECT * FROM tarefas ORDER BY data_criacao DESC';
-            const params = isCliente ? [req.user.id] : [];
+            const params = isCliente ? [clienteId] : [];
             const result = await db.query(query, params);
             res.json(result.rows);
         } catch (error) {
@@ -23,16 +94,60 @@ module.exports = function(app, db, verificarToken) {
         }
     });
 
+    app.post('/api/portal/tarefas', verificarToken, async (req, res) => {
+        try {
+            const u = req.user || req.usuario || req.cliente || {};
+            const isCliente = u.tipo !== 'admin' && u.role !== 'admin';
+            const clienteId = u.id || u.cliente_id || u.sub;
+
+            if (!isCliente || !clienteId) {
+                return res.status(403).json({ error: 'Apenas clientes podem criar tarefas por esta rota.' });
+            }
+            
+            const { titulo, descricao, data_vencimento } = req.body;
+            if (!titulo) return res.status(400).json({ error: 'O título é obrigatório.' });
+
+            const result = await db.query(
+                `INSERT INTO tarefas (titulo, descricao, data_vencimento, cliente_id, concluida, criado_por) 
+                 VALUES ($1, $2, $3, $4, false, 'cliente') RETURNING *`,
+                [titulo, descricao || null, data_vencimento || null, clienteId]
+            );
+
+            try {
+                if (mailer && mailer.enviarEmailAgencia) {
+                    const infoCliente = await db.query('SELECT nome FROM clientes WHERE id = $1', [clienteId]);
+                    const nomeCliente = infoCliente.rows[0]?.nome || 'Um cliente';
+                    
+                    mailer.enviarEmailAgencia(
+                        '📌 Nova Tarefa Solicitada pelo Cliente', 
+                        `<p>O cliente <strong>${nomeCliente}</strong> criou uma nova tarefa no portal:</p>
+                         <p><strong>Título:</strong> ${titulo}</p>
+                         <p><strong>Descrição:</strong> ${descricao || 'Sem descrição'}</p>
+                         <p><strong>Prazo Desejado:</strong> ${data_vencimento ? new Date(data_vencimento).toLocaleDateString('pt-BR') : 'Não informado'}</p>`
+                    ).catch(() => {});
+                }
+            } catch (e) { console.error("Erro ao notificar agência:", e); }
+
+            res.status(201).json(result.rows[0]);
+        } catch (error) {
+            console.error("Erro ao criar tarefa pelo cliente:", error.message);
+            res.status(500).json({ error: 'Erro ao criar tarefa.' });
+        }
+    });
+
     // ==========================================
     // CRIATIVOS (Listar, Aprovar e Recusar)
     // ==========================================
     app.get('/api/portal/criativos', verificarToken, async (req, res) => {
         try {
-            const isCliente = req.user.tipo === 'cliente';
+            const u = req.user || req.usuario || req.cliente || {};
+            const isCliente = u.tipo !== 'admin' && u.role !== 'admin';
+            const clienteId = u.id || u.cliente_id || u.sub;
+            
             const query = isCliente 
                 ? 'SELECT c.*, c.feedback AS feedback_cliente, cl.nome AS cliente_nome FROM criativos c LEFT JOIN clientes cl ON cl.id = c.cliente_id WHERE c.cliente_id = $1 ORDER BY c.data_criacao DESC'
                 : 'SELECT c.*, c.feedback AS feedback_cliente, cl.nome AS cliente_nome FROM criativos c LEFT JOIN clientes cl ON cl.id = c.cliente_id ORDER BY c.data_criacao DESC';
-            const params = isCliente ? [req.user.id] : [];
+            const params = isCliente ? [clienteId] : [];
             const result = await db.query(query, params);
             res.json(result.rows);
         } catch (error) {
@@ -85,11 +200,13 @@ module.exports = function(app, db, verificarToken) {
     });
 
     // ==========================================
-    // BRIEFING (A ROTA QUE ESTAVA FALTANDO)
+    // BRIEFING
     // ==========================================
     app.get('/api/portal/briefing', verificarToken, async (req, res) => {
         try {
-            const result = await db.query('SELECT * FROM briefings WHERE cliente_id = $1', [req.user.id]);
+            const u = req.user || req.usuario || req.cliente || {};
+            const clienteId = u.id || u.cliente_id || u.sub;
+            const result = await db.query('SELECT * FROM briefings WHERE cliente_id = $1', [clienteId]);
             res.json(result.rows[0] || {});
         } catch (error) {
             console.error("Erro ao buscar briefing:", error.message);
@@ -99,7 +216,8 @@ module.exports = function(app, db, verificarToken) {
 
     app.post('/api/portal/briefing', verificarToken, async (req, res) => {
         try {
-            const clienteId = req.user.id;
+            const u = req.user || req.usuario || req.cliente || {};
+            const clienteId = u.id || u.cliente_id || u.sub;
             const { empresa, segmento, publico_alvo, concorrentes, diferenciais, identidade_visual, redes_sociais, site } = req.body;
 
             console.log("🔥 Recebendo dados do briefing para o cliente:", clienteId);
@@ -134,8 +252,10 @@ module.exports = function(app, db, verificarToken) {
     // ==========================================
     app.get('/api/portal/relatorio', verificarToken, async (req, res) => {
         try {
-            const isCliente = req.user.tipo === 'cliente';
-            const clienteId = req.user.id;
+            const u = req.user || req.usuario || req.cliente || {};
+            const isCliente = u.tipo !== 'admin' && u.role !== 'admin';
+            const clienteId = u.id || u.cliente_id || u.sub;
+            
             const queryCliente = isCliente ? `WHERE id = ${clienteId}` : `ORDER BY id LIMIT 1`;
             const infoCliente = await db.query(`SELECT nome, email FROM clientes ${queryCliente}`);
             if (infoCliente.rows.length === 0) return res.status(404).json({ error: 'Nenhum cliente encontrado.' });
